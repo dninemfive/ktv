@@ -25,22 +25,6 @@ namespace ktv
                 return null;
             }
         }
-        public static (string app, string? details)? Info
-        {
-            get
-            {
-                if(Title is not null)
-                {
-                    string[] split = Title.Split("–");
-                    return split.Length switch
-                    {
-                        0 => null,
-                        1 => (split[0].Trim(), null),
-                        _ => (split[..1].Aggregate((x, y) => $"{x}-{y}").Trim(), split.Last().Trim())
-                    };
-                }
-                return null;
-            }
-        }
+        public static (string app, string? details)? Info => Title?.SplitOn("-");
     }
 }

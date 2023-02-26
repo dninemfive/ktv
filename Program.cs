@@ -5,7 +5,7 @@ using System.IO;
 // ktv [interval] [times]
 const int MillisecondsPerMinute = 60 * 1000;
 const int Delay = 10;
-const string Path = "ktv.log";
+const string path = "ktv.log";
 const bool Debug = false;
 float interval = 1;
 float duration = interval * 24 * 4;
@@ -15,7 +15,7 @@ static void Log(string str)
 {
     string line = $"{DateTime.Now}\t{str}\n";
     Console.Write(line);
-    File.AppendAllText(Path, line);
+    File.AppendAllText(path, line);
 }
 static void PrintSleep(int milliseconds)
 {
@@ -24,20 +24,19 @@ static void PrintSleep(int milliseconds)
     if(Debug) Console.WriteLine("done!");
 }
 
-if (args is not null)
+foreach(string arg in args)
 {
-    if(args.Length > 0)
+    (string key, string? val)? kv = arg.SplitOn("=");
+    if(kv is not null)
     {
-        if (!float.TryParse(args[0], out interval))
-        {
-            Console.WriteLine($"Argument 1 was in the wrong format. Expected something which could be parsed as {interval.GetType().Name}, but got {args[0]} instead.");
-        }
-        if(args.Length > 1 && !float.TryParse(args[1], out duration))
-        {
-            Console.WriteLine($"Argument 2 was in the wrong format. Expected something which could be parsed as {duration.GetType().Name}, but got {args[1]} instead.");
-        }
+
+    }
+    else
+    {
+        Log(kv.DefinitelyReadableString());
     }
 }
+
 Console.WriteLine($"Beginning ktv. Will log active window title at {interval}-minute intervals for {duration} minutes starting in {Delay} seconds.");
 float elapsed = 0;
 PrintSleep(Delay * 1000);

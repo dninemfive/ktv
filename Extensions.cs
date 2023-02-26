@@ -9,9 +9,31 @@ namespace ktv
     internal static class Extensions
     {
         public static string DefinitelyReadableString(this object? obj, string text = "(null)") => obj?.ToString() ?? text;
-        public static T? TryParse<T>(this string str, string key)
+        public static (string a, string? b)? SplitOn(this string str, string separator)
         {
-
+            if (str is null) return null;
+            string[] split = str.Split(separator);
+            return split.Length switch
+            {
+                0 => null,
+                1 => (split[0].Trim(), null),
+                _ => (split[..1].Aggregate((x, y) => $"{x}{separator}{y}").Trim(), split.Last().Trim())
+            };
+        }
+        public static T? ParseArg<T>(this string str, string key, Func<string, T> parser)
+        {
+            if(str.SplitOn("=") is (string, string) notNull)
+            {
+                (string k, string v) = notNull;
+                if (v is null) return default;
+                if (k == key) return parser(v);
+            }
+            return default;
+        }
+        public static bool TrySet<T>(ref T variable, T? val)
+        {
+            if (val is not null) variable = val;
+            return val is not null;
         }
     }
 }
