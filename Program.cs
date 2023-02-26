@@ -4,12 +4,12 @@ using System.IO;
 
 // ktv [interval] [times]
 const int MillisecondsPerMinute = 60 * 1000;
-const int Delay = 10;
+const int Delay = 5;
 const bool Debug = false;
 float interval = 1;
 float duration = interval * 24 * 4;
 int aggregationInterval = 15;
-string logPath = $"{DateTime.Now}.ktv.log";
+string logPath = $"{DateTime.Now:yyyyMMddHHmmss}.ktv.log";
 
 void Log(string str)
 {
@@ -37,7 +37,7 @@ PrintSleep(Delay * 1000);
 Console.WriteLine("Logging has begun.");
 while(elapsed < duration)
 {
-    Console.WriteLine(elapsed);
+    Console.Write($"{elapsed:00.00}\t");
     (string app, string? details)? info = ActiveWindow.Info;
     if(info is not null)
     {
