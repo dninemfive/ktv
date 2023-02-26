@@ -20,20 +20,22 @@ namespace ktv
                 _ => (split[..1].Aggregate((x, y) => $"{x}{separator}{y}").Trim(), split.Last().Trim())
             };
         }
-        public static T? ParseArg<T>(this string str, string key, Func<string, T> parser)
+        public static T? Parse<T>(this string str, string key, Func<string, T> parser)
         {
             if(str.SplitOn("=") is (string, string) notNull)
             {
                 (string k, string v) = notNull;
                 if (v is null) return default;
-                if (k == key) return parser(v);
+                try
+                {
+                    if (k == key) return parser(v);
+                }
+                catch
+                {
+                    return default;
+                }
             }
             return default;
-        }
-        public static bool TrySet<T>(ref T variable, T? val)
-        {
-            if (val is not null) variable = val;
-            return val is not null;
         }
     }
 }
