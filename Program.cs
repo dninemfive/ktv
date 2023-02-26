@@ -60,14 +60,14 @@ while(elapsed < duration)
     elapsed += interval;
     if(elapsed >= aggregationInterval)
     {
-        mostRecentApps.Add($"{DateTime.Now}\t{apps.MostCommon()}");
-        apps.Clear();
+        apps.Add($"{DateTime.Now}\t{mostRecentApps.MostCommon()}");
+        mostRecentApps.Clear();
     }
 }
-if(apps.Any())
+if(mostRecentApps.Any())
 {
-    mostRecentApps.Add($"{DateTime.Now}\t{apps.MostCommon()}");
-    apps.Clear();
+    apps.Add($"{DateTime.Now}\t{mostRecentApps.MostCommon()}");
+    mostRecentApps.Clear();
 }
-foreach (string item in mostRecentApps) Console.WriteLine(item);
+foreach (string item in apps) Console.WriteLine(item);
 Console.WriteLine("Done.");
