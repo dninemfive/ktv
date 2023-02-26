@@ -8,7 +8,7 @@ int delay = 5;
 float interval = 1;
 float duration = interval * 24 * 4;
 float aggregationInterval = 15;
-string logPath = $"{DateTime.Now:yyyyMMddHHmmss}.ktv.log";
+string logPath = $"{DateTime.Now:yyyyMMddHHmmss}.ktv.log", aggregateLogPath = $"{DateTime.Now:yyyyMMddHHmmss}-aggregate.ktv.log";
 
 void Log(string str)
 {
@@ -35,6 +35,7 @@ float elapsed = 0;
 Sleep(delay * 1000);
 Console.WriteLine("Logging has begun.");
 List<string> mostRecentApps = new(), apps = new();
+float nextAggregationTime = aggregationInterval;
 while(elapsed < duration)
 {
     Console.Write($"{elapsed:00.00}\t");
@@ -58,10 +59,13 @@ while(elapsed < duration)
     }
     Sleep((int)(interval * MillisecondsPerMinute));
     elapsed += interval;
-    if(elapsed >= aggregationInterval)
+    if(elapsed >= nextAggregationTime)
     {
-        apps.Add($"{DateTime.Now}\t{mostRecentApps.MostCommon()}");
+        string mca = $"{DateTime.Now:HH:mm}\t{mostRecentApps.MostCommon()}";
+        apps.Add(mca);
+        File.AppendAllText(aggregateLogPath, mca);
         mostRecentApps.Clear();
+        nextAggregationTime += aggregationInterval;
     }
 }
 if(mostRecentApps.Any())
