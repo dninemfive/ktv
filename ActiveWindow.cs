@@ -25,6 +25,6 @@ namespace ktv
                 return null;
             }
         }
-        public static (string app, string? details)? Info => Title?.SplitOn("-");
+        public static (string app, string? details)? Info => Title?.SplitOn("-—");
     }
 }
