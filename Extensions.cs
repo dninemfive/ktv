@@ -30,7 +30,7 @@ namespace ktv
         }
         public static T? Parse<T>(this string str, string key, Func<string, T> parser)
         {
-            if(str.SplitOn("=", first: true) is (string, string) notNull)
+            if(str.SplitOn(ConsoleArg.ArgumentSeparator, first: true) is (string, string) notNull)
             {
                 (string k, string v) = notNull;
                 if (v is null) return default;
