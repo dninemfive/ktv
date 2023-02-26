@@ -15,7 +15,7 @@ namespace ktv
         public bool Invalid => InvalidStr is not null;
         public ConsoleArg(string arg)
         {
-            (string key, string? value)? tuple = arg.SplitOn(ArgumentSeparator, first: true);
+            (string key, string? value)? tuple = arg.SplitOn(ArgumentSeparator, TitlePosition.First);
             if (tuple is null)
             {
                 InvalidStr = arg;

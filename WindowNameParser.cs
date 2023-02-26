@@ -11,10 +11,10 @@ namespace ktv
     {
         public static List<WindowNameParser> List = new()
         {
-            new(new(".*— Mozilla Firefox.*", RegexOptions.Compiled), s => ("Mozilla Firefox", s.SplitOn("—", first: false)?.b)),
-            new(new("MINGW64:.*", RegexOptions.Compiled), s => s.SplitOn(":", first: true)),
-            new(new(".*- MultiMC 5", RegexOptions.Compiled), s => s.SplitOn("-", first: false)),
-            new(new("Minecraft.* - .*", RegexOptions.Compiled), s => s.SplitOn(" - ", first: true)),
+            new(new(".*— Mozilla Firefox.*", RegexOptions.Compiled), s => ("Mozilla Firefox", s.SplitOn("—", TitlePosition.Last)?.b)),
+            new(new("MINGW64:.*", RegexOptions.Compiled), s => s.SplitOn(":", TitlePosition.First)),
+            new(new(".*- MultiMC 5", RegexOptions.Compiled), s => s.SplitOn("-", TitlePosition.Last)),
+            new(new("Minecraft.* - .*", RegexOptions.Compiled), s => s.SplitOn(" - ", TitlePosition.First)),
             new(new(".*", RegexOptions.Compiled), s => (s, null))
         };
         public Regex Matcher { get; private set; }

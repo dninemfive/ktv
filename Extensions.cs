@@ -7,6 +7,7 @@ using System.Linq;
 
 namespace ktv
 {
+    public enum TitlePosition { First, Last }
     internal static class Extensions
     {
         public static string DefinitelyReadableString(this object? obj, string text = "(null)") => obj?.ToString() ?? text;
@@ -18,21 +19,22 @@ namespace ktv
             foreach (T item in enumerable) result += $"{item}, ";
             return $"[{result[..^2]}]";
         }
-        public static (string a, string? b)? SplitOn(this string str, string separators, bool first)
+        public static (string a, string? b)? SplitOn(this string str, string separator, TitlePosition titlePosition)
         {
             if (str is null) return null;
-            string[] split = str.Split(separators.ToCharArray());
-            return (split.Length, first) switch
+            string[] split = str.Split(separator);
+            return (split.Length, titlePosition) switch
             {
                 (0, _) => null,
                 (1, _) => (str.Trim(), null),
-                (_, true) => (split.First().Trim(), str[(split.First().Length + 1)..].Trim()),
-                (_, false) => (split.Last().Trim(), str[..^(split.Last().Length + 1)].Trim())
+                (_, TitlePosition.First) => (split.First().Trim(), str[(split.First().Length + 1)..].Trim()),
+                (_, TitlePosition.Last) => (split.Last().Trim(), str[..^(split.Last().Length + 1)].Trim()),
+                _ => throw new ArgumentOutOfRangeException(nameof(titlePosition))
             };
         }
         public static T? Parse<T>(this string str, string key, Func<string, T> parser)
         {
-            if(str.SplitOn(ConsoleArg.ArgumentSeparator, first: true) is (string, string) notNull)
+            if(str.SplitOn(ConsoleArg.ArgumentSeparator, TitlePosition.First) is (string, string) notNull)
             {
                 (string k, string v) = notNull;
                 if (v is null) return default;
