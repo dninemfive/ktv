@@ -29,13 +29,15 @@ namespace ktv
         {
             get
             {
-                (string, string?)? result = Title?.SplitOn("-—", first: false);
-                if(result is null) return null;
-                (string app, string? details) = result.Value;
-                return (app is null, details is null) switch
+                if(Title is string s)
                 {
-                    _ => (app ?? "fuck", details)
-                };
+                    foreach (WindowNameParser wnp in WindowNameParser.List)
+                    {
+                        if (wnp.Matches(Title)) return wnp.Split(Title);
+                    }
+                    return (s, null);
+                }
+                return null;
             }
         }
     }
