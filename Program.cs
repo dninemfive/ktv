@@ -63,7 +63,7 @@ while(elapsed < duration)
     {
         string mca = $"{DateTime.Now:HH:mm}\t{mostRecentApps.MostCommon()}";
         apps.Add(mca);
-        File.AppendAllText(aggregateLogPath, mca);
+        File.AppendAllText(aggregateLogPath, $"{mca}\n");
         mostRecentApps.Clear();
         nextAggregationTime += aggregationInterval;
     }
