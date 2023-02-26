@@ -9,7 +9,7 @@ namespace ktv
 {
     internal record WindowNameParser
     {
-        public static List<WindowNameParser> List = new()
+        public static readonly List<WindowNameParser> List = new()
         {
             new(new(".*— Mozilla Firefox.*", RegexOptions.Compiled), s => ("Mozilla Firefox", s.SplitOn("—", TitlePosition.Last)?.b)),
             new(new("MINGW64:.*", RegexOptions.Compiled), s => s.SplitOn(":", TitlePosition.First)),

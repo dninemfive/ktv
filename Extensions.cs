@@ -27,8 +27,8 @@ namespace ktv
             {
                 (0, _) => null,
                 (1, _) => (str.Trim(), null),
-                (_, TitlePosition.First) => (split.First().Trim(), str[(split.First().Length + 1)..].Trim()),
-                (_, TitlePosition.Last) => (split.Last().Trim(), str[..^(split.Last().Length + 1)].Trim()),
+                (_, TitlePosition.First) => (split.First().Trim(), str[(split.First().Length + separator.Length)..].Trim()),
+                (_, TitlePosition.Last) => (split.Last().Trim(), str[..^(split.Last().Length + separator.Length)].Trim()),
                 _ => throw new ArgumentOutOfRangeException(nameof(titlePosition))
             };
         }
@@ -60,6 +60,22 @@ namespace ktv
             IEnumerable<string> mostCommons = dict.Select(x => (x.Key, x.Value)).Where(x => x.Value == dict.Select(x => x.Value).Max()).Select(x => x.Key);
             if (mostCommons.Count() == 1) return mostCommons.First();
             return mostCommons.OrderBy(x => x).Readable();
+        }
+        // 1 minute = 6e10 ns; 1 tick = 1e2 ns; 6e10 / 1e2 = 6e8
+        public static long Ticks(this float minutes) => (long)(minutes * 6e8);
+        public static string Minutes(this float minutes)
+        {
+            if (minutes < 0) return "an undefined duration";
+            if (minutes == 0) return "an instant";
+            string result = "";
+            int wholeMinutes = (int)minutes;
+            if (wholeMinutes > 0) result += $"{wholeMinutes}m";
+            float seconds = (minutes - wholeMinutes) * 60;
+            int wholeSeconds = (int)seconds;
+            if (wholeSeconds > 0) result += $"{(result.Length > 0 ? " " : "")}{wholeSeconds}s";
+            int milliseconds = (int)((minutes - wholeMinutes - (wholeSeconds / 60f)) * 1000);
+            if (milliseconds > 0) result += $"{(result.Length > 0 ? " " : "")}{milliseconds}ms";
+            return result;
         }
     }
 }
