@@ -9,7 +9,7 @@ const bool Debug = false;
 float interval = 1;
 float duration = interval * 24 * 4;
 int aggregationInterval = 15;
-string logPath = "ktv.log";
+string logPath = $"{DateTime.Now}.ktv.log";
 
 void Log(string str)
 {
@@ -26,24 +26,18 @@ static void PrintSleep(int milliseconds)
 foreach(string arg in args)
 {
     ConsoleArg carg = new(arg);
-    Console.WriteLine(carg);
     if (carg.Try<float?>(nameof(interval), s => float.TryParse(s, out float f) ? f : null) is float f) interval = f;
     if (carg.Try<float?>(nameof(duration), s => float.TryParse(s, out float f) ? f : null) is float g) duration = g;
     if (carg.Try<int?>(nameof(aggregationInterval), s => int.TryParse(s, out int i) ? i : null) is int i) aggregationInterval = i;
     if (carg.Try(nameof(logPath), s => s) is string s) logPath = s;
 }
-Console.WriteLine($"\ninterval: {interval}");
-Console.WriteLine($"duration: {duration}");
-Console.WriteLine($"aggregationInterval: {aggregationInterval}");
-Console.WriteLine($"logPath: {logPath}");
-return;
 Console.WriteLine($"Beginning ktv. Will log active window title at {interval}-minute intervals for {duration} minutes starting in {Delay} seconds.");
 float elapsed = 0;
 PrintSleep(Delay * 1000);
 Console.WriteLine("Logging has begun.");
 while(elapsed < duration)
 {
-    //Log(ActiveWindow.Title.Nullable());
+    Console.WriteLine(elapsed);
     (string app, string? details)? info = ActiveWindow.Info;
     if(info is not null)
     {

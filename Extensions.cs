@@ -17,7 +17,7 @@ namespace ktv
             {
                 0 => null,
                 1 => (split[0].Trim(), null),
-                _ => (split[..1].Aggregate((x, y) => $"{x}{separator}{y}").Trim(), split.Last().Trim())
+                _ => (split.Last().Trim(), split[..1].Aggregate((x, y) => $"{x}{separator}{y}").Trim())
             };
         }
         public static T? Parse<T>(this string str, string key, Func<string, T> parser)
