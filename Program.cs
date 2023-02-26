@@ -4,7 +4,6 @@ using System.IO;
 
 // ktv [interval] [times]
 const int MillisecondsPerMinute = 60 * 1000;
-const bool Debug = false;
 int delay = 5;
 float interval = 1;
 float duration = interval * 24 * 4;
@@ -17,11 +16,9 @@ void Log(string str)
     Console.Write(line);
     File.AppendAllText(logPath, line);
 }
-static void PrintSleep(int milliseconds)
+static void Sleep(int milliseconds)
 {
-    if(Debug) Console.Write($"Sleeping for {milliseconds} milliseconds...");
     Thread.Sleep(milliseconds);
-    if(Debug) Console.WriteLine("done!");
 }
 foreach(string arg in args)
 {
@@ -34,7 +31,7 @@ foreach(string arg in args)
 }
 Console.WriteLine($"Beginning ktv. Will log active window title at {interval}-minute intervals for {duration} minutes starting in {delay} seconds.");
 float elapsed = 0;
-PrintSleep(delay * 1000);
+Sleep(delay * 1000);
 Console.WriteLine("Logging has begun.");
 while(elapsed < duration)
 {
@@ -42,25 +39,21 @@ while(elapsed < duration)
     (string app, string? details)? info = ActiveWindow.Info;
     if(info is not null)
     {
-        Console.WriteLine("fuck~");
         (string app, string? details) = info.Value;
         if(details is not null)
         {
-            Console.WriteLine("uwu");
             Log($"{app}\t{details}");
         }
         else
         {
-            Console.WriteLine("OwO");
             Log(app);
         }
     } 
     else
     {
-        Console.WriteLine("FUCK!");
         Log(ActiveWindow.Info.DefinitelyReadableString());
     }
-    PrintSleep((int)(interval * MillisecondsPerMinute));
+    Sleep((int)(interval * MillisecondsPerMinute));
     elapsed += interval;
 }
 Console.WriteLine("Done.");

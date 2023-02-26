@@ -20,7 +20,6 @@ namespace ktv
         {
             if (str is null) return null;
             string[] split = str.Split(separators.ToCharArray());
-            Console.WriteLine($"{split.Length} {split.Readable()}");
             return (split.Length, first) switch
             {
                 (0, _) => null,

@@ -28,13 +28,10 @@ namespace ktv
         public override string ToString() => InvalidStr ?? $"{Key.DefinitelyReadableString("(null key)")}={Value.DefinitelyReadableString("(null value)")}";
         public T? Try<T>(string key, Func<string, T> parser)
         {
-            //Console.Write($"\"{this}\".Try<{typeof(T).Name}>({key},..): ");
             if (Invalid || Value is null || Key != key)
             {
-                //Console.WriteLine("failed");
                 return default;
             }
-            //Console.WriteLine("succeeded");
             return parser(Value);
         }
     }
