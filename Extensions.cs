@@ -45,5 +45,17 @@ namespace ktv
             }
             return default;
         }
+        public static string MostCommon(this IEnumerable<string> enumerable)
+        {
+            Dictionary<string, int> dict = new();
+            foreach(string s in enumerable)
+            {
+                if (!dict.ContainsKey(s)) dict.Add(s, 1);
+                else dict[s]++;
+            }
+            IEnumerable<string> mostCommons = dict.Select(x => (x.Key, x.Value)).Where(x => x.Value == dict.Select(x => x.Value).Max()).Select(x => x.Key);
+            if (mostCommons.Count() == 1) return mostCommons.First();
+            return mostCommons.OrderBy(x => x).Readable();
+        }
     }
 }

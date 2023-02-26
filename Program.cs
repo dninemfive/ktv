@@ -7,7 +7,7 @@ const int MillisecondsPerMinute = 60 * 1000;
 int delay = 5;
 float interval = 1;
 float duration = interval * 24 * 4;
-int aggregationInterval = 15;
+float aggregationInterval = 15;
 string logPath = $"{DateTime.Now:yyyyMMddHHmmss}.ktv.log";
 
 void Log(string str)
@@ -25,14 +25,16 @@ foreach(string arg in args)
     ConsoleArg carg = new(arg);
     if (carg.Try<float?>(nameof(interval), s => float.TryParse(s, out float f) ? f : null) is float f) interval = f;
     if (carg.Try<float?>(nameof(duration), s => float.TryParse(s, out float f) ? f : null) is float g) duration = g;
-    if (carg.Try<int?>(nameof(aggregationInterval), s => int.TryParse(s, out int i) ? i : null) is int i) aggregationInterval = i;
-    if (carg.Try<int?>(nameof(delay), s => int.TryParse(s, out int i) ? i : null) is int j) delay = j;
+    if (carg.Try<float?>(nameof(aggregationInterval), s => float.TryParse(s, out float f) ? f : null) is float h) aggregationInterval = h;
+    if (carg.Try<int?>(nameof(delay), s => int.TryParse(s, out int i) ? i : null) is int i) delay = i;
     if (carg.Try(nameof(logPath), s => s) is string s) logPath = s;
 }
 Console.WriteLine($"Beginning ktv. Will log active window title at {interval}-minute intervals for {duration} minutes starting in {delay} seconds.");
+Console.WriteLine($"App usage will be aggregated every {aggregationInterval} minutes and printed once the program concludes.");
 float elapsed = 0;
 Sleep(delay * 1000);
 Console.WriteLine("Logging has begun.");
+List<string> mostRecentApps = new(), apps = new();
 while(elapsed < duration)
 {
     Console.Write($"{elapsed:00.00}\t");
@@ -40,6 +42,7 @@ while(elapsed < duration)
     if(info is not null)
     {
         (string app, string? details) = info.Value;
+        mostRecentApps.Add(app);
         if(details is not null)
         {
             Log($"{app}\t{details}");
@@ -55,5 +58,16 @@ while(elapsed < duration)
     }
     Sleep((int)(interval * MillisecondsPerMinute));
     elapsed += interval;
+    if(elapsed >= aggregationInterval)
+    {
+        mostRecentApps.Add($"{DateTime.Now}\t{apps.MostCommon()}");
+        apps.Clear();
+    }
 }
+if(apps.Any())
+{
+    mostRecentApps.Add($"{DateTime.Now}\t{apps.MostCommon()}");
+    apps.Clear();
+}
+foreach (string item in mostRecentApps) Console.WriteLine(item);
 Console.WriteLine("Done.");
