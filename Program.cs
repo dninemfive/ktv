@@ -36,7 +36,7 @@ Sleep(delay * 1000);
 Console.WriteLine("Logging has begun.");
 List<string> mostRecentApps = new(), apps = new();
 float nextAggregationTime = aggregationInterval;
-while(elapsed < duration)
+while(duration < 0 || elapsed < duration)
 {
     Console.Write($"{elapsed:00.00}\t");
     (string app, string? details)? info = ActiveWindow.Info;
