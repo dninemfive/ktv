@@ -26,17 +26,20 @@ static void PrintSleep(int milliseconds)
 
 foreach(string arg in args)
 {
-    (string key, string? val)? kv = arg.SplitOn("=");
-    if(kv is not null)
+    Console.WriteLine(new ConsoleArg(arg));
+    Console.WriteLine(arg.ParseArg<int?>("test", delegate (string s)
     {
-
-    }
-    else
-    {
-        Log(kv.DefinitelyReadableString());
-    }
+        try
+        {
+            return int.Parse(s);
+        }
+        catch
+        {
+            return null;
+        }
+    }).DefinitelyReadableString());
 }
-
+return;
 Console.WriteLine($"Beginning ktv. Will log active window title at {interval}-minute intervals for {duration} minutes starting in {Delay} seconds.");
 float elapsed = 0;
 PrintSleep(Delay * 1000);
