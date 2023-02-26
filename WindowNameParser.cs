@@ -16,6 +16,7 @@ namespace ktv
             new(new(".*- MultiMC 5", RegexOptions.Compiled), s => s.SplitOn("-", TitlePosition.Last)),
             new(new("Minecraft.* - .*", RegexOptions.Compiled), s => s.SplitOn(" - ", TitlePosition.First)),
             new(new(".*- Microsoft Visual Studio", RegexOptions.Compiled), s => ("Visual Studio", s.SplitOn(" - ", TitlePosition.Last)?.b)),
+            new(new(@".* \[foobar2000]", RegexOptions.Compiled), s => ("foobar2000", s.SplitOn(" [", TitlePosition.Last)?.b)),
             // todo: find a way to automatically figure out first/last?
             new(new(".* - .*", RegexOptions.Compiled), s => s.SplitOn(" - ", TitlePosition.Last)),
             new(new(".* — .*", RegexOptions.Compiled), s => s.SplitOn(" - ", TitlePosition.Last)),
