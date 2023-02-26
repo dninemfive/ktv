@@ -16,21 +16,21 @@ namespace ktv
             foreach (T item in enumerable) result += $"{item}, ";
             return $"[{result[..^2]}]";
         }
-        public static (string a, string? b)? SplitOn(this string str, string separators)
+        public static (string a, string? b)? SplitOn(this string str, string separators, bool first)
         {
             if (str is null) return null;
-            string[] split = str.Split(separators);
+            string[] split = str.Split(separators.ToCharArray());
             Console.WriteLine(split.Readable());
             return split.Length switch
             {
                 0 => null,
-                1 => (split[0].Trim(), null),
-                _ => (split.Last().Trim(), split[..^1].Aggregate((x, y) => $"{x}{separators[0]}{y}").Trim())
+                1 => (str.Trim(), null),
+                _ => first ? (split.First().Trim(), str[(split.First().Length + 1)..]) : (split.Last().Trim(), str[..split.Last().Length])
             };
         }
         public static T? Parse<T>(this string str, string key, Func<string, T> parser)
         {
-            if(str.SplitOn("=") is (string, string) notNull)
+            if(str.SplitOn("=", first: true) is (string, string) notNull)
             {
                 (string k, string v) = notNull;
                 if (v is null) return default;
