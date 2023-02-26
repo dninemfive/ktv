@@ -4,8 +4,8 @@ using System.IO;
 
 // ktv [interval] [times]
 const int MillisecondsPerMinute = 60 * 1000;
-const int Delay = 5;
 const bool Debug = false;
+int delay = 5;
 float interval = 1;
 float duration = interval * 24 * 4;
 int aggregationInterval = 15;
@@ -29,11 +29,12 @@ foreach(string arg in args)
     if (carg.Try<float?>(nameof(interval), s => float.TryParse(s, out float f) ? f : null) is float f) interval = f;
     if (carg.Try<float?>(nameof(duration), s => float.TryParse(s, out float f) ? f : null) is float g) duration = g;
     if (carg.Try<int?>(nameof(aggregationInterval), s => int.TryParse(s, out int i) ? i : null) is int i) aggregationInterval = i;
+    if (carg.Try<int?>(nameof(delay), s => int.TryParse(s, out int i) ? i : null) is int j) delay = j;
     if (carg.Try(nameof(logPath), s => s) is string s) logPath = s;
 }
-Console.WriteLine($"Beginning ktv. Will log active window title at {interval}-minute intervals for {duration} minutes starting in {Delay} seconds.");
+Console.WriteLine($"Beginning ktv. Will log active window title at {interval}-minute intervals for {duration} minutes starting in {delay} seconds.");
 float elapsed = 0;
-PrintSleep(Delay * 1000);
+PrintSleep(delay * 1000);
 Console.WriteLine("Logging has begun.");
 while(elapsed < duration)
 {
@@ -41,18 +42,22 @@ while(elapsed < duration)
     (string app, string? details)? info = ActiveWindow.Info;
     if(info is not null)
     {
+        Console.WriteLine("fuck~");
         (string app, string? details) = info.Value;
         if(details is not null)
         {
+            Console.WriteLine("uwu");
             Log($"{app}\t{details}");
         }
         else
         {
+            Console.WriteLine("OwO");
             Log(app);
         }
     } 
     else
     {
+        Console.WriteLine("FUCK!");
         Log(ActiveWindow.Info.DefinitelyReadableString());
     }
     PrintSleep((int)(interval * MillisecondsPerMinute));

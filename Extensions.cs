@@ -20,12 +20,13 @@ namespace ktv
         {
             if (str is null) return null;
             string[] split = str.Split(separators.ToCharArray());
-            Console.WriteLine(split.Readable());
-            return split.Length switch
+            Console.WriteLine($"{split.Length} {split.Readable()}");
+            return (split.Length, first) switch
             {
-                0 => null,
-                1 => (str.Trim(), null),
-                _ => first ? (split.First().Trim(), str[(split.First().Length + 1)..]) : (split.Last().Trim(), str[..split.Last().Length])
+                (0, _) => null,
+                (1, _) => (str.Trim(), null),
+                (_, true) => (split.First().Trim(), str[(split.First().Length + 1)..].Trim()),
+                (_, false) => (split.Last().Trim(), str[..^(split.Last().Length + 1)].Trim())
             };
         }
         public static T? Parse<T>(this string str, string key, Func<string, T> parser)

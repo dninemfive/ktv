@@ -29,11 +29,13 @@ namespace ktv
         {
             get
             {
-                if(Title?.SplitOn("-—", first: false) is (string, string) result)
+                (string, string?)? result = Title?.SplitOn("-—", first: false);
+                if(result is null) return null;
+                (string app, string? details) = result.Value;
+                return (app is null, details is null) switch
                 {
-                    if (result.b is null) return (result.a, null);
-                }
-                return null;
+                    _ => (app ?? "fuck", details)
+                };
             }
         }
     }
