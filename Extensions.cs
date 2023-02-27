@@ -66,7 +66,7 @@ namespace ktv
         public static string Minutes(this float minutes)
         {
             if (minutes < 0) return "an undefined duration";
-            if (minutes == 0) return "an instant";
+            if (minutes == 0) return "0s";
             string result = "";
             int wholeMinutes = (int)minutes;
             if (wholeMinutes > 0) result += $"{wholeMinutes}m";
