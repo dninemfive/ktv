@@ -33,9 +33,15 @@ namespace ktv
                 {
                     foreach (WindowNameParser wnp in WindowNameParser.List)
                     {
-                        if (wnp.Matches(Title)) return wnp.Split(Title);
+                        if (wnp.Matches(s))
+                        {
+                            (string title, string? description)? tuple = wnp.Split(s);
+                            if (tuple is null) break;
+                            (string title, string? description) = tuple.Value;
+                            return (Alias.BestReplacement(title), description);
+                        }
                     }
-                    return (s, null);
+                    return (Alias.BestReplacement(s), null);
                 }
                 return null;
             }
