@@ -11,8 +11,9 @@ float aggregationInterval = 15;
 string logPath = $"{DateTime.Now:yyyyMMddHHmmss}.ktv.log", aggregateLogPath = $"{DateTime.Now:yyyyMMddHHmmss}-aggregate.ktv.log";
 int ct = 0;
 
-void Log(string str)
+void Log(object obj)
 {
+    string str = obj.ToString() ?? obj.DefinitelyReadableString();
     string line = $"{++ct,8}\t{DateTime.Now}\t{str}\n";
     Console.Write(line);
     File.AppendAllText(logPath, line);
@@ -34,43 +35,21 @@ Console.WriteLine($"Beginning ktv. Will log active window title to {logPath} eve
 Console.WriteLine($"App usage will be aggregated and logged to {aggregateLogPath} every {aggregationInterval.Minutes()}.");
 float elapsed = 0;
 Sleep(delay * 1000);
-List<string> mostRecentApps = new(), apps = new();
+List<string> recentPrograms = new();
 float nextAggregationTime = aggregationInterval;
 while(duration < 0 || elapsed < duration)
 {
-    (string app, string? details)? info = ActiveWindow.Info;
-    if(info is not null)
-    {
-        (string app, string? details) = info.Value;
-        mostRecentApps.Add(app);
-        if(details is not null)
-        {
-            Log($"{app,-30}\t{details}");
-        }
-        else
-        {
-            Log(app);
-        }
-    } 
-    else
-    {
-        Log(ActiveWindow.Info.DefinitelyReadableString());
-    }
+    ActiveWindowInfo info = ActiveWindow.Info;
+    recentPrograms.Add(info.Program);
+    Log(info);
     Sleep((int)(interval * MillisecondsPerMinute));
     elapsed += interval;
     if(elapsed >= nextAggregationTime)
     {
-        string mca = $"{DateTime.Now:HH:mm}\t{mostRecentApps.MostCommon()}";
-        apps.Add(mca);
+        string mca = $"{DateTime.Now:HH:mm}\t{recentPrograms.MostCommon()}";
         File.AppendAllText(aggregateLogPath, $"{mca}\n");
-        mostRecentApps.Clear();
+        recentPrograms.Clear();
         nextAggregationTime += aggregationInterval;
     }
 }
-if(mostRecentApps.Any())
-{
-    apps.Add($"{DateTime.Now}\t{mostRecentApps.MostCommon()}");
-    mostRecentApps.Clear();
-}
-foreach (string item in apps) Console.WriteLine(item);
 Console.WriteLine("Done.");

@@ -25,7 +25,7 @@ namespace ktv
                 return null;
             }
         }
-        public static (string app, string? details)? Info
+        public static ActiveWindowInfo Info
         {
             get
             {
@@ -35,15 +35,12 @@ namespace ktv
                     {
                         if (wnp.Matches(s))
                         {
-                            (string title, string? description)? tuple = wnp.Split(s);
-                            if (tuple is null) break;
-                            (string title, string? description) = tuple.Value;
-                            return (Alias.BestReplacement(title), description);
+                            return wnp.Split(s);
                         }
                     }
-                    return (Alias.BestReplacement(s), null);
+                    return new(s, alias: true);
                 }
-                return null;
+                return ActiveWindowInfo.Invalid;
             }
         }
     }

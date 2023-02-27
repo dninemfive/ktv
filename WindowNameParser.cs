@@ -20,13 +20,13 @@ namespace ktv
             new(new(".*", RegexOptions.Compiled), s => (s, null))
         };
         public Regex Matcher { get; private set; }
-        public Func<string, (string, string?)?> Splitter { get; private set; }
-        public WindowNameParser(Regex regex, Func<string, (string, string?)?> splitter)
+        public Func<string, ActiveWindowInfo> Splitter { get; private set; }
+        public WindowNameParser(Regex regex, Func<string, ActiveWindowInfo> splitter)
         {
             Matcher = regex;
             Splitter = splitter;
         }
         public bool Matches(string s) => Matcher.Matches(s).Any();
-        public (string title, string? description)? Split(string s) => Splitter(s);
+        public ActiveWindowInfo Split(string s) => Splitter(s);
     }
 }
