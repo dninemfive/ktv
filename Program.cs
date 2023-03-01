@@ -20,7 +20,7 @@ void Log(string line, string? path = null)
 {
     path ??= logPath;
     Console.Write(line);
-    File.AppendAllText(logPath, line);
+    File.AppendAllText(path, line);
 }
 static void Sleep(int milliseconds)
 {
