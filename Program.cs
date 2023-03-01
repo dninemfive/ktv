@@ -15,10 +15,10 @@ DateTime startAt = DateTime.Now + TimeSpan.FromMinutes(aggregationInterval);
 #endregion console args
 # region local functions
 int ct = 0;
-void Log(object obj)
+string StringFor(object obj) => $"{++ct,8}\t{DateTime.Now}\t{obj.ToString() ?? obj.DefinitelyReadableString()}\n";
+void Log(string line, string? path = null)
 {
-    string str = obj.ToString() ?? obj.DefinitelyReadableString();
-    string line = $"{++ct,8}\t{DateTime.Now}\t{str}\n";
+    path ??= logPath;
     Console.Write(line);
     File.AppendAllText(logPath, line);
 }
@@ -47,13 +47,13 @@ while (duration < 0 || elapsed < duration)
 {
     ActiveWindowInfo info = ActiveWindow.Info;
     aggregatedPrograms.Add(info.Program);
-    Log(info);
+    Log(StringFor(info));
     Sleep((int)(interval * MillisecondsPerMinute));
     elapsed += interval;
     if(DateTime.Now > nextAggregationTime)
     {
         string mca = $"{DateTime.Now:HH:mm}\t{aggregatedPrograms.MostCommon()}";
-        File.AppendAllText(aggregateLogPath, $"{mca}\n");
+        Log($"{mca}\n", aggregateLogPath);
         aggregatedPrograms.Clear();
         nextAggregationTime += aggregationTimespan;
     }
