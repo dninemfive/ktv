@@ -13,6 +13,7 @@ namespace ktv
         {
             new(new("MINGW64:.*", RegexOptions.Compiled), s => s.SplitOn(":", TitlePosition.First)),
             new(new("Minecraft.* - .*", RegexOptions.Compiled), s => s.SplitOn(" - ", TitlePosition.First)),
+            new(new("Wargame.* - .*", RegexOptions.Compiled), s => s.SplitOn(" - ", TitlePosition.First)),
             new(new(@".* \[foobar2000]", RegexOptions.Compiled), s => ("foobar2000", s.SplitOn(" [", TitlePosition.Last)?.b)),
             // todo: find a way to automatically figure out first/last?
             new(new(".* — .*", RegexOptions.Compiled), s => s.SplitOn(" — ", TitlePosition.Last)),
