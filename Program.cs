@@ -34,7 +34,7 @@ foreach (string arg in args)
     carg.TrySet(nameof(duration), ref duration, ConsoleArg.Parsers.Float);
     carg.TrySet(nameof(aggregationInterval), ref aggregationInterval, ConsoleArg.Parsers.Float);
     carg.TrySet(nameof(delay), ref delay, ConsoleArg.Parsers.Int);
-    carg.TrySet(nameof(startAt), ref startAt, ConsoleArg.Parsers._DateTime);
+    carg.TrySet(nameof(startAt), ref startAt, ConsoleArg.Parsers.DateTime);
 }
 Console.WriteLine($"Beginning ktv. Will log active window title to {logPath} every {interval.Minutes()} for {duration.Minutes()} starting in {(delay / 60f).Minutes()}.");
 Console.WriteLine($"App usage will be aggregated and logged to {aggregateLogPath} every {aggregationInterval.Minutes()}, starting at {startAt:HH:mm}.");
