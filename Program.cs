@@ -30,11 +30,11 @@ static void Sleep(int milliseconds)
 foreach (string arg in args)
 {
     ConsoleArg carg = new(arg);
-    if (carg.Try<float?>(nameof(interval), s => float.TryParse(s, out float f) ? f : null) is float f) interval = f;
-    if (carg.Try<float?>(nameof(duration), s => float.TryParse(s, out float f) ? f : null) is float g) duration = g;
-    if (carg.Try<float?>(nameof(aggregationInterval), s => float.TryParse(s, out float f) ? f : null) is float h) aggregationInterval = h;
-    if (carg.Try<int?>(nameof(delay), s => int.TryParse(s, out int i) ? i : null) is int i) delay = i;
-    if (carg.Try<DateTime?>(nameof(startAt), s => DateTime.TryParse(s, out DateTime dt) ? dt : null) is DateTime dt) startAt = dt;
+    carg.TrySet(nameof(interval), ref interval, ConsoleArg.Parsers.Float);
+    carg.TrySet(nameof(duration), ref duration, ConsoleArg.Parsers.Float);
+    carg.TrySet(nameof(aggregationInterval), ref aggregationInterval, ConsoleArg.Parsers.Float);
+    carg.TrySet(nameof(delay), ref delay, ConsoleArg.Parsers.Int);
+    carg.TrySet(nameof(startAt), ref startAt, ConsoleArg.Parsers._DateTime);
 }
 Console.WriteLine($"Beginning ktv. Will log active window title to {logPath} every {interval.Minutes()} for {duration.Minutes()} starting in {(delay / 60f).Minutes()}.");
 Console.WriteLine($"App usage will be aggregated and logged to {aggregateLogPath} every {aggregationInterval.Minutes()}, starting at {startAt:HH:mm}.");

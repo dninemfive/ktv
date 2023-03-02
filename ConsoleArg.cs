@@ -35,5 +35,18 @@ namespace ktv
             }
             return parser(Value);
         }
+        public delegate PossiblyNull<T> Parser<T>(string key);
+        public static class Parsers
+        {
+            public static Parser<float> Float => key => float.TryParse(key, out float f) ? f : PossiblyNull<float>.Null;
+            public static Parser<int> Int => key => int.TryParse(key, out int i) ? i : PossiblyNull<int>.Null;
+            public static Parser<DateTime> _DateTime => key => DateTime.TryParse(key, out DateTime dt) ? dt : PossiblyNull<DateTime>.Null;
+        }
+        public void TrySet<T>(string key, ref T variable, Parser<T> parser)
+        {
+            if (Invalid || Value is null || Key != key) return;
+            T? val = parser(Value);
+            if (val is not null) variable = val;
+        }
     }
 }
