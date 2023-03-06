@@ -8,19 +8,19 @@ string logPath = $"{DateTime.Now:yyyyMMddHHmmss}.ktv.log", aggregateLogPath = $"
 # endregion constants
 #region console args
 int delay = 5;
-float interval = 1;
-float duration = interval * 24 * 4;
+float interval = 0.25f;
+float duration = -1;
 float aggregationInterval = 15;
 DateTime startAt = DateTime.Now + TimeSpan.FromMinutes(aggregationInterval);
 #endregion console args
 # region local functions
 int ct = 0;
 string StringFor(object obj) => $"{++ct,8}\t{DateTime.Now}\t{obj.ToString() ?? obj.DefinitelyReadableString()}\n";
-void Log(string line, string? path = null)
+void Log(string line, string? extraPath = null)
 {
-    path ??= logPath;
     Console.Write(line);
-    File.AppendAllText(path, line);
+    File.AppendAllText(logPath, line);
+    if(extraPath is not null) File.AppendAllText(extraPath, line);
 }
 static void Sleep(int milliseconds)
 {
@@ -37,7 +37,7 @@ foreach (string arg in args)
     carg.TrySet(nameof(startAt), ref startAt, ConsoleArg.Parsers.DateTime);
 }
 Console.WriteLine($"Beginning ktv. Will log active window title to {logPath} every {interval.Minutes()} for {duration.Minutes()} starting in {(delay / 60f).Minutes()}.");
-Console.WriteLine($"App usage will be aggregated and logged to {aggregateLogPath} every {aggregationInterval.Minutes()}, starting at {startAt:HH:mm}.");
+Console.WriteLine($"App usage will be aggregated and logged to {aggregateLogPath} every {aggregationInterval.Minutes()}, starting at {startAt:h:mm tt}.");
 Sleep(delay * 1000);
 List<string> aggregatedPrograms = new();
 DateTime nextAggregationTime = startAt;
