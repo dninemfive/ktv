@@ -2,7 +2,6 @@
 using ktv;
 using System.IO;
 
-Console.WriteLine("Done.");
 namespace ktv
 {
     class OldProgram
