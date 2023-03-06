@@ -3,4 +3,4 @@ A (relatively) simple script to track what program i'm using in various time blo
 
 Documentation TBD.
 
-i would like to make this into a GUI program at some point, but that'd probably be even more procrastination than this script was.
+Working on making this a GUI program.
