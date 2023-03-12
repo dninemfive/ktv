@@ -21,23 +21,23 @@ static void Sleep(int milliseconds, ref int elapsed)
 }
 #endregion local functions
 ConsoleArgs.Init(args);
-Thread.Sleep(ConsoleArgs.Delay * 1000);
-List<string> aggregatedPrograms = new();
-DateTime nextAggregationTime = ConsoleArgs.StartAt;
+ActivityRecord activityRecord = new();
+DateTime lastAggregationTime = DateTime.Now, 
+         nextAggregationTime = ConsoleArgs.StartAt;
 TimeSpan aggregationTimespan = TimeSpan.FromMinutes(ConsoleArgs.AggregationInterval);
-int durationMilliseconds = (int)(ConsoleArgs.Duration * Constants.MillisecondsPerMinute);
-int millisecondsElapsed = 0;
+int durationMilliseconds = (int)(ConsoleArgs.Duration * Constants.MillisecondsPerMinute),
+    millisecondsElapsed = 0;
 while (ConsoleArgs.Duration < 0 || millisecondsElapsed < ConsoleArgs.Duration)
 {
     ActiveWindowInfo info = ActiveWindow.Info;
-    aggregatedPrograms.Add(info.Program);
+    activityRecord.Log(info.Program);
     Log(StringFor(info));
     Sleep(durationMilliseconds, ref millisecondsElapsed);
     if(DateTime.Now > nextAggregationTime)
     {
-        string mca = $"{DateTime.Now.Time(),8}\t{aggregatedPrograms.MostCommon()}";
+        string mca = $"{DateTime.Now.Time(),8}\t{activityRecord.MostCommon}";
         Log($"{mca}\n", "TEMP.ktv.log");
-        aggregatedPrograms.Clear();
+        activityRecords.Clear();
         nextAggregationTime += aggregationTimespan;
     }
 }

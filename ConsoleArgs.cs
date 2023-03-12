@@ -27,6 +27,7 @@ namespace ktv
             Console.WriteLine($"Beginning ktv. Will log active window title to {Constants.LogPath} every " +
                               $"{LogInterval.Minutes()} for {Duration.Minutes()} starting in {Delay.Seconds()}.");
             Console.WriteLine($"App usage will be aggregated and logged to {"TEMP.ktv.log"} every {AggregationInterval.Minutes()}, starting at {StartAt.Time()}.");
+            Thread.Sleep(Delay * 1000);
         }
     }
 }

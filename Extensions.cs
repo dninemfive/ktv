@@ -48,19 +48,7 @@ namespace ktv
                 }
             }
             return default;
-        }
-        public static string MostCommon(this IEnumerable<string> enumerable)
-        {
-            Dictionary<string, int> dict = new();
-            foreach(string s in enumerable)
-            {
-                if (!dict.ContainsKey(s)) dict.Add(s, 1);
-                else dict[s]++;
-            }
-            IEnumerable<string> mostCommons = dict.Select(x => (x.Key, x.Value)).Where(x => x.Value == dict.Select(x => x.Value).Max()).Select(x => x.Key);
-            if (mostCommons.Count() == 1) return mostCommons.First();
-            return mostCommons.OrderBy(x => x).Readable();
-        }
+        }        
         // 1 minute = 6e10 ns; 1 tick = 1e2 ns; 6e10 / 1e2 = 6e8
         public static long Ticks(this float minutes) => (long)(minutes * 6e8);
         public static string Minutes(this float minutes)
