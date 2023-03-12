@@ -9,6 +9,6 @@ namespace ktv
     public static class Constants
     {
         public const int MillisecondsPerMinute = 60 * 1000;
-        public static readonly string logPath = $"{DateTime.Now:yyyyMMddHHmmss}.ktv.log";
+        public static readonly string LogPath = $"{DateTime.Now:yyyyMMddHHmmss}.ktv.log";
     }
 }
