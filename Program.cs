@@ -14,39 +14,30 @@ void Log(string line, string? extraPath = null)
     File.AppendAllText(Constants.LogPath, line);
     if(extraPath is not null) File.AppendAllText(extraPath, line);
 }
-static void Sleep(int milliseconds)
+static void Sleep(int milliseconds, ref int elapsed)
 {
     Thread.Sleep(milliseconds);
+    elapsed += milliseconds;
 }
 #endregion local functions
 ConsoleArgs.Init(args);
-string logPath = Constants.LogPath;
-float logInterval = ConsoleArgs.LogInterval;
-float duration = ConsoleArgs.Duration;
-int delay = ConsoleArgs.Delay;
-float aggregationInterval = ConsoleArgs.AggregationInterval;
-string aggregateLogPath = "TEMP.ktv.log";
-DateTime startAt = ConsoleArgs.StartAt;
-Console.WriteLine($"Beginning ktv. Will log active window title to {logPath} every {logInterval.Minutes()} for {duration.Minutes()} starting in {(delay / 60f).Minutes()}.");
-Console.WriteLine($"App usage will be aggregated and logged to {aggregateLogPath} every {aggregationInterval.Minutes()}, starting at {startAt:h:mm tt}.");
-Sleep(delay * 1000);
+Thread.Sleep(ConsoleArgs.Delay * 1000);
 List<string> aggregatedPrograms = new();
-DateTime nextAggregationTime = startAt;
-TimeSpan aggregationTimespan = TimeSpan.FromMinutes(aggregationInterval);
-float elapsed = 0;
-while (duration < 0 || elapsed < duration)
+DateTime nextAggregationTime = ConsoleArgs.StartAt;
+TimeSpan aggregationTimespan = TimeSpan.FromMinutes(ConsoleArgs.AggregationInterval);
+int durationMilliseconds = (int)(ConsoleArgs.Duration * Constants.MillisecondsPerMinute);
+int millisecondsElapsed = 0;
+while (ConsoleArgs.Duration < 0 || millisecondsElapsed < ConsoleArgs.Duration)
 {
     ActiveWindowInfo info = ActiveWindow.Info;
     aggregatedPrograms.Add(info.Program);
     Log(StringFor(info));
-    Sleep((int)(logInterval * Constants.MillisecondsPerMinute));
-    elapsed += logInterval;
+    Sleep(durationMilliseconds, ref millisecondsElapsed);
     if(DateTime.Now > nextAggregationTime)
     {
-        string mca = $"{DateTime.Now:HH:mm}\t{aggregatedPrograms.MostCommon()}";
-        Log($"{mca}\n", aggregateLogPath);
+        string mca = $"{DateTime.Now.Time(),8}\t{aggregatedPrograms.MostCommon()}";
+        Log($"{mca}\n", "TEMP.ktv.log");
         aggregatedPrograms.Clear();
         nextAggregationTime += aggregationTimespan;
     }
 }
-Console.WriteLine("Done.");

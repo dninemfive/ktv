@@ -77,5 +77,8 @@ namespace ktv
             if (milliseconds > 0) result += $"{(result.Length > 0 ? " " : "")}{milliseconds}ms";
             return result;
         }
+        public static string Seconds(this float seconds) => (seconds / 60f).Minutes();
+        public static string Seconds(this int seconds) => Seconds(seconds);
+        public static string Time(this DateTime time) => time.ToString(Constants.TimeFormat);
     }
 }
