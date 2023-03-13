@@ -8,13 +8,13 @@ using System.Threading.Tasks;
 namespace ktv
 {
     public static class ConsoleArgs
-    {        
+    {
         public static TimeSpan Delay => TimeSpan.FromSeconds(delay);
         private static int delay = 5;
         public static TimeSpan LogInterval => TimeSpan.FromMinutes(logInterval);
-        private static float logInterval = 0.25f;               
+        private static float logInterval = 0.25f;
         public static TimeSpan? Duration => duration <= 0 ? null : TimeSpan.FromMinutes(duration);
-        private static float duration = -1;        
+        private static float duration = -1;
         public static TimeSpan AggregationInterval => TimeSpan.FromMinutes(aggregationInterval);
         private static float aggregationInterval = 15;
         public static DateTime StartAt => startAt;
@@ -30,13 +30,13 @@ namespace ktv
             foreach (string arg in args)
             {
                 ConsoleArg carg = new(arg);
-                carg.TrySet(nameof(logInterval), ref logInterval, ConsoleArg.Parsers.Float);
-                carg.TrySet(nameof(duration), ref duration, ConsoleArg.Parsers.Float);
-                carg.TrySet(nameof(aggregationInterval), ref aggregationInterval, ConsoleArg.Parsers.Float);
-                carg.TrySet(nameof(delay), ref delay, ConsoleArg.Parsers.Int);
-                carg.TrySet(nameof(startAt), ref startAt, ConsoleArg.Parsers.DateTime);
-                carg.TrySet(nameof(logFolder), ref logFolder, ConsoleArg.Parsers.DirectoryPath);
-                carg.TrySet(nameof(debug), ref debug, ConsoleArg.Parsers.Bool);
+                carg.TrySet(nameof(logInterval), ref logInterval, ConsoleArgParsers.Float);
+                carg.TrySet(nameof(duration), ref duration, ConsoleArgParsers.Float);
+                carg.TrySet(nameof(aggregationInterval), ref aggregationInterval, ConsoleArgParsers.Float);
+                carg.TrySet(nameof(delay), ref delay, ConsoleArgParsers.Int);
+                carg.TrySet(nameof(startAt), ref startAt, ConsoleArgParsers.DateTime);
+                carg.TrySet(nameof(logFolder), ref logFolder, ConsoleArgParsers.DirectoryPath);
+                carg.TrySet(nameof(debug), ref debug, ConsoleArgParsers.Bool);
             }
             #region defaults
             if (string.IsNullOrEmpty(logFolder)) logFolder = Path.GetFullPath("logs/");

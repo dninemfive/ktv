@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 
 namespace ktv
 {
-    internal class PossiblyNull<T>
+    public class PossiblyNull<T>
     {
         public T? Value { get; set; }
         public static PossiblyNull<T> Null => new() { Value = default }; 
