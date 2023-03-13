@@ -48,39 +48,9 @@ namespace ktv
                 }
             }
             return default;
-        }        
-        // 1 minute = 6e10 ns; 1 tick = 1e2 ns; 6e10 / 1e2 = 6e8
-        public static long Ticks(this float minutes) => (long)(minutes * 6e8);
-        public static string Minutes(this float minutes)
-        {
-            if (minutes < 0) return "an undefined duration";
-            if (minutes == 0) return "0s";
-            string result = "";
-            int wholeMinutes = (int)minutes;
-            if (wholeMinutes > 0) result += $"{wholeMinutes}m";
-            float seconds = (minutes - wholeMinutes) * 60;
-            int wholeSeconds = (int)seconds;
-            if (wholeSeconds > 0) result += $"{(result.Length > 0 ? " " : "")}{wholeSeconds}s";
-            int milliseconds = (int)((minutes - wholeMinutes - (wholeSeconds / 60f)) * 1000);
-            if (milliseconds > 0) result += $"{(result.Length > 0 ? " " : "")}{milliseconds}ms";
-            return result;
         }
-        public static string Seconds(this float seconds) => (seconds / 60f).Minutes();
-        public static string Seconds(this int seconds) => Seconds((float)seconds);
         public static string Time(this DateTime time) => time.ToString(TimeFormats.Time);
         public static string Format(this DateTime time, string format) => time.ToString(format);
-        /// <summary>
-        /// 
-        /// </summary>
-        /// <remarks>Code from <see href="https://stackoverflow.com/a/1393726">here</see>.</remarks>
-        /// <param name="time"></param>
-        /// <param name="span"></param>
-        /// <returns></returns>
-        public static DateTime Round(this DateTime date, TimeSpan span)
-        {
-            long ticks = (date.Ticks + (span.Ticks / 2) + 1) / span.Ticks;
-            return new(ticks * span.Ticks, date.Kind);
-        }
         /// <summary>
         /// 
         /// </summary>

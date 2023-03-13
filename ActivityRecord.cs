@@ -14,13 +14,9 @@ namespace ktv
                                                .OrderBy(x => x)
                                                .Last() ?? null;
         private readonly Dictionary<DateTime, string> activities = new();
-        public IEnumerable<string> Activities
-        {
-            get
-            {
-                foreach (DateTime key in activities.Keys.OrderBy(x => x)) yield return activities[key];
-            }
-        }
+        public IEnumerable<(DateTime timestamp, string activity)> ActivityTimestamps => activities.OrderBy(x => x.Key)
+                                                                                                  .Select(x => (x.Key, x.Value));
+        public IEnumerable<string> Activities => ActivityTimestamps.Select(x => x.activity);
         public DateTime Date => StartedAt.Date;
         public ActivityRecord(string? activity = null)
         {
@@ -58,6 +54,8 @@ namespace ktv
         public bool TryMerge(ActivityRecord other)
         {
             Console.WriteLine($"Trying to merge ActivityRecords [{this}] and [{other}]...");
+            Console.WriteLine($"this: {Data}");
+            Console.WriteLine($"other: {other.Data}");
             if (other is null 
             || other.Date != Date 
             || other.MostCommon != MostCommon) return false;
@@ -71,6 +69,18 @@ namespace ktv
             return true;
         }
         public override string ToString() => $"{StartedAt.Time(),-8}\t{(EndedAt?.Time()).PrintNull(),-8}\t{MostCommon.PrintNull()}";
-        public static string Header(DateTime date) => $"{"Start",-8}\t{"End",-8}\tActivity";
+        public static readonly string Header = $"{"Start",-8}\t{"End",-8}\tActivity";
+        public string Data
+        {
+            get
+            {
+                string result = $"ActivityRecord {StartedAt:G}-{EndedAt:G} ({MostCommon}) {{\n";
+                foreach((DateTime timestamp, string activity) in ActivityTimestamps)
+                {
+                    result += $"{timestamp.Time()}: {activity}\n";
+                }
+                return result + "}";
+            }
+        }
     }
 }

@@ -21,7 +21,7 @@ static void Sleep(TimeSpan duration, ref TimeSpan elapsed)
 }
 static IEnumerable<string> DailyActivity(IEnumerable<ActivityRecord> records, DateTime date)
 {
-    yield return ActivityRecord.Header(date);
+    yield return ActivityRecord.Header;
     foreach (ActivityRecord record in records.Where(x => x.Date == date).OrderBy(x => x.StartedAt)) yield return record.ToString();
 }
 static void WriteActivity(IEnumerable<ActivityRecord> records)
