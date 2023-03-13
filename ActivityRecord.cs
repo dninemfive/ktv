@@ -83,7 +83,7 @@ namespace ktv
             foreach (KeyValuePair<DateTime, string> kvp in other.activities) activities.Add(kvp.Key, kvp.Value);
             return true;
         }
-        public override string ToString() => $"{StartedAt,8}\t{EndedAt.PrintNull(),8}\t{MostCommon.PrintNull()}";
-        public static string Header(DateTime date) => $"{date.ToString(TimeFormats.Date)}\n{"Start",8}\t{"End",8}\tActivity";
+        public override string ToString() => $"{StartedAt.Time(),-8}\t{(EndedAt?.Time()).PrintNull(),-8}\t{MostCommon.PrintNull()}";
+        public static string Header(DateTime date) => $"{"Start",-8}\t{"End",-8}\tActivity";
     }
 }
