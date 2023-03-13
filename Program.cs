@@ -8,11 +8,10 @@ using System.IO;
 # region local functions
 int ct = 0;
 string StringFor(object obj) => $"{++ct,8}\t{DateTime.Now}\t{obj.ToString() ?? obj.PrintNull()}\n";
-void Log(string line, string? extraPath = null)
+void Log(string line)
 {
     Console.Write(line);
     File.AppendAllText(Path.Join(ConsoleArgs.LogFolder, Constants.LogName), line);
-    if(extraPath is not null) File.AppendAllText(extraPath, line);
 }
 static void Sleep(TimeSpan duration, ref TimeSpan elapsed)
 {
@@ -26,12 +25,14 @@ static IEnumerable<string> DailyActivity(IEnumerable<ActivityRecord> records, Da
 }
 static void WriteActivity(IEnumerable<ActivityRecord> records)
 {
+    Console.WriteLine($"Writing activity with {records.Count()} records.");
     List<DateTime> uniqueDates = records.Select(x => x.Date).ToList();
     foreach(DateTime uniqueDate in uniqueDates)
     {
         // todo: check if the path already exists and append a (n) instead of overwriting
         // also, put logs in a specified folder (default to subfolder of install path)
         string path = Path.Join(ConsoleArgs.LogFolder, $"{uniqueDate.ToString(TimeFormats.Date)}-aggregate.ktv.log");
+        Console.WriteLine($"\t{path}");
         File.WriteAllLines(path, DailyActivity(records, uniqueDate));
     }
 }
@@ -47,11 +48,11 @@ while (ConsoleArgs.Duration is null || elapsed < ConsoleArgs.Duration)
     activityRecord.Log(info.Program);
     Log(StringFor(info));
     Sleep(ConsoleArgs.LogInterval, ref elapsed);
-    if(DateTime.Now > nextAggregationTime)
+    if(DateTime.Now >= nextAggregationTime)
     {
         string mca = $"{DateTime.Now.Time(),8}\t{activityRecord.MostCommon}";
         Log($"{mca}\n");        
-        if (!previousRecords.Any() || previousRecords.Last().TryMerge(activityRecord)) previousRecords.Add(activityRecord);
+        if (!previousRecords.Any() || !previousRecords.Last().TryMerge(activityRecord)) previousRecords.Add(activityRecord);
         activityRecord = new();
         nextAggregationTime += ConsoleArgs.AggregationInterval;
         WriteActivity(previousRecords);

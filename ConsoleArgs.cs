@@ -20,7 +20,7 @@ namespace ktv
         public static DateTime StartAt => startAt;
         private static DateTime startAt = DateTime.MinValue;
         public static string LogFolder => logFolder;
-        private static string logFolder = "logs/";
+        private static string logFolder = string.Empty;
         public static void Init(string[] args)
         {
             Console.WriteLine("Starting ktv...");
@@ -34,10 +34,12 @@ namespace ktv
                 carg.TrySet(nameof(startAt), ref startAt, ConsoleArg.Parsers.DateTime);
                 carg.TrySet(nameof(logFolder), ref logFolder, ConsoleArg.Parsers.DirectoryPath);
             }
+            if (string.IsNullOrEmpty(logFolder)) logFolder = Path.GetFullPath("logs/");
             if (!Directory.Exists(logFolder)) Directory.CreateDirectory(logFolder);
             if (startAt < DateTime.Now) startAt = DateTime.Now.Ceiling(AggregationInterval);
             Console.WriteLine($"Will log active window every {LogInterval:g} starting in {Delay:g}.");
             Console.WriteLine($"Will aggregate activity every {AggregationInterval:g} starting at {StartAt.Time()}.");
+            Console.WriteLine($"Log folder is {logFolder}.");
             if (Duration is not null) Console.WriteLine($"Will continue for {Duration:g}.");
             Thread.Sleep(Delay);
         }
