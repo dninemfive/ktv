@@ -69,5 +69,29 @@ namespace ktv
         public static string Seconds(this int seconds) => Seconds(seconds);
         public static string Time(this DateTime time) => time.ToString(TimeFormats.Time);
         public static string Format(this DateTime time, string format) => time.ToString(format);
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <remarks>Code from <see href="https://stackoverflow.com/a/1393726">here</see>.</remarks>
+        /// <param name="time"></param>
+        /// <param name="span"></param>
+        /// <returns></returns>
+        public static DateTime Round(this DateTime date, TimeSpan span)
+        {
+            long ticks = (date.Ticks + (span.Ticks / 2) + 1) / span.Ticks;
+            return new(ticks * span.Ticks, date.Kind);
+        }
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <remarks>Code from <see href="https://stackoverflow.com/a/1393726">here</see>.</remarks>
+        /// <param name="time"></param>
+        /// <param name="span"></param>
+        /// <returns></returns>
+        public static DateTime Ceiling(this DateTime date, TimeSpan span)
+        {
+            long ticks = (date.Ticks + span.Ticks - 1) / span.Ticks;
+            return new DateTime(ticks * span.Ticks, date.Kind);
+        }
     }
 }

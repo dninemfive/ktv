@@ -27,13 +27,13 @@ namespace ktv
             }
         }
         public override string ToString() => InvalidStr ?? $"{Key.DefinitelyReadableString("(null key)")}{ArgumentSeparator}{Value.DefinitelyReadableString("(null value)")}";
-        public T? Try<T>(string key, Func<string, T> parser, T? @default = default)
+        public T? Try<T>(string key, Func<string, T> parser)
         {
             if (Invalid || Value is null || Key != key)
             {
                 return default;
             }
-            return parser(Value) ?? @default;
+            return parser(Value);
         }
         public delegate PossiblyNull<T> Parser<T>(string key);
         public static class Parsers

@@ -12,7 +12,7 @@ namespace ktv
         public static float LogInterval = 0.25f;
         public static float Duration = -1;
         public static float AggregationInterval = 15;
-        public static DateTime StartAt = DateTime.Now + TimeSpan.FromMinutes(AggregationInterval);
+        public static DateTime StartAt = DateTime.Now.Ceiling(TimeSpan.FromMinutes(AggregationInterval));
         public static void Init(string[] args)
         {
             foreach (string arg in args)
