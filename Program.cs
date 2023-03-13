@@ -11,7 +11,7 @@ string StringFor(object obj) => $"{++ct,8}\t{DateTime.Now}\t{obj.ToString() ?? o
 void Log(string line, string? extraPath = null)
 {
     Console.Write(line);
-    File.AppendAllText(Constants.LogPath, line);
+    File.AppendAllText(Constants.LogName, line);
     if(extraPath is not null) File.AppendAllText(extraPath, line);
 }
 static void Sleep(int milliseconds, ref int elapsed)

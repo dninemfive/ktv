@@ -57,6 +57,7 @@ namespace ktv
         }
         public bool TryMerge(ActivityRecord other)
         {
+            Console.WriteLine($"Trying to merge ActivityRecords [{this}] and [{other}]...");
             if (other is null 
             || other.Date != Date 
             || other.MostCommon != MostCommon) return false;

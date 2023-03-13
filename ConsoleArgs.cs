@@ -17,7 +17,9 @@ namespace ktv
         public static float AggregationInterval => aggregationInterval;
         private static float aggregationInterval = 15;
         public static DateTime StartAt => startAt;
-        private static DateTime startAt = DateTime.Now.Ceiling(TimeSpan.FromMinutes(AggregationInterval));        
+        private static DateTime startAt = DateTime.Now.Ceiling(TimeSpan.FromMinutes(AggregationInterval));
+        public static string LogFolder => logFolder;
+        private static string logFolder = "logs/";
         public static void Init(string[] args)
         {
             Console.WriteLine("Starting ktv...");
@@ -29,6 +31,7 @@ namespace ktv
                 carg.TrySet(nameof(aggregationInterval), ref aggregationInterval, ConsoleArg.Parsers.Float);
                 carg.TrySet(nameof(delay), ref delay, ConsoleArg.Parsers.Int);
                 carg.TrySet(nameof(startAt), ref startAt, ConsoleArg.Parsers.DateTime);
+                carg.TrySet(nameof(logFolder), ref logFolder, ConsoleArg.Parsers.DirectoryPath);
             }
             Console.WriteLine($"Will log active window every {LogInterval.Minutes()} starting in {Delay.Seconds()}.");
             Console.WriteLine($"Will aggregate activity every {AggregationInterval.Minutes()} starting at {StartAt.Time()}.");
