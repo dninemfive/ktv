@@ -9,18 +9,26 @@ using System.IO;
 # region local functions
 int ct = 0;
 string StringFor(object obj) => $"{++ct,8}\t{DateTime.Now}\t{obj.ToString() ?? obj.PrintNull()}\n";
-
+List<string>? existingAggregateLines = null;
+DateTime launchedOnDate = DateTime.Today;
 static void Sleep(TimeSpan duration, ref TimeSpan elapsed)
 {
     Thread.Sleep((int)duration.TotalMilliseconds);
     elapsed += duration;
 }
-static IEnumerable<string> DailyActivity(IEnumerable<ActivityRecord> records, DateTime date)
+IEnumerable<string> DailyActivity(IEnumerable<ActivityRecord> records, DateTime date)
 {
-    yield return ActivityRecord.Header;
+    
+    if(existingAggregateLines is null)
+    {
+        yield return ActivityRecord.Header;
+    } else
+    {
+        foreach (string line in existingAggregateLines) yield return line;
+    }
     foreach (ActivityRecord record in records.Where(x => x.Date == date).OrderBy(x => x.StartedAt)) yield return record.ToString();
 }
-static void WriteActivity(IEnumerable<ActivityRecord> records)
+void WriteActivity(IEnumerable<ActivityRecord> records)
 {
     //Console.WriteLine($"Writing activity with {records.Count()} records.");
     List<DateTime> uniqueDates = records.Select(x => x.Date).ToList();
@@ -33,6 +41,11 @@ static void WriteActivity(IEnumerable<ActivityRecord> records)
 }
 #endregion local functions
 ConsoleArgs.Init(args);
+if(File.Exists(ActivityRecord.AggregateFile(launchedOnDate)))
+{
+    string[] lines = File.ReadAllLines(ActivityRecord.AggregateFile(launchedOnDate));
+    if(lines.Length > 1) existingAggregateLines = lines[1..].ToList();
+}
 List<ActivityRecord> previousRecords = new();
 ActivityRecord activityRecord = new();
 DateTime nextAggregationTime = ConsoleArgs.StartAt;
