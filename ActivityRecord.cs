@@ -53,9 +53,9 @@ namespace ktv
         }
         public bool TryMerge(ActivityRecord other)
         {
-            Console.WriteLine($"Trying to merge ActivityRecords [{this}] and [{other}]...");
-            Console.WriteLine($"this: {Data}");
-            Console.WriteLine($"other: {other.Data}");
+            //Console.WriteLine($"Trying to merge ActivityRecords [{this}] and [{other}]...");
+            //Console.WriteLine($"this: {Data}");
+            //Console.WriteLine($"other: {other.Data}");
             if (other is null 
             || other.Date != Date 
             || other.MostCommon != MostCommon) return false;
@@ -71,6 +71,7 @@ namespace ktv
         }
         public override string ToString() => $"{StartedAt.Time(),-8}\t{(EndedAt?.Time()).PrintNull(),-8}\t{MostCommon.PrintNull()}";
         public static readonly string Header = $"{"Start",-8}\t{"End",-8}\tActivity";
+        public static string AggregateFile(DateTime date) => Path.Join(ConsoleArgs.LogFolder, $"{date.ToString(TimeFormats.Date)}-aggregate.ktv.log");
         public string Data
         {
             get

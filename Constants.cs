@@ -6,10 +6,6 @@ using System.Threading.Tasks;
 
 namespace ktv
 {
-    public static class Constants
-    {
-        public static readonly string LogName = $"{DateTime.Now.Format(TimeFormats.DateTime24H!)}.ktv.log";
-    }
     public static class TimeFormats
     {        
         public const string Time = "h:mm tt";
