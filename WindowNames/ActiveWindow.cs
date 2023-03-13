@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 using System.Runtime.InteropServices;
 
 // https://stackoverflow.com/a/115905
-namespace ktv
+namespace ktv.WindowNames
 {
     public static class ActiveWindow
     {
@@ -29,7 +29,7 @@ namespace ktv
         {
             get
             {
-                if(Title is string s)
+                if (Title is string s)
                 {
                     foreach (WindowNameParser wnp in WindowNameParser.List)
                     {

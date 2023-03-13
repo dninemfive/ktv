@@ -4,7 +4,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace ktv
+namespace ktv.WindowNames
 {
     public record ActiveWindowInfo
     {
@@ -27,7 +27,7 @@ namespace ktv
         }
         public override string ToString()
         {
-            if(Details is not null)
+            if (Details is not null)
             {
                 return $"{Program,-30}\t{Details}";
             }

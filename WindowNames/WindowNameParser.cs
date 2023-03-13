@@ -5,7 +5,7 @@ using System.Text;
 using System.Text.RegularExpressions;
 using System.Threading.Tasks;
 
-namespace ktv
+namespace ktv.WindowNames
 {
     internal record WindowNameParser
     {
@@ -17,7 +17,7 @@ namespace ktv
             new(new(@".* \[foobar2000]", RegexOptions.Compiled), s => ("foobar2000", s.SplitOn(" [", TitlePosition.Last)?.b)),
             // todo: find a way to automatically figure out first/last?
             new(new(".* — .*", RegexOptions.Compiled), s => s.SplitOn(" — ", TitlePosition.Last)),
-            new(new(".* - .*", RegexOptions.Compiled), s => s.SplitOn(" - ", TitlePosition.Last)),            
+            new(new(".* - .*", RegexOptions.Compiled), s => s.SplitOn(" - ", TitlePosition.Last)),
             new(new(".*", RegexOptions.Compiled), s => (s, null))
         };
         public Regex Matcher { get; private set; }
