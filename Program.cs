@@ -39,14 +39,14 @@ List<ActivityRecord> previousRecords = new();
 ActivityRecord activityRecord = new();
 DateTime nextAggregationTime = ConsoleArgs.StartAt;
 TimeSpan aggregationTimespan = TimeSpan.FromMinutes(ConsoleArgs.AggregationInterval);
-int durationMilliseconds = (int)(ConsoleArgs.Duration * Constants.MillisecondsPerMinute),
+int logInterval = (int)(ConsoleArgs.LogInterval * Constants.MillisecondsPerMinute),
     millisecondsElapsed = 0;
 while (ConsoleArgs.Duration < 0 || millisecondsElapsed < ConsoleArgs.Duration)
 {
     ActiveWindowInfo info = ActiveWindow.Info;
     activityRecord.Log(info.Program);
     Log(StringFor(info));
-    Sleep(durationMilliseconds, ref millisecondsElapsed);
+    Sleep(logInterval, ref millisecondsElapsed);
     if(DateTime.Now > nextAggregationTime)
     {
         string mca = $"{DateTime.Now.Time(),8}\t{activityRecord.MostCommon}";

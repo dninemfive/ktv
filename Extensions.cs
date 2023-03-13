@@ -66,7 +66,7 @@ namespace ktv
             return result;
         }
         public static string Seconds(this float seconds) => (seconds / 60f).Minutes();
-        public static string Seconds(this int seconds) => Seconds(seconds);
+        public static string Seconds(this int seconds) => Seconds((float)seconds);
         public static string Time(this DateTime time) => time.ToString(TimeFormats.Time);
         public static string Format(this DateTime time, string format) => time.ToString(format);
         /// <summary>

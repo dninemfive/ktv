@@ -46,7 +46,11 @@ namespace ktv
         {
             if (Invalid || Value is null || Key != key) return;
             T? val = parser(Value);
-            if (val is not null) variable = val;
+            if (val is not null)
+            {
+                variable = val;
+                Console.WriteLine($"{key} = {val}");
+            }
         }
     }
 }

@@ -7,26 +7,32 @@ using System.Threading.Tasks;
 namespace ktv
 {
     public static class ConsoleArgs
-    {
-        public static int Delay = 5;
-        public static float LogInterval = 0.25f;
-        public static float Duration = -1;
-        public static float AggregationInterval = 15;
-        public static DateTime StartAt = DateTime.Now.Ceiling(TimeSpan.FromMinutes(AggregationInterval));
+    {        
+        public static int Delay => delay;
+        private static int delay = 5;
+        public static float LogInterval => logInterval;
+        private static float logInterval = 0.25f;               
+        public static float Duration => duration;
+        private static float duration = -1;        
+        public static float AggregationInterval => aggregationInterval;
+        private static float aggregationInterval = 15;
+        public static DateTime StartAt => startAt;
+        private static DateTime startAt = DateTime.Now.Ceiling(TimeSpan.FromMinutes(AggregationInterval));        
         public static void Init(string[] args)
         {
+            Console.WriteLine("Starting ktv...");
             foreach (string arg in args)
             {
                 ConsoleArg carg = new(arg);
-                carg.TrySet(nameof(LogInterval), ref LogInterval, ConsoleArg.Parsers.Float);
-                carg.TrySet(nameof(Duration), ref Duration, ConsoleArg.Parsers.Float);
-                carg.TrySet(nameof(AggregationInterval), ref AggregationInterval, ConsoleArg.Parsers.Float);
-                carg.TrySet(nameof(Delay), ref Delay, ConsoleArg.Parsers.Int);
-                carg.TrySet(nameof(StartAt), ref StartAt, ConsoleArg.Parsers.DateTime);
+                carg.TrySet(nameof(logInterval), ref logInterval, ConsoleArg.Parsers.Float);
+                carg.TrySet(nameof(duration), ref duration, ConsoleArg.Parsers.Float);
+                carg.TrySet(nameof(aggregationInterval), ref aggregationInterval, ConsoleArg.Parsers.Float);
+                carg.TrySet(nameof(delay), ref delay, ConsoleArg.Parsers.Int);
+                carg.TrySet(nameof(startAt), ref startAt, ConsoleArg.Parsers.DateTime);
             }
-            Console.WriteLine($"Beginning ktv. Will log active window title to {Constants.LogPath} every " +
-                              $"{LogInterval.Minutes()} for {Duration.Minutes()} starting in {Delay.Seconds()}.");
-            Console.WriteLine($"App usage will be aggregated and logged to {"TEMP.ktv.log"} every {AggregationInterval.Minutes()}, starting at {StartAt.Time()}.");
+            Console.WriteLine($"Will log active window every {LogInterval.Minutes()} starting in {Delay.Seconds()}.");
+            Console.WriteLine($"Will aggregate activity every {AggregationInterval.Minutes()} starting at {StartAt.Time()}.");
+            if (Duration >= 0) Console.WriteLine($"Will continue for {Duration.Minutes()}.");
             Thread.Sleep(Delay * 1000);
         }
     }
