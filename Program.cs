@@ -21,9 +21,9 @@ static void Sleep(int milliseconds, ref int elapsed)
 }
 #endregion local functions
 ConsoleArgs.Init(args);
+List<ActivityRecord> previousRecords = new();
 ActivityRecord activityRecord = new();
-DateTime lastAggregationTime = DateTime.Now, 
-         nextAggregationTime = ConsoleArgs.StartAt;
+DateTime nextAggregationTime = ConsoleArgs.StartAt;
 TimeSpan aggregationTimespan = TimeSpan.FromMinutes(ConsoleArgs.AggregationInterval);
 int durationMilliseconds = (int)(ConsoleArgs.Duration * Constants.MillisecondsPerMinute),
     millisecondsElapsed = 0;
@@ -37,7 +37,8 @@ while (ConsoleArgs.Duration < 0 || millisecondsElapsed < ConsoleArgs.Duration)
     {
         string mca = $"{DateTime.Now.Time(),8}\t{activityRecord.MostCommon}";
         Log($"{mca}\n", "TEMP.ktv.log");
-        activityRecords.Clear();
+        if (!previousRecords.Any() || previousRecords.Last().TryMerge(activityRecord)) previousRecords.Add(activityRecord);
+        activityRecord = new();
         nextAggregationTime += aggregationTimespan;
     }
 }

@@ -10,13 +10,15 @@ namespace ktv
     internal class ActivityRecord
     {
         public DateTime StartedAt { get; private set; }
-        public DateTime? EndedAt { get; private set; } = null;
-        private readonly List<string> activities = new();
+        public DateTime? EndedAt => activities?.Select(x => x.Key)
+                                               .OrderBy(x => x)
+                                               .Last() ?? null;
+        private readonly Dictionary<DateTime, string> activities = new();
         public IEnumerable<string> Activities
         {
             get
             {
-                foreach (string activity in activities) yield return activity;
+                foreach (DateTime key in activities.Keys.OrderBy(x => x)) yield return activities[key];
             }
         }
         public DateTime Date => StartedAt.Date;
@@ -27,8 +29,7 @@ namespace ktv
         }
         public void Log(string activity)
         {
-            activities.Add(activity);
-            EndedAt = DateTime.Now;
+            activities[DateTime.Now] = activity;
             _mostCommon = null;
         }
         private string? _mostCommon = null;
@@ -38,9 +39,9 @@ namespace ktv
             {
                 if(_mostCommon is null)
                 {
-                    if (!activities.Any()) return _mostCommon.DefinitelyReadableString();
+                    if (!Activities.Any()) return _mostCommon.DefinitelyReadableString();
                     Dictionary<string, int> dict = new();
-                    foreach (string activity in activities)
+                    foreach (string activity in Activities)
                     {
                         if (!dict.ContainsKey(activity)) dict.Add(activity, 1);
                         else dict[activity]++;
@@ -54,20 +55,37 @@ namespace ktv
                 return _mostCommon;
             }
         }
-        public void Merge(ActivityRecord other)
+        public bool OverlapsWith(ActivityRecord other) 
         {
-            if (other is null || other.Date != Date || other.MostCommon != MostCommon) return;
+            if (other.EndedAt > StartedAt && other.StartedAt <= EndedAt) return true;
+            if (other.OverlapsWith(this)) return true;
+            return false;
+        }
+        public bool AdjacentTo(ActivityRecord other)
+        {
+            if (other.StartedAt - EndedAt < TimeSpan.FromMinutes(ConsoleArgs.AggregationInterval)) return true;
+            if (other.AdjacentTo(this)) return true;
+            return false;
+        }
+        public bool TryMerge(ActivityRecord other)
+        {
+            if (other is null 
+            || other.Date != Date 
+            || other.MostCommon != MostCommon
+            || other.OverlapsWith(this)
+            || !other.AdjacentTo(this)) return false;
             if (EndedAt is null || other.EndedAt is null)
                 throw new Exception("Should not merge ActivityRecords when one of their EndedAt values is null!\n"
                                  + $"\tother.EndedAt = {other.EndedAt.DefinitelyReadableString()}\n"
                                  + $"\tthis. EndedAt = {EndedAt.DefinitelyReadableString()}");
             DateTime first = other.StartedAt < StartedAt ? other.StartedAt : StartedAt;
-            DateTime otherEA = other.EndedAt.Value, thisEA = EndedAt.Value;
-            DateTime last = otherEA > thisEA ? otherEA : thisEA;
-
             StartedAt = first;
-            EndedAt = last;
-            foreach (string activity in other.Activities) activities.Add(activity);
+            foreach (KeyValuePair<DateTime, string> kvp in other.activities) activities.Add(kvp.Key, kvp.Value);
+            return true;
+        }
+        public override string ToString()
+        {
+            return base.ToString();
         }
     }
 }
