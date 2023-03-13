@@ -39,7 +39,7 @@ namespace ktv
             {
                 if(_mostCommon is null)
                 {
-                    if (!Activities.Any()) return _mostCommon.DefinitelyReadableString();
+                    if (!Activities.Any()) return _mostCommon.PrintNull();
                     Dictionary<string, int> dict = new();
                     foreach (string activity in Activities)
                     {
@@ -76,16 +76,14 @@ namespace ktv
             || !other.AdjacentTo(this)) return false;
             if (EndedAt is null || other.EndedAt is null)
                 throw new Exception("Should not merge ActivityRecords when one of their EndedAt values is null!\n"
-                                 + $"\tother.EndedAt = {other.EndedAt.DefinitelyReadableString()}\n"
-                                 + $"\tthis. EndedAt = {EndedAt.DefinitelyReadableString()}");
+                                 + $"\tother.EndedAt = {other.EndedAt.PrintNull()}\n"
+                                 + $"\tthis. EndedAt = {EndedAt.PrintNull()}");
             DateTime first = other.StartedAt < StartedAt ? other.StartedAt : StartedAt;
             StartedAt = first;
             foreach (KeyValuePair<DateTime, string> kvp in other.activities) activities.Add(kvp.Key, kvp.Value);
             return true;
         }
-        public override string ToString()
-        {
-            return base.ToString();
-        }
+        public override string ToString() => $"{StartedAt,8}\t{EndedAt.PrintNull(),8}\t{MostCommon.PrintNull()}";
+        public static string Header(DateTime date) => $"{date.ToString(TimeFormats.Date)}\n{"Start",8}\t{"End",8}\tActivity";
     }
 }

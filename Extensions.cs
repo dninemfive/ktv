@@ -10,7 +10,7 @@ namespace ktv
     public enum TitlePosition { First, Last }
     internal static class Extensions
     {
-        public static string DefinitelyReadableString(this object? obj, string text = "(null)") => obj?.ToString() ?? text;
+        public static string PrintNull(this object? obj, string text = "(null)") => obj?.ToString() ?? text;
         public static string Readable<T>(this IEnumerable<T> enumerable)
         {
             if (enumerable is null) return "(null enumerable)";

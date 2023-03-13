@@ -26,7 +26,7 @@ namespace ktv
                 Value = tuple.Value.value;
             }
         }
-        public override string ToString() => InvalidStr ?? $"{Key.DefinitelyReadableString("(null key)")}{ArgumentSeparator}{Value.DefinitelyReadableString("(null value)")}";
+        public override string ToString() => InvalidStr ?? $"{Key.PrintNull("(null key)")}{ArgumentSeparator}{Value.PrintNull("(null value)")}";
         public T? Try<T>(string key, Func<string, T> parser)
         {
             if (Invalid || Value is null || Key != key)
