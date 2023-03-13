@@ -55,25 +55,11 @@ namespace ktv
                 return _mostCommon;
             }
         }
-        public bool OverlapsWith(ActivityRecord other) 
-        {
-            if (other.EndedAt > StartedAt && other.StartedAt <= EndedAt) return true;
-            if (other.OverlapsWith(this)) return true;
-            return false;
-        }
-        public bool AdjacentTo(ActivityRecord other)
-        {
-            if (other.StartedAt - EndedAt < TimeSpan.FromMinutes(ConsoleArgs.AggregationInterval)) return true;
-            if (other.AdjacentTo(this)) return true;
-            return false;
-        }
         public bool TryMerge(ActivityRecord other)
         {
             if (other is null 
             || other.Date != Date 
-            || other.MostCommon != MostCommon
-            || other.OverlapsWith(this)
-            || !other.AdjacentTo(this)) return false;
+            || other.MostCommon != MostCommon) return false;
             if (EndedAt is null || other.EndedAt is null)
                 throw new Exception("Should not merge ActivityRecords when one of their EndedAt values is null!\n"
                                  + $"\tother.EndedAt = {other.EndedAt.PrintNull()}\n"

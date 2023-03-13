@@ -29,6 +29,8 @@ static void WriteActivity(IEnumerable<ActivityRecord> records)
     List<DateTime> uniqueDates = records.Select(x => x.Date).ToList();
     foreach(DateTime uniqueDate in uniqueDates)
     {
+        // todo: check if the path already exists and append a (n) instead of overwriting
+        // also, put logs in a specified folder (default to subfolder of install path)
         string path = $"{uniqueDate.ToString(TimeFormats.Date)}-aggregate.ktv.log";
         File.WriteAllLines(path, DailyActivity(records, uniqueDate));
     }
