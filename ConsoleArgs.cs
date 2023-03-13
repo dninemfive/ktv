@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -33,6 +34,7 @@ namespace ktv
                 carg.TrySet(nameof(startAt), ref startAt, ConsoleArg.Parsers.DateTime);
                 carg.TrySet(nameof(logFolder), ref logFolder, ConsoleArg.Parsers.DirectoryPath);
             }
+            if (!Directory.Exists(logFolder)) Directory.CreateDirectory(logFolder);
             if (startAt < DateTime.Now) startAt = DateTime.Now.Ceiling(AggregationInterval);
             Console.WriteLine($"Will log active window every {LogInterval:g} starting in {Delay:g}.");
             Console.WriteLine($"Will aggregate activity every {AggregationInterval:g} starting at {StartAt.Time()}.");

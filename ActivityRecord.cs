@@ -66,6 +66,7 @@ namespace ktv
             DateTime first = other.StartedAt < StartedAt ? other.StartedAt : StartedAt;
             StartedAt = first;
             foreach (KeyValuePair<DateTime, string> kvp in other.activities) activities.Add(kvp.Key, kvp.Value);
+            Console.WriteLine($"Merged: {Data}");
             return true;
         }
         public override string ToString() => $"{StartedAt.Time(),-8}\t{(EndedAt?.Time()).PrintNull(),-8}\t{MostCommon.PrintNull()}";
@@ -77,7 +78,7 @@ namespace ktv
                 string result = $"ActivityRecord {StartedAt:G}-{EndedAt:G} ({MostCommon}) {{\n";
                 foreach((DateTime timestamp, string activity) in ActivityTimestamps)
                 {
-                    result += $"{timestamp.Time()}: {activity}\n";
+                    result += $"\t{timestamp.Time()}: {activity}\n";
                 }
                 return result + "}";
             }
