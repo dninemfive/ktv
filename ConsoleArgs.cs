@@ -22,6 +22,8 @@ namespace ktv
         public static string LogFolder => logFolder;
         private static string logFolder = string.Empty;
         public static string LogPath { get; private set; } = string.Empty;
+        public static bool Debug => debug;
+        private static bool debug = false;
         public static void Init(string[] args)
         {
             Console.WriteLine("Starting ktv...");
@@ -34,6 +36,7 @@ namespace ktv
                 carg.TrySet(nameof(delay), ref delay, ConsoleArg.Parsers.Int);
                 carg.TrySet(nameof(startAt), ref startAt, ConsoleArg.Parsers.DateTime);
                 carg.TrySet(nameof(logFolder), ref logFolder, ConsoleArg.Parsers.DirectoryPath);
+                carg.TrySet(nameof(debug), ref debug, ConsoleArg.Parsers.Bool);
             }
             #region defaults
             if (string.IsNullOrEmpty(logFolder)) logFolder = Path.GetFullPath("logs/");

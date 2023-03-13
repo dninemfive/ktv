@@ -38,6 +38,7 @@ namespace ktv
         public delegate PossiblyNull<T> Parser<T>(string key);
         public static class Parsers
         {
+            public static Parser<bool> Bool => key => bool.TryParse(key, out bool b) ? b : PossiblyNull<bool>.Null;
             public static Parser<float> Float => key => float.TryParse(key, out float f) ? f : PossiblyNull<float>.Null;
             public static Parser<int> Int => key => int.TryParse(key, out int i) ? i : PossiblyNull<int>.Null;
             public static Parser<DateTime> DateTime => key => System.DateTime.TryParse(key, out DateTime dt) ? dt : ktv.PossiblyNull<System.DateTime>.Null;
