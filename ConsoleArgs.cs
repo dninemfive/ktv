@@ -8,16 +8,16 @@ namespace ktv
 {
     public static class ConsoleArgs
     {        
-        public static int Delay => delay;
+        public static TimeSpan Delay => TimeSpan.FromSeconds(delay);
         private static int delay = 5;
-        public static float LogInterval => logInterval;
+        public static TimeSpan LogInterval => TimeSpan.FromMinutes(logInterval);
         private static float logInterval = 0.25f;               
-        public static float Duration => duration;
+        public static TimeSpan? Duration => duration <= 0 ? null : TimeSpan.FromMinutes(duration);
         private static float duration = -1;        
-        public static float AggregationInterval => aggregationInterval;
+        public static TimeSpan AggregationInterval => TimeSpan.FromMinutes(aggregationInterval);
         private static float aggregationInterval = 15;
         public static DateTime StartAt => startAt;
-        private static DateTime startAt = DateTime.Now.Ceiling(TimeSpan.FromMinutes(AggregationInterval));
+        private static DateTime startAt = DateTime.Now.Ceiling(AggregationInterval);
         public static string LogFolder => logFolder;
         private static string logFolder = "logs/";
         public static void Init(string[] args)
@@ -33,9 +33,9 @@ namespace ktv
                 carg.TrySet(nameof(startAt), ref startAt, ConsoleArg.Parsers.DateTime);
                 carg.TrySet(nameof(logFolder), ref logFolder, ConsoleArg.Parsers.DirectoryPath);
             }
-            Console.WriteLine($"Will log active window every {LogInterval.Minutes()} starting in {Delay.Seconds()}.");
-            Console.WriteLine($"Will aggregate activity every {AggregationInterval.Minutes()} starting at {StartAt.Time()}.");
-            if (Duration >= 0) Console.WriteLine($"Will continue for {Duration.Minutes()}.");
+            Console.WriteLine($"Will log active window every {LogInterval:g} starting in {Delay:g}.");
+            Console.WriteLine($"Will aggregate activity every {AggregationInterval:g} starting at {StartAt.Time()}.");
+            if (Duration is null) Console.WriteLine($"Will continue for {Duration:g}.");
             Thread.Sleep(Delay * 1000);
         }
     }

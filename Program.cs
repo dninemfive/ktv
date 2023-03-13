@@ -11,13 +11,13 @@ string StringFor(object obj) => $"{++ct,8}\t{DateTime.Now}\t{obj.ToString() ?? o
 void Log(string line, string? extraPath = null)
 {
     Console.Write(line);
-    File.AppendAllText(Constants.LogName, line);
+    File.AppendAllText(Path.Join(ConsoleArgs.LogFolder, Constants.LogName), line);
     if(extraPath is not null) File.AppendAllText(extraPath, line);
 }
-static void Sleep(int milliseconds, ref int elapsed)
+static void Sleep(TimeSpan duration, ref TimeSpan elapsed)
 {
-    Thread.Sleep(milliseconds);
-    elapsed += milliseconds;
+    Thread.Sleep((int)duration.TotalMilliseconds);
+    elapsed += duration;
 }
 static IEnumerable<string> DailyActivity(IEnumerable<ActivityRecord> records, DateTime date)
 {
@@ -31,7 +31,7 @@ static void WriteActivity(IEnumerable<ActivityRecord> records)
     {
         // todo: check if the path already exists and append a (n) instead of overwriting
         // also, put logs in a specified folder (default to subfolder of install path)
-        string path = $"{uniqueDate.ToString(TimeFormats.Date)}-aggregate.ktv.log";
+        string path = Path.Join(ConsoleArgs.LogFolder, $"{uniqueDate.ToString(TimeFormats.Date)}-aggregate.ktv.log");
         File.WriteAllLines(path, DailyActivity(records, uniqueDate));
     }
 }
@@ -40,22 +40,20 @@ ConsoleArgs.Init(args);
 List<ActivityRecord> previousRecords = new();
 ActivityRecord activityRecord = new();
 DateTime nextAggregationTime = ConsoleArgs.StartAt;
-TimeSpan aggregationTimespan = TimeSpan.FromMinutes(ConsoleArgs.AggregationInterval);
-int logInterval = (int)(ConsoleArgs.LogInterval * Constants.MillisecondsPerMinute),
-    millisecondsElapsed = 0;
-while (ConsoleArgs.Duration < 0 || millisecondsElapsed < ConsoleArgs.Duration)
+TimeSpan elapsed = TimeSpan.Zero;
+while (ConsoleArgs.Duration is null || elapsed < ConsoleArgs.Duration)
 {
     ActiveWindowInfo info = ActiveWindow.Info;
     activityRecord.Log(info.Program);
     Log(StringFor(info));
-    Sleep(logInterval, ref millisecondsElapsed);
+    Sleep(ConsoleArgs.LogInterval, ref elapsed);
     if(DateTime.Now > nextAggregationTime)
     {
         string mca = $"{DateTime.Now.Time(),8}\t{activityRecord.MostCommon}";
         Log($"{mca}\n");        
         if (!previousRecords.Any() || previousRecords.Last().TryMerge(activityRecord)) previousRecords.Add(activityRecord);
         activityRecord = new();
-        nextAggregationTime += aggregationTimespan;
+        nextAggregationTime += ConsoleArgs.AggregationInterval;
         WriteActivity(previousRecords);
     }
 }
