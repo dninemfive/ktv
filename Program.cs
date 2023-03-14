@@ -18,11 +18,8 @@ static void Sleep(TimeSpan duration, ref TimeSpan elapsed)
 }
 IEnumerable<string> DailyActivity(IEnumerable<ActivityRecord> records, DateTime date)
 {
-    
-    if(existingAggregateLines is null)
-    {
-        yield return ActivityRecord.Header;
-    } else
+    yield return ActivityRecord.Header;
+    if(existingAggregateLines is not null)
     {
         foreach (string line in existingAggregateLines) yield return line;
     }
@@ -30,12 +27,10 @@ IEnumerable<string> DailyActivity(IEnumerable<ActivityRecord> records, DateTime 
 }
 void WriteActivity(IEnumerable<ActivityRecord> records)
 {
-    //Console.WriteLine($"Writing activity with {records.Count()} records.");
     List<DateTime> uniqueDates = records.Select(x => x.Date).ToList();
     foreach(DateTime uniqueDate in uniqueDates)
     {
         string path = ActivityRecord.AggregateFile(uniqueDate);
-        //Console.WriteLine($"\t{path}");
         File.WriteAllLines(path, DailyActivity(records, uniqueDate));
     }
 }

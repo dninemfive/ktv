@@ -58,10 +58,11 @@ namespace ktv
         /// <param name="time"></param>
         /// <param name="span"></param>
         /// <returns></returns>
-        public static DateTime Ceiling(this DateTime date, TimeSpan span)
+        public static DateTime Ceiling(this DateTime date, TimeSpan? span = null)
         {
-            long ticks = (date.Ticks + span.Ticks - 1) / span.Ticks;
-            return new DateTime(ticks * span.Ticks, date.Kind);
+            TimeSpan ts = span ?? TimeSpan.FromMinutes(1);
+            long ticks = (date.Ticks + ts.Ticks - 1) / ts.Ticks;
+            return new DateTime(ticks * ts.Ticks, date.Kind);
         }
     }
 }
