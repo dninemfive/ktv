@@ -63,7 +63,6 @@ namespace ktv
             DateTime first = other.StartedAt < StartedAt ? other.StartedAt : StartedAt;
             StartedAt = first;
             foreach (KeyValuePair<DateTime, string> kvp in other.activities) activities.Add(kvp.Key, kvp.Value);
-            Console.WriteLine($"Merged: {Data}");
             return true;
         }
         public override string ToString() => $"{StartedAt.Time(),-8}\t{(EndedAt?.Ceiling().Time()).PrintNull(),-8}\t{MostCommon.PrintNull()}";

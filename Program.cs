@@ -1,6 +1,5 @@
 ﻿// See https://aka.ms/new-console-template for more information
 using ktv;
-using ktv.WindowNames;
 using System.IO;
 
 #region console args
