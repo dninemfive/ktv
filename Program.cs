@@ -18,7 +18,7 @@ static void Sleep(TimeSpan duration, ref TimeSpan elapsed)
 IEnumerable<string> DailyActivity(IEnumerable<ActivityRecord> records, DateTime date)
 {
     yield return ActivityRecord.Header;
-    if(existingAggregateLines is not null)
+    if(existingAggregateLines is not null && launchedOnDate == DateTime.Today)
     {
         foreach (string line in existingAggregateLines) yield return line;
     }
@@ -32,6 +32,7 @@ void WriteActivity(IEnumerable<ActivityRecord> records)
         string path = ActivityRecord.AggregateFile(uniqueDate);
         File.WriteAllLines(path, DailyActivity(records, uniqueDate));
     }
+
 }
 #endregion local functions
 ConsoleArgs.Init(args);
@@ -58,5 +59,6 @@ while (ConsoleArgs.Duration is null || elapsed < ConsoleArgs.Duration)
         activityRecord = new();
         nextAggregationTime += ConsoleArgs.AggregationInterval;
         WriteActivity(previousRecords);
+        previousRecords = previousRecords.Where(x => x.FromToday).ToList();
     }
 }

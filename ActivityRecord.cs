@@ -80,5 +80,6 @@ namespace ktv
                 return result + "}";
             }
         }
+        public bool FromToday => Date == DateTime.Today;
     }
 }
