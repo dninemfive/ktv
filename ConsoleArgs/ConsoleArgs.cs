@@ -46,7 +46,7 @@ namespace ktv
             #endregion defaults
             Console.WriteLine($"Will log active window every {LogInterval:g} starting in {Delay:g}.");
             Console.WriteLine($"Will aggregate activity every {AggregationInterval:g} starting at {StartAt.Time()}.");
-            Console.WriteLine($"Log folder is {logFolder}.");
+            Console.WriteLine($"Log folder is {logFolder.Replace(@"\","/")}.");
             if (Duration is not null) Console.WriteLine($"Will continue for {Duration:g}.");
             Thread.Sleep(Delay);
         }
