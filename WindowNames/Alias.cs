@@ -13,7 +13,9 @@ namespace ktv
         public static readonly List<Alias> List = new()
         {
             new("Mozilla Firefox.*", "Mozilla Firefox"),
-            new(".*Visual Studio", "Visual Studio")
+            new(".*Visual Studio", "Visual Studio"),
+            new("GNU Image Manipulation Program", "GIMP"),
+            new("GIMP Startup", "GIMP")
         };
         public Regex Matcher { get; private set; }
         public string Replacement { get; private set; }

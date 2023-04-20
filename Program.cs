@@ -18,7 +18,7 @@ static void Sleep(TimeSpan duration, ref TimeSpan elapsed)
 IEnumerable<string> DailyActivity(IEnumerable<ActivityRecord> records, DateTime date)
 {
     yield return ActivityRecord.Header;
-    if(existingAggregateLines is not null && launchedOnDate == DateTime.Today)
+    if(existingAggregateLines is not null && launchedOnDate == date)
     {
         foreach (string line in existingAggregateLines) yield return line;
     }
