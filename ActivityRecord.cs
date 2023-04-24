@@ -4,6 +4,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using d9.utl;
 
 namespace ktv
 {
@@ -46,7 +47,7 @@ namespace ktv
                                                           .Where(x => x.Value == dict.Select(x => x.Value).Max())
                                                           .Select(x => x.Key);
                     if (mostCommons.Count() == 1) _mostCommon = mostCommons.First();
-                    else _mostCommon = mostCommons.OrderBy(x => x).Readable();
+                    else _mostCommon = mostCommons.OrderBy(x => x).ListNotation();
                 }
                 return _mostCommon;
             }

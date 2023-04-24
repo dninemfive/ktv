@@ -10,15 +10,6 @@ namespace ktv
     public enum TitlePosition { First, Last }
     internal static class Extensions
     {
-        public static string PrintNull(this object? obj, string text = "(null)") => obj?.ToString() ?? text;
-        public static string Readable<T>(this IEnumerable<T> enumerable)
-        {
-            if (enumerable is null) return "(null enumerable)";
-            if (!enumerable.Any()) return "[]";
-            string result = "";
-            foreach (T item in enumerable) result += $"{item}, ";
-            return $"[{result[..^2]}]";
-        }
         public static (string a, string? b)? SplitOn(this string str, string separator, TitlePosition titlePosition)
         {
             if (str is null) return null;
