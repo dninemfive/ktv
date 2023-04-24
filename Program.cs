@@ -8,7 +8,7 @@ using System.IO;
 #endregion console args
 # region local functions
 int ct = 0;
-string StringFor(object obj) => $"{++ct,8}\t{DateTime.Now}\t{obj.ToString() ?? obj.PrintNull()}\n";
+string StringFor(object obj) => $"{++ct,8}\t{DateTime.Now}\t{obj.ToString() ?? obj.PrintNull()}";
 List<string>? existingAggregateLines = null;
 DateTime launchedOnDate = DateTime.Today;
 static void Sleep(TimeSpan duration, ref TimeSpan elapsed)
@@ -50,12 +50,12 @@ while (ConsoleArgs.Duration is null || elapsed < ConsoleArgs.Duration)
 {
     ActiveWindowInfo info = ActiveWindow.Info;
     activityRecord.Log(info.Program);
-    Utils.Log(StringFor(info));
+    Utils.Log(StringFor(info), ConsoleArgs.LogPath);
     Sleep(ConsoleArgs.LogInterval, ref elapsed);
     if(DateTime.Now >= nextAggregationTime)
     {
         string mca = $"{DateTime.Now.Time(),8}\t{activityRecord.MostCommon}";
-        Utils.Log($"{mca}\n");        
+        Utils.Log(mca, ConsoleArgs.LogPath);        
         if (!previousRecords.Any() || !previousRecords.Last().TryMerge(activityRecord)) previousRecords.Add(activityRecord);
         activityRecord = new();
         nextAggregationTime += ConsoleArgs.AggregationInterval;
