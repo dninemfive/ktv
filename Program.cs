@@ -35,7 +35,7 @@ void WriteActivity(IEnumerable<ActivityRecord> records)
 
 }
 #endregion local functions
-ConsoleArgs.Init(args);
+ConsoleArgs.Init();
 if(File.Exists(ActivityRecord.AggregateFile(launchedOnDate)))
 {
     string[] lines = File.ReadAllLines(ActivityRecord.AggregateFile(launchedOnDate));

@@ -32,23 +32,6 @@ namespace ktv
                 _ => throw new ArgumentOutOfRangeException(nameof(titlePosition))
             };
         }
-        public static T? Parse<T>(this string str, string key, Func<string, T> parser)
-        {
-            if(str.SplitOn(ConsoleArg.ArgumentSeparator, TitlePosition.First) is (string, string) notNull)
-            {
-                (string k, string v) = notNull;
-                if (v is null) return default;
-                try
-                {
-                    if (k == key) return parser(v);
-                }
-                catch
-                {
-                    return default;
-                }
-            }
-            return default;
-        }
         public static string Time(this DateTime time) => time.ToString(TimeFormats.Time);
         public static string Format(this DateTime time, string format) => time.ToString(format);
         /// <summary>
