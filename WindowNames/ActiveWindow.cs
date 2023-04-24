@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 using System.Runtime.InteropServices;
 
 // https://stackoverflow.com/a/115905
-namespace ktv
+namespace d9.ktv
 {
     public static class ActiveWindow
     {

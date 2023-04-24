@@ -5,7 +5,7 @@ using System.Text;
 using System.Text.RegularExpressions;
 using System.Threading.Tasks;
 
-namespace ktv
+namespace d9.ktv
 {
     internal record WindowNameParser
     {

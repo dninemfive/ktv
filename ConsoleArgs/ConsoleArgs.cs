@@ -6,7 +6,7 @@ using System.Text;
 using System.Threading.Tasks;
 using d9.utl;
 
-namespace ktv
+namespace d9.ktv
 {
     public static class ConsoleArgs
     {
