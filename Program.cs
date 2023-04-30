@@ -37,6 +37,7 @@ void WriteActivity(IEnumerable<ActivityRecord> records)
 }
 #endregion local functions
 ConsoleArgs.Init();
+Utils.DefaultLog = new(ConsoleArgs.LogPath, mode: Log.Mode.WriteImmediate);
 if(File.Exists(ActivityRecord.AggregateFile(launchedOnDate)))
 {
     string[] lines = File.ReadAllLines(ActivityRecord.AggregateFile(launchedOnDate));
@@ -50,12 +51,12 @@ while (ConsoleArgs.Duration is null || elapsed < ConsoleArgs.Duration)
 {
     ActiveWindowInfo info = ActiveWindow.Info;
     activityRecord.Log(info.Program);
-    Utils.Log(StringFor(info), ConsoleArgs.LogPath);
+    Utils.Log(StringFor(info));
     Sleep(ConsoleArgs.LogInterval, ref elapsed);
     if(DateTime.Now >= nextAggregationTime)
     {
         string mca = $"{DateTime.Now.Time(),8}\t{activityRecord.MostCommon}";
-        Utils.Log(mca, ConsoleArgs.LogPath);        
+        Utils.Log(mca);        
         if (!previousRecords.Any() || !previousRecords.Last().TryMerge(activityRecord)) previousRecords.Add(activityRecord);
         activityRecord = new();
         nextAggregationTime += ConsoleArgs.AggregationInterval;

@@ -25,7 +25,6 @@ namespace d9.ktv
               ?? DateTime.Now.Ceiling(AggregationInterval);
         public static readonly string LogFolder = Path.Join(Config.BaseFolderPath, "logs");
         public static readonly string LogPath = Path.Join(LogFolder, $"{DateTime.Now.Format(TimeFormats.DateTime24H)}.ktv.log");
-        public static bool Debug => d9.utl.Utils.DebugEnabled;
         public static void Init()
         {
             Console.WriteLine("Starting ktv...");
