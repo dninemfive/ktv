@@ -1,5 +1,6 @@
 ﻿// See https://aka.ms/new-console-template for more information
 using d9.utl;
+using d9.utl.compat;
 using System.IO;
 namespace d9.ktv
 {
@@ -13,6 +14,7 @@ namespace d9.ktv
             public static readonly TimeSpan AggregationInterval
                                     = CommandLineArgs.TryGet(nameof(AggregationInterval), CommandLineArgs.Parsers.UsingParser(TimeSpan.FromMinutes))
                                    ?? TimeSpan.FromMinutes(15);
+            public static readonly string? CalendarId = CommandLineArgs.TryGet(nameof(CalendarId), CommandLineArgs.Parsers.FirstNonNullOrEmptyString);
         }
         public static DateTime NextAggregationTime { get; private set; } = DateTime.Now.Ceiling(Args.AggregationInterval);
         public static int LineNumber { get; private set; } = 0;        
@@ -22,9 +24,10 @@ namespace d9.ktv
         private static ActivityRecord CurrentRecord = new();
         public static readonly string LogFolder = Path.Join(Config.BaseFolderPath, "logs");
         public static readonly string LogPath = Path.Join(LogFolder, $"{DateTime.Now.Format(TimeFormats.DateTime24H)}.ktv.log");
+        public static bool UpdateGoogleCalendar => Args.CalendarId is not null && GoogleUtils.ValidConfig;
         public static void Main()
         {
-            Utils.Log($"Logging to {LogFolder.Replace(@"\", " / ")} every {Args.LogInterval:g} with aggregation every {Args.AggregationInterval:g} and " +
+            Utils.Log($"Logging to `{LogFolder.Replace(@"\", "/")}` every {Args.LogInterval:g}; aggregating every {Args.AggregationInterval:g}, " +
                               $"starting at {NextAggregationTime.Time()}.");            
             PerformSetup();
             try
@@ -83,7 +86,14 @@ namespace d9.ktv
         private static void Aggregate()
         {
             Utils.Log($"{DateTime.Now.Time(),8}\t{CurrentRecord.MostCommon}");
-            if (!PreviousRecords.Any() || !PreviousRecords.Last().TryMerge(CurrentRecord)) PreviousRecords.Add(CurrentRecord);
+            if (!PreviousRecords.Any() || !PreviousRecords.Last().TryMerge(CurrentRecord))
+            {
+                PreviousRecords.Add(CurrentRecord);
+                if (UpdateGoogleCalendar) GoogleUtils.AddEventTo(Args.CalendarId!,                  // known to be non-null because of UpdateGoogleCalendar
+                                                                 CurrentRecord.MostCommon,
+                                                                 CurrentRecord.StartedAt,
+                                                                 CurrentRecord.EndedAt!.Value);     // known to be non-null because of check in TryMerge()
+            }
             CurrentRecord = new();
             NextAggregationTime += Args.AggregationInterval;
             WriteActivity();

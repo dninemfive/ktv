@@ -64,11 +64,12 @@ namespace d9.ktv
             DateTime first = other.StartedAt < StartedAt ? other.StartedAt : StartedAt;
             StartedAt = first;
             foreach (KeyValuePair<DateTime, string> kvp in other.activities) activities.Add(kvp.Key, kvp.Value);
+            // update calendar with new ending time
             return true;
         }
         public override string ToString() => $"{StartedAt.Time(),-8}\t{(EndedAt?.Ceiling().Time()).PrintNull(),-8}\t{MostCommon.PrintNull()}";
         public static readonly string Header = $"{"Start",-8}\t{"End",-8}\tActivity";
-        public static string AggregateFile(DateTime date) => Path.Join(ConsoleArgs.LogFolder, $"{date.ToString(TimeFormats.Date)}-aggregate.ktv.log");
+        public static string AggregateFile(DateTime date) => Path.Join(Program.LogFolder, $"{date.ToString(TimeFormats.Date)}-aggregate.ktv.log");
         public string Data
         {
             get
