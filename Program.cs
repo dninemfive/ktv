@@ -1,66 +1,81 @@
 ﻿// See https://aka.ms/new-console-template for more information
-using d9.ktv;
 using d9.utl;
 using System.IO;
-
-#region console args
-
-#endregion console args
-# region local functions
-int ct = 0;
-string StringFor(object obj) => $"{++ct,8}\t{DateTime.Now}\t{obj.ToString() ?? obj.PrintNull()}";
-List<string>? existingAggregateLines = null;
-DateTime launchedOnDate = DateTime.Today;
-static void Sleep(TimeSpan duration, ref TimeSpan elapsed)
+namespace d9.ktv
 {
-    Thread.Sleep((int)duration.TotalMilliseconds);
-    elapsed += duration;
-}
-IEnumerable<string> DailyActivity(IEnumerable<ActivityRecord> records, DateTime date)
-{
-    yield return ActivityRecord.Header;
-    if(existingAggregateLines is not null && launchedOnDate == date)
+    public class Program
     {
-        foreach (string line in existingAggregateLines) yield return line;
-    }
-    foreach (ActivityRecord record in records.Where(x => x.Date == date).OrderBy(x => x.StartedAt)) yield return record.ToString();
-}
-void WriteActivity(IEnumerable<ActivityRecord> records)
-{
-    List<DateTime> uniqueDates = records.Select(x => x.Date).ToList();
-    foreach(DateTime uniqueDate in uniqueDates)
-    {
-        string path = ActivityRecord.AggregateFile(uniqueDate);
-        File.WriteAllLines(path, DailyActivity(records, uniqueDate));
-    }
-
-}
-#endregion local functions
-ConsoleArgs.Init();
-Utils.DefaultLog = new(ConsoleArgs.LogPath, mode: Log.Mode.WriteImmediate);
-if(File.Exists(ActivityRecord.AggregateFile(launchedOnDate)))
-{
-    string[] lines = File.ReadAllLines(ActivityRecord.AggregateFile(launchedOnDate));
-    if(lines.Length > 1) existingAggregateLines = lines[1..].ToList();
-}
-List<ActivityRecord> previousRecords = new();
-ActivityRecord activityRecord = new();
-DateTime nextAggregationTime = ConsoleArgs.StartAt;
-TimeSpan elapsed = TimeSpan.Zero;
-while (ConsoleArgs.Duration is null || elapsed < ConsoleArgs.Duration)
-{
-    ActiveWindowInfo info = ActiveWindow.Info;
-    activityRecord.Log(info.Program);
-    Utils.Log(StringFor(info));
-    Sleep(ConsoleArgs.LogInterval, ref elapsed);
-    if(DateTime.Now >= nextAggregationTime)
-    {
-        string mca = $"{DateTime.Now.Time(),8}\t{activityRecord.MostCommon}";
-        Utils.Log(mca);        
-        if (!previousRecords.Any() || !previousRecords.Last().TryMerge(activityRecord)) previousRecords.Add(activityRecord);
-        activityRecord = new();
-        nextAggregationTime += ConsoleArgs.AggregationInterval;
-        WriteActivity(previousRecords);
-        previousRecords = previousRecords.Where(x => x.FromToday).ToList();
+        public static TimeSpan Elapsed { get; private set; } = TimeSpan.Zero;
+        public static DateTime NextAggregationTime { get; private set; } = ConsoleArgs.StartAt;
+        public static int LineNumber { get; private set; } = 0;
+        private static List<string>? ExistingAggregateLines = null;
+        public static DateTime LaunchedOn { get; } = DateTime.Today;
+        private static List<ActivityRecord> PreviousRecords = new();
+        private static ActivityRecord CurrentRecord = new();
+        public static void Main()
+        {
+            ConsoleArgs.Init();
+            Utils.DefaultLog = new(ConsoleArgs.LogPath, mode: Log.Mode.WriteImmediate);
+            if (File.Exists(ActivityRecord.AggregateFile(LaunchedOn)))
+            {
+                string[] lines = File.ReadAllLines(ActivityRecord.AggregateFile(LaunchedOn));
+                if (lines.Length > 1) ExistingAggregateLines = lines[1..].ToList();
+            }
+            try
+            {
+                MainLoop();
+            } finally
+            {
+                WriteActivity();
+            }
+        }
+        private static void Sleep(TimeSpan duration)
+        {
+            Thread.Sleep((int)duration.TotalMilliseconds);
+            Elapsed += duration;
+        }
+        private static IEnumerable<string> DailyActivity(DateTime date)
+        {
+            yield return ActivityRecord.Header;
+            if (ExistingAggregateLines is not null && LaunchedOn == date)
+            {
+                foreach (string line in ExistingAggregateLines) yield return line;
+            }
+            foreach (ActivityRecord record in PreviousRecords.Where(x => x.Date == date).OrderBy(x => x.StartedAt)) yield return record.ToString();
+        }
+        private static void WriteActivity()
+        {
+            List<DateTime> uniqueDates = PreviousRecords.Select(x => x.Date).ToList();
+            foreach (DateTime uniqueDate in uniqueDates)
+            {
+                string path = ActivityRecord.AggregateFile(uniqueDate);
+                File.WriteAllLines(path, DailyActivity(uniqueDate));
+            }
+        }
+        private static void MainLoop()
+        {
+            
+            while (ConsoleArgs.Duration is null || Elapsed < ConsoleArgs.Duration)
+            {
+                RecordActivity();
+                Sleep(ConsoleArgs.LogInterval);
+                if (DateTime.Now >= NextAggregationTime) Aggregate();
+            }
+        }
+        private static void RecordActivity()
+        {
+            ActiveWindowInfo info = ActiveWindow.Info;
+            CurrentRecord.Log(info.Program);
+            Utils.Log($"{++LineNumber,8}\t{DateTime.Now}\t{info.PrintNull()}");
+        }
+        private static void Aggregate()
+        {
+            Utils.Log($"{DateTime.Now.Time(),8}\t{CurrentRecord.MostCommon}");
+            if (!PreviousRecords.Any() || !PreviousRecords.Last().TryMerge(CurrentRecord)) PreviousRecords.Add(CurrentRecord);
+            CurrentRecord = new();
+            NextAggregationTime += ConsoleArgs.AggregationInterval;
+            WriteActivity();
+            PreviousRecords = PreviousRecords.Where(x => x.FromToday).ToList();
+        }
     }
 }

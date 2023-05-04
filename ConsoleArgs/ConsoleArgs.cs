@@ -27,14 +27,13 @@ namespace d9.ktv
         public static readonly string LogPath = Path.Join(LogFolder, $"{DateTime.Now.Format(TimeFormats.DateTime24H)}.ktv.log");
         public static void Init()
         {
-            Console.WriteLine("Starting ktv...");
             if (LogPath is not null)
             {                
                 if (!Directory.Exists(LogFolder)) Directory.CreateDirectory(LogFolder);
             }
-            Console.WriteLine($"Will log active window every {LogInterval:g} starting in {Delay:g}.");
-            Console.WriteLine($"Will aggregate activity every {AggregationInterval:g} starting at {StartAt.Time()}.");
-            Console.WriteLine($"Log folder is {LogFolder.Replace(@"\","/")}.");
+            Program.Log($"Logging to {LogFolder.Replace(@"\"," / ")} every {LogInterval:g} with aggregation every {AggregationInterval:g} " +
+                              $"starting at {StartAt.Time()} and continuing for {Duration:g}.");
+            Console.WriteLine($"Log folder is .");
             if (Duration is not null) Console.WriteLine($"Will continue for {Duration:g}.");
             Thread.Sleep(Delay);
         }
