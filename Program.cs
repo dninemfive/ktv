@@ -47,7 +47,6 @@ namespace d9.ktv
             Utils.DefaultLog = new(LogPath, mode: Log.Mode.WriteImmediate);
             Thread.Sleep(TimeSpan.FromSeconds(5));
         }
-        private static void Sleep(TimeSpan duration) => Thread.Sleep((int)duration.TotalMilliseconds);
         private static IEnumerable<string> DailyActivity(DateTime date)
         {
             yield return ActivityRecord.Header;
@@ -71,7 +70,7 @@ namespace d9.ktv
             while (true)
             {
                 RecordActivity();
-                Sleep(Args.LogInterval);
+                Utils.Sleep(Args.LogInterval);
                 if (DateTime.Now >= NextAggregationTime) Aggregate();
             }
         }
