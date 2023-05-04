@@ -1,6 +1,9 @@
 ﻿// See https://aka.ms/new-console-template for more information
 using d9.utl;
 using d9.utl.compat;
+using Google.Apis.Calendar.v3;
+using Google.Apis.Calendar.v3.Data;
+using System.Diagnostics;
 using System.IO;
 namespace d9.ktv
 {
@@ -28,8 +31,18 @@ namespace d9.ktv
         public static void Main()
         {
             Utils.Log($"Logging to `{LogFolder.Replace(@"\", "/")}` every {Args.LogInterval:g}; aggregating every {Args.AggregationInterval:g}, " +
-                              $"starting at {NextAggregationTime.Time()}.");            
-            PerformSetup();
+                              $"starting at {NextAggregationTime.Time()}.");
+            Utils.DebugLog($"{UpdateGoogleCalendar} {Args.CalendarId.PrintNull()}");
+            #region fucking around
+            Utils.DebugLog("Calendar list {");
+            CalendarListResource.ListRequest clrlr = new(GoogleUtils.CalendarService);
+            CalendarList cl = clrlr.Execute();
+            Utils.DebugLog($"  ({cl.ETag} {cl.Items.ListNotation()} {cl.Kind})");
+            foreach (CalendarListEntry cle in cl.Items) Utils.DebugLog($"\t{cle.Summary,-32}{cle.Id}");
+            Utils.DebugLog("}");
+            GoogleUtils.AddEventTo(Args.CalendarId!, "fuck", DateTime.Now, DateTime.Now + TimeSpan.FromMinutes(15));
+            #endregion fucking around
+            PerformSetup();            
             try
             {
                 MainLoop();
@@ -45,7 +58,7 @@ namespace d9.ktv
             if (File.Exists(ActivityRecord.AggregateFile(LaunchedOn)))
             {
                 string[] lines = File.ReadAllLines(ActivityRecord.AggregateFile(LaunchedOn));
-                if (lines.Length > 1) ExistingAggregateLines = lines[1..].ToList();
+                if (lines.Length > 1) ExistingAggregateLines = lines.Skip(1).ToList();
             }
             Utils.DefaultLog = new(LogPath, mode: Log.Mode.WriteImmediate);
             Thread.Sleep(TimeSpan.FromSeconds(5));
@@ -88,7 +101,7 @@ namespace d9.ktv
             Utils.Log($"{DateTime.Now.Time(),8}\t{CurrentRecord.MostCommon}");
             if (!PreviousRecords.Any() || !PreviousRecords.Last().TryMerge(CurrentRecord))
             {
-                PreviousRecords.Add(CurrentRecord);
+                PreviousRecords.Add(CurrentRecord);                
                 if (UpdateGoogleCalendar) GoogleUtils.AddEventTo(Args.CalendarId!,                  // known to be non-null because of UpdateGoogleCalendar
                                                                  CurrentRecord.MostCommon,
                                                                  CurrentRecord.StartedAt,
