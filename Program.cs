@@ -5,35 +5,49 @@ namespace d9.ktv
 {
     public class Program
     {
-        public static TimeSpan Elapsed { get; private set; } = TimeSpan.Zero;
-        public static DateTime NextAggregationTime { get; private set; } = ConsoleArgs.StartAt;
-        public static int LineNumber { get; private set; } = 0;
-        private static List<string>? ExistingAggregateLines = null;
+        public static class Args
+        {
+            public static readonly TimeSpan LogInterval
+                                    = CommandLineArgs.TryGet(nameof(LogInterval), CommandLineArgs.Parsers.UsingParser(TimeSpan.FromMinutes))
+                                   ?? TimeSpan.FromMinutes(0.5);
+            public static readonly TimeSpan AggregationInterval
+                                    = CommandLineArgs.TryGet(nameof(AggregationInterval), CommandLineArgs.Parsers.UsingParser(TimeSpan.FromMinutes))
+                                   ?? TimeSpan.FromMinutes(15);
+        }
+        public static DateTime NextAggregationTime { get; private set; } = DateTime.Now.Ceiling(Args.AggregationInterval);
+        public static int LineNumber { get; private set; } = 0;        
         public static DateTime LaunchedOn { get; } = DateTime.Today;
+        private static List<string>? ExistingAggregateLines = null;
         private static List<ActivityRecord> PreviousRecords = new();
         private static ActivityRecord CurrentRecord = new();
+        public static readonly string LogFolder = Path.Join(Config.BaseFolderPath, "logs");
+        public static readonly string LogPath = Path.Join(LogFolder, $"{DateTime.Now.Format(TimeFormats.DateTime24H)}.ktv.log");
         public static void Main()
         {
-            ConsoleArgs.Init();
-            Utils.DefaultLog = new(ConsoleArgs.LogPath, mode: Log.Mode.WriteImmediate);
+            Utils.Log($"Logging to {LogFolder.Replace(@"\", " / ")} every {Args.LogInterval:g} with aggregation every {Args.AggregationInterval:g} and " +
+                              $"starting at {NextAggregationTime.Time()}.");            
+            PerformSetup();
+            try
+            {
+                MainLoop();
+            } 
+            finally
+            {
+                WriteActivity();
+            }
+        }
+        private static void PerformSetup()
+        {
+            if (!Directory.Exists(LogFolder)) Directory.CreateDirectory(LogFolder);
             if (File.Exists(ActivityRecord.AggregateFile(LaunchedOn)))
             {
                 string[] lines = File.ReadAllLines(ActivityRecord.AggregateFile(LaunchedOn));
                 if (lines.Length > 1) ExistingAggregateLines = lines[1..].ToList();
             }
-            try
-            {
-                MainLoop();
-            } finally
-            {
-                WriteActivity();
-            }
+            Utils.DefaultLog = new(LogPath, mode: Log.Mode.WriteImmediate);
+            Thread.Sleep(TimeSpan.FromSeconds(5));
         }
-        private static void Sleep(TimeSpan duration)
-        {
-            Thread.Sleep((int)duration.TotalMilliseconds);
-            Elapsed += duration;
-        }
+        private static void Sleep(TimeSpan duration) => Thread.Sleep((int)duration.TotalMilliseconds);
         private static IEnumerable<string> DailyActivity(DateTime date)
         {
             yield return ActivityRecord.Header;
@@ -53,12 +67,11 @@ namespace d9.ktv
             }
         }
         private static void MainLoop()
-        {
-            
-            while (ConsoleArgs.Duration is null || Elapsed < ConsoleArgs.Duration)
+        {            
+            while (true)
             {
                 RecordActivity();
-                Sleep(ConsoleArgs.LogInterval);
+                Sleep(Args.LogInterval);
                 if (DateTime.Now >= NextAggregationTime) Aggregate();
             }
         }
@@ -73,7 +86,7 @@ namespace d9.ktv
             Utils.Log($"{DateTime.Now.Time(),8}\t{CurrentRecord.MostCommon}");
             if (!PreviousRecords.Any() || !PreviousRecords.Last().TryMerge(CurrentRecord)) PreviousRecords.Add(CurrentRecord);
             CurrentRecord = new();
-            NextAggregationTime += ConsoleArgs.AggregationInterval;
+            NextAggregationTime += Args.AggregationInterval;
             WriteActivity();
             PreviousRecords = PreviousRecords.Where(x => x.FromToday).ToList();
         }
