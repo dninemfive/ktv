@@ -28,20 +28,11 @@ namespace d9.ktv
         public static readonly string LogFolder = Path.Join(Config.BaseFolderPath, "logs");
         public static readonly string LogPath = Path.Join(LogFolder, $"{DateTime.Now.Format(TimeFormats.DateTime24H)}.ktv.log");
         public static bool UpdateGoogleCalendar => Args.CalendarId is not null && GoogleUtils.ValidConfig;
+        public static string? LastEventId { get; private set; } = null;
         public static void Main()
         {
             Utils.Log($"Logging to `{LogFolder.Replace(@"\", "/")}` every {Args.LogInterval:g}; aggregating every {Args.AggregationInterval:g}, " +
                               $"starting at {NextAggregationTime.Time()}.");
-            Utils.DebugLog($"{UpdateGoogleCalendar} {Args.CalendarId.PrintNull()}");
-            #region fucking around
-            Utils.DebugLog("Calendar list {");
-            CalendarListResource.ListRequest clrlr = new(GoogleUtils.CalendarService);
-            CalendarList cl = clrlr.Execute();
-            Utils.DebugLog($"  ({cl.ETag} {cl.Items.ListNotation()} {cl.Kind})");
-            foreach (CalendarListEntry cle in cl.Items) Utils.DebugLog($"\t{cle.Summary,-32}{cle.Id}");
-            Utils.DebugLog("}");
-            GoogleUtils.AddEventTo(Args.CalendarId!, "fuck", DateTime.Now, DateTime.Now + TimeSpan.FromMinutes(15));
-            #endregion fucking around
             PerformSetup();            
             try
             {
@@ -101,11 +92,15 @@ namespace d9.ktv
             Utils.Log($"{DateTime.Now.Time(),8}\t{CurrentRecord.MostCommon}");
             if (!PreviousRecords.Any() || !PreviousRecords.Last().TryMerge(CurrentRecord))
             {
-                PreviousRecords.Add(CurrentRecord);                
-                if (UpdateGoogleCalendar) GoogleUtils.AddEventTo(Args.CalendarId!,                  // known to be non-null because of UpdateGoogleCalendar
-                                                                 CurrentRecord.MostCommon,
-                                                                 CurrentRecord.StartedAt,
-                                                                 CurrentRecord.EndedAt!.Value);     // known to be non-null because of check in TryMerge()
+                PreviousRecords.Add(CurrentRecord);
+                if (UpdateGoogleCalendar)
+                {
+                    Event ev = GoogleUtils.AddEventTo(Args.CalendarId!,                  // known to be non-null because of UpdateGoogleCalendar
+                                                      CurrentRecord.MostCommon,
+                                                      CurrentRecord.StartedAt,
+                                                      CurrentRecord.EndedAt!.Value);     // known to be non-null because of check in TryMerge()
+                    LastEventId = ev.Id;
+                }
             }
             CurrentRecord = new();
             NextAggregationTime += Args.AggregationInterval;

@@ -5,6 +5,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using d9.utl;
+using d9.utl.compat;
 
 namespace d9.ktv
 {
@@ -64,7 +65,9 @@ namespace d9.ktv
             DateTime first = other.StartedAt < StartedAt ? other.StartedAt : StartedAt;
             StartedAt = first;
             foreach (KeyValuePair<DateTime, string> kvp in other.activities) activities.Add(kvp.Key, kvp.Value);
-            // update calendar with new ending time
+            if (Program.UpdateGoogleCalendar) GoogleUtils.UpdateEvent(Program.Args.CalendarId!,    // known to be non-null because of UpdateGoogleCalendar
+                                                                      Program.LastEventId!,        // may be null but whatever
+                                                                      newEnd: EndedAt);
             return true;
         }
         public override string ToString() => $"{StartedAt.Time(),-8}\t{(EndedAt?.Ceiling().Time()).PrintNull(),-8}\t{MostCommon.PrintNull()}";
