@@ -68,9 +68,7 @@ namespace d9.ktv
             foreach (KeyValuePair<DateTime, string> kvp in other.activities) activities.Add(kvp.Key, kvp.Value);
             if (Program.UpdateGoogleCalendar) GoogleUtils.UpdateEvent(Program.Args.CalendarId!,    // known to be non-null because of UpdateGoogleCalendar
                                                                       Program.LastEventId!,        // may be null but whatever
-                                                                      MostCommon,
-                                                                      StartedAt.Floor(),
-                                                                      EndedAt?.Ceiling());         // known to be non-null because of the check above
+                                                                      CalendarEvent);
             return true;
         }
         public override string ToString() => $"{StartedAt.Time(),-8}\t{(EndedAt?.Ceiling().Time()).PrintNull(),-8}\t{MostCommon.PrintNull()}";
@@ -89,10 +87,11 @@ namespace d9.ktv
             }
         }
         public bool FromToday => Date == DateTime.Today;
-        public Event CalendarEvent
-            => new()
+        public Event CalendarEvent => new()
             {
-
+                Summary = MostCommon,
+                Start = StartedAt.Floor().ToEventDateTime(),
+                End = EndedAt?.Ceiling().ToEventDateTime()
             };
     }
 }
