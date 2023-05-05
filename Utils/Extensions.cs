@@ -36,7 +36,12 @@ namespace d9.ktv
         {
             TimeSpan ts = span ?? TimeSpan.FromMinutes(1);
             long ticks = (date.Ticks + ts.Ticks - 1) / ts.Ticks;
-            return new DateTime(ticks * ts.Ticks, date.Kind);
+            return new(ticks * ts.Ticks, date.Kind);
+        }
+        public static DateTime Floor(this DateTime date, TimeSpan? span = null)
+        {
+            TimeSpan ts = span ?? TimeSpan.FromMinutes(1);
+            return new((date.Ticks / ts.Ticks) * ts.Ticks, date.Kind);
         }
     }
 }

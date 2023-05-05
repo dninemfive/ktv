@@ -6,6 +6,7 @@ using System.Text;
 using System.Threading.Tasks;
 using d9.utl;
 using d9.utl.compat;
+using Google.Apis.Calendar.v3.Data;
 
 namespace d9.ktv
 {
@@ -61,13 +62,15 @@ namespace d9.ktv
             if (EndedAt is null || other.EndedAt is null)
                 throw new Exception("Should not merge ActivityRecords when one of their EndedAt values is null!\n"
                                  + $"\tother.EndedAt = {other.EndedAt.PrintNull()}\n"
-                                 + $"\tthis. EndedAt = {EndedAt.PrintNull()}");
+                                 + $"\tthis.EndedAt  = {EndedAt.PrintNull()}");
             DateTime first = other.StartedAt < StartedAt ? other.StartedAt : StartedAt;
             StartedAt = first;
             foreach (KeyValuePair<DateTime, string> kvp in other.activities) activities.Add(kvp.Key, kvp.Value);
             if (Program.UpdateGoogleCalendar) GoogleUtils.UpdateEvent(Program.Args.CalendarId!,    // known to be non-null because of UpdateGoogleCalendar
                                                                       Program.LastEventId!,        // may be null but whatever
-                                                                      newEnd: EndedAt);
+                                                                      MostCommon,
+                                                                      StartedAt.Floor(),
+                                                                      EndedAt?.Ceiling());         // known to be non-null because of the check above
             return true;
         }
         public override string ToString() => $"{StartedAt.Time(),-8}\t{(EndedAt?.Ceiling().Time()).PrintNull(),-8}\t{MostCommon.PrintNull()}";
@@ -86,5 +89,10 @@ namespace d9.ktv
             }
         }
         public bool FromToday => Date == DateTime.Today;
+        public Event CalendarEvent
+            => new()
+            {
+
+            };
     }
 }

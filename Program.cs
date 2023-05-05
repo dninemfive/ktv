@@ -95,10 +95,10 @@ namespace d9.ktv
                 PreviousRecords.Add(CurrentRecord);
                 if (UpdateGoogleCalendar)
                 {
-                    Event ev = GoogleUtils.AddEventTo(Args.CalendarId!,                  // known to be non-null because of UpdateGoogleCalendar
+                    Event ev = GoogleUtils.AddEventTo(Args.CalendarId!,                         // known to be non-null because of UpdateGoogleCalendar
                                                       CurrentRecord.MostCommon,
-                                                      CurrentRecord.StartedAt,
-                                                      CurrentRecord.EndedAt!.Value);     // known to be non-null because of check in TryMerge()
+                                                      CurrentRecord.StartedAt.Floor(),
+                                                      CurrentRecord.EndedAt!.Value.Ceiling());  // known to be non-null because of check in TryMerge()
                     LastEventId = ev.Id;
                 }
             }
