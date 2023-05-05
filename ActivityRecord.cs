@@ -91,7 +91,10 @@ namespace d9.ktv
             {
                 Summary = MostCommon,
                 Start = StartedAt.Floor().ToEventDateTime(),
-                End = EndedAt?.Ceiling().ToEventDateTime()
+                End = EndedAt?.Ceiling().ToEventDateTime(),
+                ColorId = (Program.Calendar!.eventColors.TryGetValue(MostCommon, out GoogleUtils.EventColor val) ?
+                    val :
+                    Program.Calendar!.defaultColor).ToString()
             };
     }
 }

@@ -57,10 +57,10 @@ namespace d9.ktv
         public static string? LastEventId { get; private set; } = null;
         public static void Main()
         {
-            // Utils.Log(Config.TryLoad<KtvConfig>("calendarConfig.json"));
             Utils.Log($"Logging to `{LogFolder.Replace(@"\", "/")}` every {Args.LogInterval:g}; aggregating every {Args.AggregationInterval:g}, " +
                               $"starting at {NextAggregationTime.Time()}.");
             PerformSetup();
+            Utils.DebugLog(Calendar.PrettyPrint().PrintNull());
             try
             {
                 MainLoop();

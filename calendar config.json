@@ -1,12 +1,17 @@
 {
-  "calendarId": null,
-  "defaultColor": 3,
+  "id": "lol",
+  "defaultColor": 8,
   "ignore": [
-    "example.com",
-    "example.ca.gov"
+    "Windows Default Lock Screen"
   ],
   "eventColors": {
-    "example.ua": 5,
-    "example.cz": 9
+    "Discord": 9,
+    "Excel": 10,
+    "foobar2000": 6,
+    "Mozilla Firefox": 6,
+    "Slay the Spire": 5,
+    "Visual Studio": 3,
+	"Unity": 3,
+    "Wargame: Red Dragon": 5
   }
 }

@@ -15,7 +15,8 @@ namespace d9.ktv
             new("Mozilla Firefox.*", "Mozilla Firefox"),
             new(".*Visual Studio", "Visual Studio"),
             new("GNU Image Manipulation Program", "GIMP"),
-            new("GIMP Startup", "GIMP")
+            new("GIMP Startup", "GIMP"),
+            new("Unity.*", "Unity")
         };
         public Regex Matcher { get; private set; }
         public string Replacement { get; private set; }
