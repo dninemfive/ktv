@@ -1,0 +1,12 @@
+{
+  "calendarId": "lol",
+  "defaultColor": 3,
+  "ignore": [
+    "example.com",
+    "example.ca.gov"
+  ],
+  "eventColors": {
+    "example.ua": 5,
+    "example.cz": 9
+  }
+}

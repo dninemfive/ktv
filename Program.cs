@@ -5,6 +5,9 @@ using Google.Apis.Calendar.v3;
 using Google.Apis.Calendar.v3.Data;
 using System.Diagnostics;
 using System.IO;
+using System.Text.Json;
+using System.Text.Json.Serialization;
+
 namespace d9.ktv
 {
     public class Program
@@ -13,12 +16,32 @@ namespace d9.ktv
         {
             public static readonly TimeSpan LogInterval
                                     = CommandLineArgs.TryGet(nameof(LogInterval), CommandLineArgs.Parsers.UsingParser(TimeSpan.FromMinutes))
-                                   ?? TimeSpan.FromMinutes(0.5);
+                                   ?? TimeSpan.FromMinutes(0.25);
             public static readonly TimeSpan AggregationInterval
                                     = CommandLineArgs.TryGet(nameof(AggregationInterval), CommandLineArgs.Parsers.UsingParser(TimeSpan.FromMinutes))
                                    ?? TimeSpan.FromMinutes(15);
             public static readonly string? CalendarId = CommandLineArgs.TryGet(nameof(CalendarId), CommandLineArgs.Parsers.FirstNonNullOrEmptyString);
         }
+        public class KtvConfig
+        {
+            [JsonInclude]
+            public string? calendarId;
+            [JsonInclude]
+            public GoogleUtils.EventColor defaultColor;
+            [JsonInclude]
+            public HashSet<string> ignore;
+            [JsonInclude]
+            public Dictionary<string, GoogleUtils.EventColor> eventColors;
+            public override string ToString()
+            {
+                string result = calendarId.PrintNull();
+                result += $"\n{defaultColor}";
+                result += $"\n{ignore.ListNotation()}";
+                result += $"\n{eventColors.ListNotation()}";
+                return result;
+            }
+        }
+        public static DateTime NextLogTime { get; private set; } = DateTime.Now.Ceiling(Args.LogInterval);
         public static DateTime NextAggregationTime { get; private set; } = DateTime.Now.Ceiling(Args.AggregationInterval);
         public static int LineNumber { get; private set; } = 0;        
         public static DateTime LaunchedOn { get; } = DateTime.Today;
@@ -31,9 +54,25 @@ namespace d9.ktv
         public static string? LastEventId { get; private set; } = null;
         public static void Main()
         {
+            File.WriteAllText("calendar config.json", JsonSerializer.Serialize(new KtvConfig()
+            {
+                calendarId = Args.CalendarId,
+                defaultColor = GoogleUtils.EventColor.Mauve,
+                ignore = new()
+                {
+                    "example.com",
+                    "example.ca.gov"
+                },
+                eventColors = new()
+                {
+                    { "example.ua", GoogleUtils.EventColor.NaplesYellow },
+                    { "example.cz", GoogleUtils.EventColor.Blueberry }
+                }
+            }, new JsonSerializerOptions() { WriteIndented = true }));
+            // Utils.Log(Config.TryLoad<KtvConfig>("calendarConfig.json"));
             Utils.Log($"Logging to `{LogFolder.Replace(@"\", "/")}` every {Args.LogInterval:g}; aggregating every {Args.AggregationInterval:g}, " +
                               $"starting at {NextAggregationTime.Time()}.");
-            PerformSetup();            
+            PerformSetup();
             try
             {
                 MainLoop();
@@ -52,7 +91,6 @@ namespace d9.ktv
                 if (lines.Length > 1) ExistingAggregateLines = lines.Skip(1).ToList();
             }
             Utils.DefaultLog = new(LogPath, mode: Log.Mode.WriteImmediate);
-            Thread.Sleep(TimeSpan.FromSeconds(5));
         }
         private static IEnumerable<string> DailyActivity(DateTime date)
         {
@@ -76,8 +114,8 @@ namespace d9.ktv
         {            
             while (true)
             {
-                RecordActivity();
-                Utils.Sleep(Args.LogInterval);
+                
+                if (DateTime.Now >= NextLogTime) RecordActivity();
                 if (DateTime.Now >= NextAggregationTime) Aggregate();
             }
         }
@@ -86,6 +124,7 @@ namespace d9.ktv
             ActiveWindowInfo info = ActiveWindow.Info;
             CurrentRecord.Log(info.Program);
             Utils.Log($"{++LineNumber,8}\t{DateTime.Now}\t{info.PrintNull()}");
+            NextLogTime = DateTime.Now.Ceiling(Args.LogInterval);
         }
         private static void Aggregate()
         {
@@ -101,7 +140,7 @@ namespace d9.ktv
                 }
             }
             CurrentRecord = new();
-            NextAggregationTime += Args.AggregationInterval;
+            NextAggregationTime = DateTime.Now.Ceiling(Args.AggregationInterval);
             WriteActivity();
             PreviousRecords = PreviousRecords.Where(x => x.FromToday).ToList();
         }
