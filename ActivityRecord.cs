@@ -90,9 +90,7 @@ namespace d9.ktv
                 Summary = MostCommon,
                 Start = StartedAt.Round().ToEventDateTime(),
                 End = EndedAt?.Round().ToEventDateTime(),
-                ColorId = (Program.Calendar!.eventColors.TryGetValue(MostCommon, out GoogleUtils.EventColor val) ?
-                    val :
-                    Program.Calendar!.defaultColor).ToString()
+                ColorId = Program.ColorIdFor(MostCommon)
             };
     }
 }

@@ -130,5 +130,10 @@ namespace d9.ktv
             WriteActivity();
             PreviousRecords = PreviousRecords.Where(x => x.FromToday).ToList();
         }
+        public static string ColorIdFor(string activityName)
+        {
+            GoogleUtils.EventColor color = Calendar!.eventColors.TryGetValue(activityName, out GoogleUtils.EventColor val) ? val : Calendar!.defaultColor;
+            return ((int)color).ToString();
+        }
     }
 }
