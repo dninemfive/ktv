@@ -20,12 +20,13 @@ namespace d9.ktv
             public static readonly TimeSpan AggregationInterval
                                     = CommandLineArgs.TryGet(nameof(AggregationInterval), CommandLineArgs.Parsers.UsingParser(TimeSpan.FromMinutes))
                                    ?? TimeSpan.FromMinutes(15);
-            public static readonly string? CalendarId = CommandLineArgs.TryGet(nameof(CalendarId), CommandLineArgs.Parsers.FirstNonNullOrEmptyString);
+            public static readonly string? CalendarConfigPath = CommandLineArgs.TryGet(nameof(CalendarConfigPath), CommandLineArgs.Parsers.FilePath);
         }
+#pragma warning disable CS8618
         public class KtvConfig
         {
             [JsonInclude]
-            public string? calendarId;
+            public string? id;
             [JsonInclude]
             public GoogleUtils.EventColor defaultColor;
             [JsonInclude]
@@ -34,13 +35,15 @@ namespace d9.ktv
             public Dictionary<string, GoogleUtils.EventColor> eventColors;
             public override string ToString()
             {
-                string result = calendarId.PrintNull();
+                string result = id.PrintNull();
                 result += $"\n{defaultColor}";
                 result += $"\n{ignore.ListNotation()}";
                 result += $"\n{eventColors.ListNotation()}";
                 return result;
             }
         }
+#pragma warning restore CS8618
+        public static readonly KtvConfig? Calendar = Config.TryLoad<KtvConfig>(Args.CalendarConfigPath ?? "calendar config.json");
         public static DateTime NextLogTime { get; private set; } = DateTime.Now.Ceiling(Args.LogInterval);
         public static DateTime NextAggregationTime { get; private set; } = DateTime.Now.Ceiling(Args.AggregationInterval);
         public static int LineNumber { get; private set; } = 0;        
@@ -50,25 +53,10 @@ namespace d9.ktv
         private static ActivityRecord CurrentRecord = new();
         public static readonly string LogFolder = Path.Join(Config.BaseFolderPath, "logs");
         public static readonly string LogPath = Path.Join(LogFolder, $"{DateTime.Now.Format(TimeFormats.DateTime24H)}.ktv.log");
-        public static bool UpdateGoogleCalendar => Args.CalendarId is not null && GoogleUtils.ValidConfig;
+        public static bool UpdateGoogleCalendar => Calendar is not null && GoogleUtils.ValidConfig;
         public static string? LastEventId { get; private set; } = null;
         public static void Main()
         {
-            File.WriteAllText("calendar config.json", JsonSerializer.Serialize(new KtvConfig()
-            {
-                calendarId = Args.CalendarId,
-                defaultColor = GoogleUtils.EventColor.Mauve,
-                ignore = new()
-                {
-                    "example.com",
-                    "example.ca.gov"
-                },
-                eventColors = new()
-                {
-                    { "example.ua", GoogleUtils.EventColor.NaplesYellow },
-                    { "example.cz", GoogleUtils.EventColor.Blueberry }
-                }
-            }, new JsonSerializerOptions() { WriteIndented = true }));
             // Utils.Log(Config.TryLoad<KtvConfig>("calendarConfig.json"));
             Utils.Log($"Logging to `{LogFolder.Replace(@"\", "/")}` every {Args.LogInterval:g}; aggregating every {Args.AggregationInterval:g}, " +
                               $"starting at {NextAggregationTime.Time()}.");
@@ -134,8 +122,8 @@ namespace d9.ktv
                 PreviousRecords.Add(CurrentRecord);
                 if (UpdateGoogleCalendar)
                 {
-                    // CalendarId known to be non-null because of UpdateGoogleCalendar
-                    Event ev = GoogleUtils.AddEventTo(Args.CalendarId!, CurrentRecord.CalendarEvent);
+                    // CalendarConfig known to be non-null because of UpdateGoogleCalendar
+                    Event ev = GoogleUtils.AddEventTo(Calendar?.id!, CurrentRecord.CalendarEvent);
                     LastEventId = ev.Id;
                 }
             }

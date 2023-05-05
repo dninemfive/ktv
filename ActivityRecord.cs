@@ -66,8 +66,8 @@ namespace d9.ktv
             DateTime first = other.StartedAt < StartedAt ? other.StartedAt : StartedAt;
             StartedAt = first;
             foreach (KeyValuePair<DateTime, string> kvp in other.activities) activities.Add(kvp.Key, kvp.Value);
-            if (Program.UpdateGoogleCalendar) GoogleUtils.UpdateEvent(Program.Args.CalendarId!,    // known to be non-null because of UpdateGoogleCalendar
-                                                                      Program.LastEventId!,        // may be null but whatever
+            if (Program.UpdateGoogleCalendar) GoogleUtils.UpdateEvent(Program.Calendar?.id!,    // known to be non-null because of UpdateGoogleCalendar
+                                                                      Program.LastEventId!,     // may be null but whatever
                                                                       CalendarEvent);
             return true;
         }
