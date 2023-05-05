@@ -122,9 +122,7 @@ namespace d9.ktv
                 PreviousRecords.Add(CurrentRecord);
                 if (UpdateGoogleCalendar)
                 {
-                    // CalendarConfig known to be non-null because of UpdateGoogleCalendar
-                    Event ev = GoogleUtils.AddEventTo(Calendar?.id!, CurrentRecord.CalendarEvent);
-                    LastEventId = ev.Id;
+                    LastEventId = CurrentRecord.CalendarEvent.SendToCalendar(Calendar!.id!);
                 }
             }
             CurrentRecord = new();

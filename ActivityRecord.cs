@@ -66,9 +66,7 @@ namespace d9.ktv
             DateTime first = other.StartedAt < StartedAt ? other.StartedAt : StartedAt;
             StartedAt = first;
             foreach (KeyValuePair<DateTime, string> kvp in other.activities) activities.Add(kvp.Key, kvp.Value);
-            if (Program.UpdateGoogleCalendar) GoogleUtils.UpdateEvent(Program.Calendar?.id!,    // known to be non-null because of UpdateGoogleCalendar
-                                                                      Program.LastEventId!,     // may be null but whatever
-                                                                      CalendarEvent);
+            CalendarEvent.SendToCalendar(Program.Calendar!.id!, Program.LastEventId);
             return true;
         }
         public override string ToString() => $"{StartedAt.Time(),-8}\t{(EndedAt?.Ceiling().Time()).PrintNull(),-8}\t{MostCommon.PrintNull()}";
@@ -90,8 +88,8 @@ namespace d9.ktv
         public Event CalendarEvent => new()
             {
                 Summary = MostCommon,
-                Start = StartedAt.Floor().ToEventDateTime(),
-                End = EndedAt?.Ceiling().ToEventDateTime(),
+                Start = StartedAt.Round().ToEventDateTime(),
+                End = EndedAt?.Round().ToEventDateTime(),
                 ColorId = (Program.Calendar!.eventColors.TryGetValue(MostCommon, out GoogleUtils.EventColor val) ?
                     val :
                     Program.Calendar!.defaultColor).ToString()

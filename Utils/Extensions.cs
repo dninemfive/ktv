@@ -4,6 +4,8 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using System.Linq;
+using Google.Apis.Calendar.v3.Data;
+using d9.utl.compat;
 
 namespace d9.ktv
 {
@@ -42,6 +44,18 @@ namespace d9.ktv
         {
             TimeSpan ts = span ?? TimeSpan.FromMinutes(1);
             return new((date.Ticks / ts.Ticks) * ts.Ticks, date.Kind);
+        }
+        public static DateTime Round(this DateTime date, TimeSpan? span = null)
+        {
+            TimeSpan ts = span ?? TimeSpan.FromMinutes(1);
+            if (date.Ticks % ts.Ticks < ts.Ticks / 2) return Floor(date, span);
+            return Ceiling(date, span);
+        }
+        public static string? SendToCalendar(this Event @event, string calendarId, string? existingEventId = null)
+        {
+            if (!Program.UpdateGoogleCalendar || Program.Calendar!.ignore.Contains(@event.Summary)) return null;
+            if (existingEventId is not null) return GoogleUtils.UpdateEvent(calendarId, existingEventId, @event).Id;
+            return GoogleUtils.AddEventTo(calendarId, @event).Id;
         }
     }
 }
