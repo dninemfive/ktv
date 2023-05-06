@@ -1,5 +1,4 @@
-﻿// See https://aka.ms/new-console-template for more information
-using d9.utl;
+﻿using d9.utl;
 using d9.utl.compat;
 using Google.Apis.Calendar.v3;
 using Google.Apis.Calendar.v3.Data;
