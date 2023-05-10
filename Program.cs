@@ -121,7 +121,13 @@ namespace d9.ktv
                 PreviousRecords.Add(CurrentRecord);
                 if (UpdateGoogleCalendar)
                 {
-                    LastEventId = CurrentRecord.CalendarEvent.SendToCalendar(Calendar!.id!);
+                    try
+                    {
+                        LastEventId = CurrentRecord.CalendarEvent.SendToCalendar(Calendar!.id!);
+                    } catch(Exception e)
+                    {
+                        Utils.Log($"Failed to send log to calendar: {e.Message}");
+                    }                    
                 }
             }
             CurrentRecord = new();
