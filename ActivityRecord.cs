@@ -15,7 +15,8 @@ namespace d9.ktv
         public DateTime StartedAt { get; private set; }
         public DateTime? EndedAt => activities?.Select(x => x.Key)
                                                .OrderBy(x => x)
-                                               .Last() ?? null;
+                                               .Last()
+                                               .Round() ?? null;
         private readonly Dictionary<DateTime, string> activities = new();
         public IEnumerable<(DateTime timestamp, string activity)> ActivityTimestamps => activities.OrderBy(x => x.Key)
                                                                                                   .Select(x => (x.Key, x.Value));
@@ -69,7 +70,7 @@ namespace d9.ktv
             CalendarEvent.SendToCalendar(Program.Calendar!.id!, Program.LastEventId);
             return true;
         }
-        public override string ToString() => $"{StartedAt.Time(),-8}\t{(EndedAt?.Ceiling().Time()).PrintNull(),-8}\t{MostCommon.PrintNull()}";
+        public override string ToString() => $"{StartedAt.Time(),-8}\t{(EndedAt?.Time()).PrintNull(),-8}\t{MostCommon.PrintNull()}";
         public static readonly string Header = $"{"Start",-8}\t{"End",-8}\tActivity";
         public static string AggregateFile(DateTime date) => Path.Join(Program.LogFolder, $"{date.ToString(TimeFormats.Date)}-aggregate.ktv.log");
         public string Data
@@ -89,7 +90,7 @@ namespace d9.ktv
             {
                 Summary = MostCommon,
                 Start = StartedAt.Round().ToEventDateTime(),
-                End = EndedAt?.Round().ToEventDateTime(),
+                End = EndedAt?.ToEventDateTime(),
                 ColorId = Program.ColorIdFor(MostCommon)
             };
     }
