@@ -53,7 +53,7 @@ namespace d9.ktv
         }
         public static string? SendToCalendar(this Event @event, string calendarId, string? existingEventId = null)
         {
-            if (!Program.UpdateGoogleCalendar || Program.Calendar!.ignore.Contains(@event.Summary)) return null;
+            if (!Program.UpdateGoogleCalendar || Program.Ignore(@event.Summary)) return null;
             if (existingEventId is not null) return GoogleUtils.UpdateEvent(calendarId, existingEventId, @event).Id;
             return GoogleUtils.AddEventTo(calendarId, @event).Id;
         }

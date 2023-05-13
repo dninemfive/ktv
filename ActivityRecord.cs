@@ -55,7 +55,7 @@ namespace d9.ktv
                 return _mostCommon;
             }
         }
-        public bool TryMerge(ActivityRecord other)
+        public bool TryMerge(ActivityRecord other, string? CalendarConfigId)
         {
             if (other is null 
             || other.Date != Date 
@@ -67,7 +67,10 @@ namespace d9.ktv
             DateTime first = other.StartedAt < StartedAt ? other.StartedAt : StartedAt;
             StartedAt = first;
             foreach (KeyValuePair<DateTime, string> kvp in other.activities) activities.Add(kvp.Key, kvp.Value);
-            CalendarEvent.SendToCalendar(Program.Calendar!.id!, Program.LastEventId);
+            if(CalendarConfigId is not null)
+            {
+                CalendarEvent.SendToCalendar(CalendarConfigId, Program.LastEventId);
+            }            
             return true;
         }
         public override string ToString() => $"{StartedAt.Time(),-8}\t{(EndedAt?.Time()).PrintNull(),-8}\t{MostCommon.PrintNull()}";

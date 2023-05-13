@@ -19,30 +19,31 @@ namespace d9.ktv
             public static readonly TimeSpan AggregationInterval
                                     = CommandLineArgs.TryGet(nameof(AggregationInterval), CommandLineArgs.Parsers.UsingParser(TimeSpan.FromMinutes))
                                    ?? TimeSpan.FromMinutes(15);
-            public static readonly string? CalendarConfigPath = CommandLineArgs.TryGet(nameof(CalendarConfigPath), CommandLineArgs.Parsers.FilePath);
+            public static readonly string CalendarConfigPath = CommandLineArgs.TryGet(nameof(CalendarConfigPath), CommandLineArgs.Parsers.FilePath) 
+                                   ?? "calendar config.json";
         }
 #pragma warning disable CS8618
-        public class KtvConfig
+        public class KtvCalendarConfig
         {
             [JsonInclude]
-            public string? id;
+            public string? Id;
             [JsonInclude]
-            public GoogleUtils.EventColor defaultColor;
+            public GoogleUtils.EventColor DefaultColor;
             [JsonInclude]
-            public HashSet<string> ignore;
+            public HashSet<string> Ignore;
             [JsonInclude]
-            public Dictionary<string, GoogleUtils.EventColor> eventColors;
+            public Dictionary<string, GoogleUtils.EventColor> EventColors;
             public override string ToString()
             {
-                string result = id.PrintNull();
-                result += $"\n{defaultColor}";
-                result += $"\n{ignore.ListNotation()}";
-                result += $"\n{eventColors.ListNotation()}";
+                string result = Id.PrintNull();
+                result += $"\n{DefaultColor}";
+                result += $"\n{Ignore.ListNotation()}";
+                result += $"\n{EventColors.ListNotation()}";
                 return result;
             }
         }
 #pragma warning restore CS8618
-        public static readonly KtvConfig? Calendar = Config.TryLoad<KtvConfig>(Args.CalendarConfigPath ?? "calendar config.json");
+        private static KtvCalendarConfig? CalendarConfig = Config.TryLoad<KtvCalendarConfig>(Args.CalendarConfigPath);
         public static DateTime NextLogTime { get; private set; } = DateTime.Now.Ceiling(Args.LogInterval);
         public static DateTime NextAggregationTime { get; private set; } = DateTime.Now.Ceiling(Args.AggregationInterval);
         public static int LineNumber { get; private set; } = 0;        
@@ -52,14 +53,14 @@ namespace d9.ktv
         private static ActivityRecord CurrentRecord = new();
         public static readonly string LogFolder = Path.Join(Config.BaseFolderPath, "logs");
         public static readonly string LogPath = Path.Join(LogFolder, $"{DateTime.Now.Format(TimeFormats.DateTime24H)}.ktv.log");
-        public static bool UpdateGoogleCalendar => Calendar is not null && GoogleUtils.ValidConfig;
+        public static bool UpdateGoogleCalendar => CalendarConfig is not null && GoogleUtils.ValidConfig;
         public static string? LastEventId { get; private set; } = null;
         public static void Main()
         {
             Utils.Log($"Logging to `{LogFolder.Replace(@"\", "/")}` every {Args.LogInterval:g}; aggregating every {Args.AggregationInterval:g}, " +
                               $"starting at {NextAggregationTime.Time()}.");
             PerformSetup();
-            Utils.DebugLog(Calendar.PrettyPrint().PrintNull());
+            Utils.DebugLog(CalendarConfig.PrettyPrint().PrintNull());
             try
             {
                 MainLoop();
@@ -116,14 +117,15 @@ namespace d9.ktv
         private static void Aggregate()
         {
             Utils.Log($"{DateTime.Now.Time(),8}\t{CurrentRecord.MostCommon}");
-            if (!PreviousRecords.Any() || !PreviousRecords.Last().TryMerge(CurrentRecord))
+            if (!PreviousRecords.Any() || !PreviousRecords.Last().TryMerge(CurrentRecord, CalendarConfig?.Id))
             {
                 PreviousRecords.Add(CurrentRecord);
                 if (UpdateGoogleCalendar)
                 {
+                    CalendarConfig = Config.TryLoad<KtvCalendarConfig>(Args.CalendarConfigPath);
                     try
                     {
-                        LastEventId = CurrentRecord.CalendarEvent.SendToCalendar(Calendar!.id!);
+                        LastEventId = CurrentRecord.CalendarEvent.SendToCalendar(CalendarConfig!.Id!);
                     } catch(Exception e)
                     {
                         Utils.Log($"Failed to send log to calendar: {e.Message}");
@@ -137,8 +139,9 @@ namespace d9.ktv
         }
         public static string ColorIdFor(string activityName)
         {
-            GoogleUtils.EventColor color = Calendar!.eventColors.TryGetValue(activityName, out GoogleUtils.EventColor val) ? val : Calendar!.defaultColor;
+            GoogleUtils.EventColor color = CalendarConfig!.EventColors.TryGetValue(activityName, out GoogleUtils.EventColor val) ? val : CalendarConfig!.DefaultColor;
             return ((int)color).ToString();
         }
+        public static bool Ignore(string activityName) => CalendarConfig?.Ignore.Contains(activityName) ?? false;
     }
 }

@@ -1,17 +1,19 @@
 {
   "id": "d464fccd7779a92643a8582d21b18c6a28003570e077b9788b113bd4bf963b6e@group.calendar.google.com",
-  "defaultColor": 8,
+  "defaultColor": "graphite",
   "ignore": [
     "Windows Default Lock Screen"
   ],
   "eventColors": {
-    "Discord": 9,
-    "Excel": 10,
-    "foobar2000": 6,
-    "Mozilla Firefox": 6,
-    "Slay the Spire": 5,
-    "Visual Studio": 3,
-	"Unity": 3,
-    "Wargame: Red Dragon": 5
+    "Discord": "blueberry",
+    "Excel": "basil",
+    "foobar2000": "tangerine",
+    "Mozilla Firefox": "tangerine",
+    "Slay the Spire": "banana",
+    "Visual Studio": "grape",
+	"Unity": "grape",
+    "Wargame: Red Dragon": "banana",
+	"Rogue Legacy 2": "banana",
+	"Minecraft* 1.19": "banana"
   }
 }
