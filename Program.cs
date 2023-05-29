@@ -53,14 +53,13 @@ namespace d9.ktv
         private static ActivityRecord CurrentRecord = new();
         public static readonly string LogFolder = Path.Join(Config.BaseFolderPath, "logs");
         public static readonly string LogPath = Path.Join(LogFolder, $"{DateTime.Now.Format(TimeFormats.DateTime24H)}.ktv.log");
-        public static bool UpdateGoogleCalendar => CalendarConfig is not null && GoogleUtils.ValidConfig;
+        public static bool UpdateGoogleCalendar => CalendarConfig is not null && GoogleUtils.HasValidAuthConfig;
         public static string? LastEventId { get; private set; } = null;
         public static void Main()
         {
             Utils.Log($"Logging to `{LogFolder.Replace(@"\", "/")}` every {Args.LogInterval:g}; aggregating every {Args.AggregationInterval:g}, " +
                               $"starting at {NextAggregationTime.Time()}.");
             PerformSetup();
-            Utils.DebugLog(CalendarConfig.PrettyPrint().PrintNull());
             try
             {
                 MainLoop();
@@ -120,9 +119,14 @@ namespace d9.ktv
             if (!PreviousRecords.Any() || !PreviousRecords.Last().TryMerge(CurrentRecord, CalendarConfig?.Id))
             {
                 PreviousRecords.Add(CurrentRecord);
+                KtvCalendarConfig? newConfig = Config.TryLoad<KtvCalendarConfig>(Args.CalendarConfigPath);
+                if(newConfig is not null && newConfig != CalendarConfig)
+                {
+                    Console.WriteLine($"Loaded new calendar config:\n{newConfig.PrettyPrint()}");
+                    CalendarConfig = newConfig;
+                }
                 if (UpdateGoogleCalendar)
                 {
-                    CalendarConfig = Config.TryLoad<KtvCalendarConfig>(Args.CalendarConfigPath);
                     try
                     {
                         LastEventId = CurrentRecord.CalendarEvent.SendToCalendar(CalendarConfig!.Id!);
