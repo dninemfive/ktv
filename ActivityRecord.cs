@@ -2,6 +2,7 @@
 using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
+using System.Security.Cryptography.X509Certificates;
 using System.Text;
 using System.Threading.Tasks;
 using d9.utl;
@@ -30,29 +31,40 @@ namespace d9.ktv
         public void Log(string activity)
         {
             activities[DateTime.Now] = activity;
-            _mostCommon = null;
         }
-        private string? _mostCommon = null;
-        public string MostCommon
+        public IEnumerable<string> MostCommon
         {
             get
             {
-                if(_mostCommon is null)
+                float threshold = 0.4f;
+                if (!Activities.Any())
                 {
-                    if (!Activities.Any()) return _mostCommon.PrintNull();
-                    Dictionary<string, int> dict = new();
-                    foreach (string activity in Activities)
-                    {
-                        if (!dict.ContainsKey(activity)) dict.Add(activity, 1);
-                        else dict[activity]++;
-                    }
-                    IEnumerable<string> mostCommons = dict.Select(x => (x.Key, x.Value))
-                                                          .Where(x => x.Value == dict.Select(x => x.Value).Max())
-                                                          .Select(x => x.Key);
-                    if (mostCommons.Count() == 1) _mostCommon = mostCommons.First();
-                    else _mostCommon = mostCommons.OrderBy(x => x).ListNotation();
+                    yield return "";
+                    yield break;
                 }
-                return _mostCommon;
+                Dictionary<string, int> dict = new();
+                foreach (string activity in Activities)
+                {
+                    if (!dict.ContainsKey(activity)) dict.Add(activity, 1);
+                    else dict[activity]++;
+                }
+                List<(string activity, float percent)> orderedActivities = dict.Keys.Select(x => (x, dict[x] / (float)activities.Count))
+                                                                                    .OrderByDescending(x => x.Item2).ToList();
+                List<string> result = new();
+                int ctYielded = 0;
+                while(!result.Any() && threshold > 0)
+                {
+                    foreach((string activity, float percent) in orderedActivities)
+                    {
+                        if (percent >= threshold)
+                        {
+                            yield return $"{$"{percent:p0}",4}\t{activity}";
+                            ctYielded++;
+                        }
+                        else if (ctYielded > 0) yield break;
+                    }
+                    threshold -= 0.05f;
+                }
             }
         }
         public bool TryMerge(ActivityRecord other, string? CalendarConfigId)
@@ -69,7 +81,7 @@ namespace d9.ktv
             foreach (KeyValuePair<DateTime, string> kvp in other.activities) activities.Add(kvp.Key, kvp.Value);
             if(CalendarConfigId is not null)
             {
-                CalendarEvent.SendToCalendar(CalendarConfigId, Program.LastEventId);
+                foreach(Event calendarEvent in CalendarEvents) calendarEvent.SendToCalendar(CalendarConfigId, Program.LastEventId);
             }            
             return true;
         }
@@ -89,12 +101,12 @@ namespace d9.ktv
             }
         }
         public bool FromToday => Date == DateTime.Today;
-        public Event CalendarEvent => new()
-            {
-                Summary = MostCommon,
-                Start = StartedAt.Round().ToEventDateTime(),
-                End = EndedAt?.ToEventDateTime(),
-                ColorId = Program.ColorIdFor(MostCommon)
-            };
+        public IEnumerable<Event> CalendarEvents => MostCommon.Select(x => new Event()
+        {
+            Summary = x,
+            Start = StartedAt.Round().ToEventDateTime(),
+            End = EndedAt?.ToEventDateTime(),
+            ColorId = Program.ColorIdFor(x)
+        });
     }
 }
