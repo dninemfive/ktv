@@ -1,20 +1,21 @@
-﻿namespace d9.ktv;
+﻿using d9.utl;
+using d9.utl.compat;
+
+namespace d9.ktv;
 
 internal static class CalendarManager
 {
-    internal static IReadOnlyDictionary<string, string> ActiveEventIds => _activeEventIds;
-    private static readonly Dictionary<string, string> _activeEventIds = new();
-    /// <summary>
-    /// Adds (or updates, if already present) the activities in the ActivityRecord specified 
-    /// to the calendar, if possible.
-    /// </summary>
-    /// <param name="activityRecord">
-    /// The ActivityRecord with which to update the calendar.<br/><br/>
-    /// <b>NOTE:</b> there are no checks that the activity is actually contiguous with the 
-    /// previous ones; that's the caller's problem.
-    /// </param>
-    internal static void Update(ActivityRecord activityRecord)
+    internal static string? PostOrUpdateEvent(string name, DateTime start, DateTime end, string? existingId = null)
     {
-
+        if (Program.CalendarId is null || Program.Ignore(name))
+            return null;
+        Google.Apis.Calendar.v3.Data.Event ev = new()
+        {
+            Summary = name,
+            Start = start.Round().ToEventDateTime(),
+            End = end.Round().ToEventDateTime(),
+            ColorId = Program.ColorIdFor(name)
+        };
+        return ev.SendToCalendar(Program.CalendarId, existingId);
     }
 }

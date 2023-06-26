@@ -38,7 +38,8 @@ public class Program
         }
     }
 #pragma warning restore CS8618
-    private static KtvCalendarConfig? CalendarConfig = Config.TryLoad<KtvCalendarConfig>(Args.CalendarConfigPath);
+    private static KtvCalendarConfig? _config = Config.TryLoad<KtvCalendarConfig>(Args.CalendarConfigPath);
+    public static string? CalendarId => _config?.Id;
     public static DateTime NextLogTime { get; private set; } = DateTime.Now.Ceiling(Args.LogInterval);
     public static DateTime NextAggregationTime { get; private set; } = DateTime.Now.Ceiling(Args.AggregationInterval);
     public static int LineNumber { get; private set; } = 0;
@@ -48,7 +49,7 @@ public class Program
     private static ActivityRecord CurrentRecord = new();
     public static readonly string LogFolder = Path.Join(Config.BaseFolderPath, "logs");
     public static readonly string LogPath = Path.Join(LogFolder, $"{DateTime.Now.Format(TimeFormats.DateTime24H)}.ktv.log");
-    public static bool UpdateGoogleCalendar => CalendarConfig is not null && GoogleUtils.HasValidAuthConfig;
+    public static bool UpdateGoogleCalendar => _config is not null && GoogleUtils.HasValidAuthConfig;
     public static string? LastEventId { get; private set; } = null;
     public static void Main()
     {
@@ -117,20 +118,20 @@ public class Program
     private static void Aggregate()
     {
         Utils.Log($"{DateTime.Now.Time(),8}\t{CurrentRecord.MostCommon}");
-        if (!PreviousRecords.Any() || !PreviousRecords.Last().TryMerge(CurrentRecord, CalendarConfig?.Id))
+        if (!PreviousRecords.Any() || !PreviousRecords.Last().TryMerge(CurrentRecord, _config?.Id))
         {
             PreviousRecords.Add(CurrentRecord);
             KtvCalendarConfig? newConfig = Config.TryLoad<KtvCalendarConfig>(Args.CalendarConfigPath);
-            if (newConfig is not null && newConfig != CalendarConfig)
+            if (newConfig is not null && newConfig != _config)
             {
                 Console.WriteLine($"Loaded new calendar config:\n{newConfig.PrettyPrint()}");
-                CalendarConfig = newConfig;
+                _config = newConfig;
             }
             if (UpdateGoogleCalendar)
             {
                 try
                 {
-                    LastEventId = CurrentRecord.CalendarEvent.SendToCalendar(CalendarConfig!.Id!);
+                    LastEventId = CurrentRecord.CalendarEvent.SendToCalendar(_config!.Id!);
                 }
                 catch (Exception e)
                 {
@@ -145,8 +146,8 @@ public class Program
     }
     public static string ColorIdFor(string activityName)
     {
-        GoogleUtils.EventColor color = CalendarConfig!.EventColors.TryGetValue(activityName, out GoogleUtils.EventColor val) ? val : CalendarConfig!.DefaultColor;
+        GoogleUtils.EventColor color = _config!.EventColors.TryGetValue(activityName, out GoogleUtils.EventColor val) ? val : _config!.DefaultColor;
         return ((int)color).ToString();
     }
-    public static bool Ignore(string activityName) => CalendarConfig?.Ignore.Contains(activityName) ?? false;
+    public static bool Ignore(string activityName) => _config?.Ignore.Contains(activityName) ?? false;
 }
