@@ -1,47 +1,43 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
+﻿using System.Runtime.InteropServices;
 using System.Text;
-using System.Threading.Tasks;
-using System.Runtime.InteropServices;
 
 // https://stackoverflow.com/a/115905
-namespace d9.ktv
+namespace d9.ktv;
+
+public static partial class ActiveWindow
 {
-    public static class ActiveWindow
+    [LibraryImport("user32.dll")]
+    private static partial IntPtr GetForegroundWindow();
+    [DllImport("user32.dll", CharSet = CharSet.Unicode)]
+    private static extern int GetWindowText(IntPtr hWnd, StringBuilder text, int count);
+    public const int MaxLength = 256;
+    public static string? Title
     {
-        [DllImport("user32.dll")]
-        private static extern IntPtr GetForegroundWindow();
-        [DllImport("user32.dll", CharSet = CharSet.Unicode)]
-        private static extern int GetWindowText(IntPtr hWnd, StringBuilder text, int count);
-        public const int MaxLength = 256;
-        public static string? Title
+        get
         {
-            get
-            {
-                StringBuilder buffer = new(MaxLength);
-                IntPtr handle = GetForegroundWindow();
-                if (GetWindowText(handle, buffer, MaxLength) > 0) return buffer.ToString();
-                return null;
-            }
+            StringBuilder buffer = new(MaxLength);
+            IntPtr handle = GetForegroundWindow();
+            if (GetWindowText(handle, buffer, MaxLength) > 0)
+                return buffer.ToString();
+            return null;
         }
-        public static ActiveWindowInfo Info
+    }
+    public static ActiveWindowInfo Info
+    {
+        get
         {
-            get
+            if (Title is string s)
             {
-                if (Title is string s)
+                foreach (WindowNameParser wnp in WindowNameParser.List)
                 {
-                    foreach (WindowNameParser wnp in WindowNameParser.List)
+                    if (wnp.Matches(s))
                     {
-                        if (wnp.Matches(s))
-                        {
-                            return wnp.Split(s);
-                        }
+                        return wnp.Split(s);
                     }
-                    return new(s, alias: true);
                 }
-                return ActiveWindowInfo.Invalid;
+                return new(s, alias: true);
             }
+            return ActiveWindowInfo.Invalid;
         }
     }
 }

@@ -1,10 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-
-namespace d9.ktv;
+﻿namespace d9.ktv;
 public static class WindowNameLog
 {
     public class Entry : IComparable<Entry>
@@ -16,7 +10,7 @@ public static class WindowNameLog
             Timestamp = timestamp;
             WindowName = windowName;
         }
-        public int CompareTo(Entry? other) => Timestamp.CompareTo(other?.Timestamp);        
+        public int CompareTo(Entry? other) => Timestamp.CompareTo(other?.Timestamp);
     }
     private static readonly SortedSet<Entry> _rawData = new();
     public static void Log(string s) => _rawData.Add(new(DateTime.Now, s));
