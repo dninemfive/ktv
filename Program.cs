@@ -42,6 +42,7 @@ public class Program
     private static KtvCalendarConfig? _config = Config.TryLoad<KtvCalendarConfig>(Args.CalendarConfigPath);
     public static string? CalendarId => _config?.Id;
     public static DateTime NextLogTime { get; private set; } = DateTime.Now.Ceiling(Args.LogInterval);
+    public static DateTime LastAggregationTime { get; private set; } = DateTime.Now;
     public static DateTime NextAggregationTime { get; private set; } = DateTime.Now.Ceiling(Args.AggregationInterval);
     public static int LineNumber { get; private set; } = 0;
     public static DateTime LaunchedOn { get; } = DateTime.Today;
@@ -50,6 +51,11 @@ public class Program
     public static string? LastEventId { get; private set; } = null;
     public static void Main()
     {
+        if(1440 % Args.AggregationInterval.TotalMinutes != 0)
+        {
+            Console.WriteLine($"The aggregation interval must divide the number of minutes in a day evenly, but {Args.AggregationInterval} does not.");
+            return;
+        }
         Utils.Log($"Logging to `{LogFolder.Replace(@"\", "/")}` every {Args.LogInterval:g}; aggregating every {Args.AggregationInterval:g}, " +
                           $"starting at {NextAggregationTime.Time()}.");
         try
@@ -58,7 +64,7 @@ public class Program
         }
         finally
         {
-            WriteActivity();
+            Aggregate(true);
         }
     }
     private static void MainLoop()
@@ -79,14 +85,14 @@ public class Program
         Utils.Log($"{++LineNumber,8}\t{DateTime.Now}\t{info.PrintNull()}");
         NextLogTime = DateTime.Now.Ceiling(Args.LogInterval);
     }
-    private static void Aggregate()
+    private static void Aggregate(bool offAggregationTime = false)
     {
         Utils.Log($"{DateTime.Now.Time(),8}:");
-        _config = Config.TryLoad<KtvCalendarConfig>(Args.CalendarConfigPath);
-        DateTime prev = NextAggregationTime;
-        NextAggregationTime += Args.AggregationInterval;
-        foreach ((Activity activity, float proportion) in Activities.Between(prev, NextAggregationTime))
+        _config = Config.TryLoad<KtvCalendarConfig>(Args.CalendarConfigPath);        
+        foreach ((Activity activity, float proportion) in Activities.Between(LastAggregationTime, offAggregationTime ? DateTime.Now : NextAggregationTime))
             Utils.Log($"\t{$"{proportion:p0}",-8}\t{activity}");
+        LastAggregationTime = NextAggregationTime;
+        NextAggregationTime += Args.AggregationInterval;
     }
     public static string ColorIdFor(string activityName)
     {

@@ -13,7 +13,17 @@ public static class WindowNameLog
         public int CompareTo(Entry? other) => Timestamp.CompareTo(other?.Timestamp);
     }
     private static readonly SortedSet<Entry> _rawData = new();
-    public static void Log(string s) => _rawData.Add(new(DateTime.Now, s));
+    static WindowNameLog()
+    {
+        foreach (Entry entry in FileManager.LoadEntries())
+            _ = _rawData.Add(entry);
+    }
+    public static void Log(string s)
+    {
+        Entry entry = new(DateTime.Now, s);
+        _ = _rawData.Add(entry);
+        FileManager.Append(FileManager.LogFile.Raw, entry);
+    }
     public static IEnumerable<Entry> EntriesBetween(DateTime start, DateTime end)
         => _rawData.SkipWhile(x => x.Timestamp < start).TakeWhile(x => x.Timestamp < end);
 }

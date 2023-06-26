@@ -8,7 +8,6 @@ using System.Collections;
 using System.Runtime.InteropServices;
 
 namespace d9.ktv;
-[ComDefaultInterface(typeof(IEnumerable))]
 public class CountingDictionary<K, V> : IEnumerable<KeyValuePair<K,V>>
     where K : notnull
     where V : INumberBase<V>

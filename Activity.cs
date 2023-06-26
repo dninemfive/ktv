@@ -12,7 +12,7 @@ public class Activity
         set
         {
             _end = value;
-            CalendarManager.PostOrUpdateEvent(Name, Start, End, EventId);
+            EventId = CalendarManager.PostOrUpdateEvent(Name, Start, End, EventId);
         }
     }
     public Activity(string name, DateTime start, DateTime end, string? description = null)
