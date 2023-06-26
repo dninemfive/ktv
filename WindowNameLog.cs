@@ -22,7 +22,7 @@ public static class WindowNameLog
     {
         Entry entry = new(DateTime.Now, s);
         _ = _rawData.Add(entry);
-        FileManager.Append(FileManager.LogFile.Raw, entry);
+        FileManager.Append(entry);
     }
     public static IEnumerable<Entry> EntriesBetween(DateTime start, DateTime end)
         => _rawData.SkipWhile(x => x.Timestamp < start).TakeWhile(x => x.Timestamp < end);
