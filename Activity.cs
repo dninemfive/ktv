@@ -35,7 +35,7 @@ public static class Activities
         _activities[name] = result;
         return result;
     }
-    public static IEnumerable<Activity> Between(DateTime start, DateTime end, float threshold = 0.4f)
+    public static IEnumerable<(Activity activity, float proportion)> Between(DateTime start, DateTime end, float threshold = 0.4f)
     {
         CountingDictionary<WindowNameLog.Entry, int> entryCounts = new();
         HashSet<string> activeActivities = new();
@@ -45,16 +45,17 @@ public static class Activities
         foreach(KeyValuePair<WindowNameLog.Entry, int> kvp in entryCounts.Descending())
         {
             (WindowNameLog.Entry entry, int value) = kvp;
-            if (value / (float)ct > threshold)
-            {
-                yield return GetOrMakeActivity(entry.WindowName, start, end, $"{value / (float)ct:p2}");
-                activeActivities.Add(entry.WindowName);
+            float proportion = value / (float)ct;
+            if (proportion > threshold)
+            {                
+                yield return (GetOrMakeActivity(entry.WindowName, start, end, $"{proportion:p2}"), proportion);
+                _ = activeActivities.Add(entry.WindowName);
             }                
         }
         foreach(KeyValuePair<string, Activity> kvp in _activities)
         {
             if (!activeActivities.Contains(kvp.Key))
-                _activities.Remove(kvp.Key);
+                _ = _activities.Remove(kvp.Key);
         }
     }
 }

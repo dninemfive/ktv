@@ -7,7 +7,7 @@ internal static class CalendarManager
 {
     internal static string? PostOrUpdateEvent(string name, DateTime start, DateTime end, string? existingId = null)
     {
-        if (Program.CalendarId is null || Program.Ignore(name))
+        if (!Program.UpdateGoogleCalendar || Program.Ignore(name))
             return null;
         Google.Apis.Calendar.v3.Data.Event ev = new()
         {
@@ -16,6 +16,6 @@ internal static class CalendarManager
             End = end.Round().ToEventDateTime(),
             ColorId = Program.ColorIdFor(name)
         };
-        return ev.SendToCalendar(Program.CalendarId, existingId);
+        return ev.SendToCalendar(Program.CalendarId!, existingId);
     }
 }
