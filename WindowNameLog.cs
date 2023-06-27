@@ -11,6 +11,7 @@ public static class WindowNameLog
             WindowName = windowName;
         }
         public int CompareTo(Entry? other) => Timestamp.CompareTo(other?.Timestamp);
+        public override string ToString() => $"Entry({WindowName}, {Timestamp})";
     }
     private static readonly SortedSet<Entry> _rawData = new();
     static WindowNameLog()

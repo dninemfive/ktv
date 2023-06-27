@@ -21,8 +21,9 @@ public class Activity
         Start = start;
         End = end;
         Description = description;
-        EventId = CalendarManager.PostOrUpdateEvent(name, start, end);
+        //EventId = CalendarManager.PostOrUpdateEvent(name, start, end);
     }
+    public override string ToString() => $"{Start} - {End}: {Name}{(!string.IsNullOrEmpty(Description) ? $" ({Description})" : "")}";
 }
 public static class Activities
 {
@@ -37,19 +38,23 @@ public static class Activities
     }
     public static IEnumerable<(Activity activity, float proportion)> Between(DateTime start, DateTime end, float threshold = 0.4f)
     {
-        CountingDictionary<WindowNameLog.Entry, int> entryCounts = new();
+        Console.WriteLine($"Activities.Between({start}, {end}, {threshold})");
+        CountingDictionary<string, int> entryCounts = new();
         HashSet<string> activeActivities = new();
         foreach (WindowNameLog.Entry entry in WindowNameLog.EntriesBetween(start, end))
-            entryCounts.Add(entry);
-        int ct = entryCounts.Count();
-        foreach(KeyValuePair<WindowNameLog.Entry, int> kvp in entryCounts.Descending())
+            entryCounts.Add(entry.WindowName);
+        int sum = entryCounts.Total;
+        Console.WriteLine($"\tct = {sum}");
+        foreach(KeyValuePair<string, int> kvp in entryCounts.Descending())
         {
-            (WindowNameLog.Entry entry, int value) = kvp;
-            float proportion = value / (float)ct;
+            
+            (string entry, int value) = kvp;            
+            float proportion = value / (float)sum;
+            Console.WriteLine($"({entry}, {value}): {proportion}");
             if (proportion > threshold)
             {                
-                yield return (GetOrMakeActivity(entry.WindowName, start, end, $"{proportion:p2}"), proportion);
-                _ = activeActivities.Add(entry.WindowName);
+                yield return (GetOrMakeActivity(entry, start, end, $"{proportion:p2}"), proportion);
+                _ = activeActivities.Add(entry);
             }                
         }
         foreach(KeyValuePair<string, Activity> kvp in _activities)

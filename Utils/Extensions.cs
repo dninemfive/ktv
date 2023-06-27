@@ -46,13 +46,5 @@ internal static class Extensions
         if (date.Ticks % ts.Ticks < ts.Ticks / 2)
             return Floor(date, span);
         return Ceiling(date, span);
-    }
-    public static string? SendToCalendar(this Event @event, string calendarId, string? existingEventId = null)
-    {
-        if (!Program.UpdateGoogleCalendar || Program.Ignore(@event.Summary))
-            return null;
-        if (existingEventId is not null)
-            return GoogleUtils.UpdateEvent(calendarId, existingEventId, @event).Id;
-        return GoogleUtils.AddEventTo(calendarId, @event).Id;
-    }
+    }    
 }

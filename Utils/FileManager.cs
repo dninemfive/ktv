@@ -18,12 +18,7 @@ internal static class FileManager
         }
     }
     private enum LogFile { Raw, Aggregate }
-    private static string Folder(this LogFile folder)
-    {
-        if (folder is not LogFile.Raw or LogFile.Aggregate)
-            throw new Exception($"{folder} is not a valid FileManager type. Valid values are Raw or Aggregate.");
-        return folder.ToString().ToLower();
-    }
+    private static string Folder(this LogFile folder) => folder.ToString().ToLower();
     private static string FolderPath(this LogFile file) => Path.Join(LogFolder, file.Folder());
     private static string Extension(this LogFile file) => $"{file.Folder()[0..3]}.ktv.log";
     private static string FilePath(this LogFile file, DateTime? date = null) 
@@ -33,14 +28,14 @@ internal static class FileManager
         string path = file.FilePath(date);
         if(!File.Exists(path))
         {
-            _ = File.Create(path);
+            File.WriteAllText(path, "");
             yield break;
         }
         foreach (string s in File.ReadAllLines(path))
             yield return s;
     }
     private static void AppendObj(object obj, LogFile file, DateTime? date = null) 
-        => File.AppendAllText(file.FilePath(date), JsonSerializer.Serialize(obj));    
+        => File.AppendAllText(file.FilePath(date), $"{JsonSerializer.Serialize(obj)}\n");    
     public static IEnumerable<WindowNameLog.Entry> LoadEntries(DateTime? date = null) 
         => Load(LogFile.Raw, date)
             .Select(x => JsonSerializer.Deserialize<WindowNameLog.Entry>(x))

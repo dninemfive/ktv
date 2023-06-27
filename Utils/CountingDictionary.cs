@@ -33,4 +33,6 @@ public class CountingDictionary<K, V> : IEnumerable<KeyValuePair<K,V>>
     public IEnumerator GetEnumerator() => _dict.GetEnumerator();
     public IEnumerable<KeyValuePair<K, V>> Descending() => _dict.OrderByDescending(x => x.Value);
     public IEnumerable<KeyValuePair<K, V>> Ascending() => _dict.OrderBy(x => x.Value);
+    public V Total => _dict.Values.Aggregate((x, y) => x + y);
+    public int Count => _dict.Count;
 }
