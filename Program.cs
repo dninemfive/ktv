@@ -17,12 +17,12 @@ public class Program
                                ?? TimeSpan.FromMinutes(15);
         public static readonly string CalendarConfigPath = CommandLineArgs.TryGet(nameof(CalendarConfigPath), CommandLineArgs.Parsers.FilePath)
                                ?? "calendar config.json";
-    }    
+    }
     public static DateTime NextLogTime { get; private set; } = DateTime.Now.Ceiling(Args.LogInterval);
     public static DateTime LastAggregationTime { get; private set; } = DateTime.Now;
     public static DateTime NextAggregationTime { get; private set; } = DateTime.Now.Ceiling(Args.AggregationInterval);
     public static int LineNumber { get; private set; } = 0;
-    public static DateTime LaunchedOn { get; } = DateTime.Today;
+    public static DateTime LaunchTime { get; } = DateTime.Now;
     
     
     public static string? LastEventId { get; private set; } = null;
@@ -33,7 +33,7 @@ public class Program
             Console.WriteLine($"The aggregation interval must divide the number of minutes in a day evenly, but {Args.AggregationInterval} does not.");
             return;
         }
-        Utils.Log($"Logging to `{FileManager.LogFolder.Replace(@"\", "/")}` every {Args.LogInterval:g}; aggregating every {Args.AggregationInterval:g}, " +
+        Utils.Log($"Logging to `{FileManager.LogFolder.Replace(@"\", "/")}` every {Args.LogInterval.Natural()}; aggregating every {Args.AggregationInterval.Natural()}, " +
                           $"starting at {NextAggregationTime.Time()}.");
         try
         {
@@ -64,7 +64,8 @@ public class Program
     }
     private static void Aggregate(bool offAggregationTime = false)
     {
-        Utils.Log($"{DateTime.Now.Time(),8}:");
+        RecordActivity(); // otherwise it doesn't get called before Aggregate :thonk:
+        Utils.Log($"{DateTime.Now.Time(),8} (Uptime: {(DateTime.Now - LaunchTime).Natural()}):");
         CalendarManager.LoadConfig();
         foreach ((Activity activity, float proportion) in Activities.Between(LastAggregationTime, offAggregationTime ? DateTime.Now : NextAggregationTime))
             Utils.Log($"\t{$"{proportion:p0}",-8}\t{activity}");

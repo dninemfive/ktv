@@ -8,13 +8,9 @@ namespace d9.ktv;
 internal static class CalendarManager
 {
     private static KtvCalendarConfig? _config;
-    static CalendarManager()
-    {
-        LoadConfig();
-    }
     internal static string? PostOrUpdateEvent(string name, DateTime start, DateTime end, string? existingId = null)
     {
-        Console.WriteLine($"PostOrUpdateEvent({name}, {start}, {end}, {existingId.PrintNull()})");
+        //Console.WriteLine($"PostOrUpdateEvent({name}, {start}, {end}, {existingId.PrintNull()})");
         if (!UseCalendar || Ignore(name))
             return null;
         Event ev = new()

@@ -32,25 +32,22 @@ public static class Activities
     {
         if (_activities.TryGetValue(name, out Activity? activity))
             return activity;
-        Activity result = new(name, start, end, description);
+        Activity result = new(name, start.Floor(Program.Args.AggregationInterval), end, description);
         _activities[name] = result;
         return result;
     }
     public static IEnumerable<(Activity activity, float proportion)> Between(DateTime start, DateTime end, float threshold = 0.4f)
     {
-        Console.WriteLine($"Activities.Between({start}, {end}, {threshold})");
         CountingDictionary<string, int> entryCounts = new();
         HashSet<string> activeActivities = new();
         foreach (WindowNameLog.Entry entry in WindowNameLog.EntriesBetween(start, end))
             entryCounts.Add(entry.WindowName);
         int sum = entryCounts.Total;
-        Console.WriteLine($"\tct = {sum}");
         foreach(KeyValuePair<string, int> kvp in entryCounts.Descending())
         {
             
-            (string entry, int value) = kvp;            
+            (string entry, int value) = kvp;
             float proportion = value / (float)sum;
-            Console.WriteLine($"({entry}, {value}): {proportion}");
             if (proportion > threshold)
             {                
                 yield return (GetOrMakeActivity(entry, start, end, $"{proportion:p2}"), proportion);

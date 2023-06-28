@@ -47,4 +47,23 @@ internal static class Extensions
             return Floor(date, span);
         return Ceiling(date, span);
     }    
+    public static string Natural(this TimeSpan ts)
+    {
+        static string? portion(int amt, string name) => amt switch
+        {
+            <= 0 => null,
+            1    => $"{amt} {name}",
+            _    => $"{amt} {name}s"
+        };
+        List<string?> portions = new()
+        {
+            portion(ts.Days, "day"),
+            portion(ts.Hours, "hour"),
+            portion(ts.Minutes, "minute"),
+            portion(ts.Seconds, "second")
+        };
+        return portions.Where(x => x is not null)
+                       .Aggregate((x, y) => $"{x}, {y}") 
+               ?? "";
+    }
 }
