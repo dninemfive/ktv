@@ -31,7 +31,10 @@ public static class Activities
     private static Activity GetOrMakeActivity(string name, DateTime start, DateTime end, string? description = null)
     {
         if (_activities.TryGetValue(name, out Activity? activity))
+        {
+            activity.End = end;
             return activity;
+        }
         Activity result = new(name, start.Floor(Program.Args.AggregationInterval), end, description);
         _activities[name] = result;
         return result;
