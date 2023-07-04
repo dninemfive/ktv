@@ -22,9 +22,7 @@ public class Program
     public static DateTime LastAggregationTime { get; private set; } = DateTime.Now;
     public static DateTime NextAggregationTime { get; private set; } = DateTime.Now.Ceiling(Args.AggregationInterval);
     public static int LineNumber { get; private set; } = 0;
-    public static DateTime LaunchTime { get; } = DateTime.Now;
-    
-    
+    public static DateTime LaunchTime { get; } = DateTime.Now; 
     public static string? LastEventId { get; private set; } = null;
     public static void Main()
     {
@@ -48,7 +46,6 @@ public class Program
     {
         while (true)
         {
-
             if (DateTime.Now >= NextLogTime)
                 RecordActivity();
             if (DateTime.Now >= NextAggregationTime)
