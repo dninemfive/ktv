@@ -12,14 +12,7 @@ public record ActiveWindowInfo
         Program = alias ? Alias.BestReplacement(program) : program;
         Details = details;
     }
-    public ActiveWindowInfo((string program, string? details)? tuple, bool alias = true)
-    {
-        if (tuple is null)
-            return;
-        (string program, string? details) = tuple.Value;
-        Program = alias ? Alias.BestReplacement(program) : program;
-        Details = details;
-    }
+    public ActiveWindowInfo((string program, string? details) tuple, bool alias = true) : this(tuple.program, tuple.details, alias) { }
     public override string ToString()
     {
         if (Details is not null)
@@ -28,5 +21,5 @@ public record ActiveWindowInfo
         }
         return Program;
     }
-    public static implicit operator ActiveWindowInfo((string program, string? details)? tuple) => new(tuple, true);
+    public static implicit operator ActiveWindowInfo((string program, string? details) tuple) => new(tuple, true);
 }

@@ -1,7 +1,7 @@
 ﻿using d9.utl;
 using d9.utl.compat;
+using System.Text.Json;
 using System.Text.Json.Serialization;
-using static System.Runtime.InteropServices.JavaScript.JSType;
 
 namespace d9.ktv;
 
@@ -17,6 +17,7 @@ public class Program
                                ?? TimeSpan.FromMinutes(15);
         public static readonly string CalendarConfigPath = CommandLineArgs.TryGet(nameof(CalendarConfigPath), CommandLineArgs.Parsers.FilePath)
                                ?? "calendar config.json";
+        public static readonly bool Test = CommandLineArgs.GetFlag(nameof(Test), 't');
     }
     public static DateTime NextLogTime { get; private set; } = DateTime.Now.Ceiling(Args.LogInterval);
     public static DateTime LastAggregationTime { get; private set; } = DateTime.Now;
@@ -26,6 +27,13 @@ public class Program
     public static string? LastEventId { get; private set; } = null;
     public static void Main()
     {
+        if(Args.Test)
+        {
+            // print all window names
+            WindowNameParser.Def def = new("example", ":", TitlePosition.First);
+            File.WriteAllText("assdfasdfafg.txt", JsonSerializer.Serialize(new List<WindowNameParser.Def>() { def }, Config.DefaultSerializerOptions));
+            return;
+        }
         if(1440 % Args.AggregationInterval.TotalMinutes != 0)
         {
             Console.WriteLine($"The aggregation interval must divide the number of minutes in a day evenly, but {Args.AggregationInterval} does not.");
@@ -63,7 +71,6 @@ public class Program
     {
         RecordActivity(); // otherwise it doesn't get called before Aggregate :thonk:
         Utils.Log($"{DateTime.Now.Time(),8} (Uptime: {(DateTime.Now - LaunchTime).Natural()}):");
-        CalendarManager.LoadConfig();
         foreach ((Activity activity, float proportion) in Activities.Between(LastAggregationTime, offAggregationTime ? DateTime.Now : NextAggregationTime))
             Utils.Log($"\t{$"{proportion:p0}",-8}\t{activity}");
         LastAggregationTime = NextAggregationTime;

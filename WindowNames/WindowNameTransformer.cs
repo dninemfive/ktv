@@ -1,28 +1,22 @@
-﻿using System;
+﻿using d9.utl;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
+using System.Text.RegularExpressions;
 using System.Threading.Tasks;
 
-namespace d9.ktv.WindowNames;
-internal class WindowNameTransformer
+namespace d9.ktv;
+/*
+internal class Rule
 {
-    internal delegate (string? info, string? remainder) Splitter(string s);
-    public IEnumerable<string> Specifics(string s, params Splitter[] splitters)
+    private readonly Func<string, bool> _appliesTo;
+    private readonly Func<string, string> _transformer;
+    public Rule(Func<string, bool> validator, Func<string, string> transformer)
     {
-        foreach(Splitter splitter in splitters)
-        {
-            (string? info, string? remainder) = splitter(s);
-            if (info is not null)
-                yield return info;
-            if (remainder is not null)
-            {
-                s = remainder;
-            }
-            else
-            {
-                yield break;
-            }
-        } 
+        _appliesTo = validator;
+        _transformer = transformer;
     }
-}
+    public string? Try(string s) => _appliesTo(s) ? _transformer(s) : null;
+    public static readonly Rule Mozilla = new(x => Regex.IsMatch(x, @"- Mozilla"), )
+}*/

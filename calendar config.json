@@ -16,5 +16,27 @@
 	"Rogue Legacy 2": "banana",
 	"Minecraft* 1.19": "banana",
 	"Dorfromantik": "banana"
-  }
+  },
+  "windowNameParsers": [
+    {
+      "title": "MINGW64",
+      "delimiter": ":",
+      "titlePosition": "first"
+    },
+    {
+        "title": "Minecraft",
+        "delimiter": " - ",
+        "titlePosition": "first"
+    },
+    {
+        "title": "Wargame",
+        "delimiter": " - ",
+        "titlePosition": "first"
+    },
+    {
+        "title": "Warno",
+        "delimiter": " - ",
+        "titlePosition": "first"
+    }
+  ]
 }
