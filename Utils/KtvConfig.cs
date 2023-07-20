@@ -9,23 +9,24 @@ using System.Text.Json.Serialization;
 using System.Threading.Tasks;
 
 namespace d9.ktv;
-internal static class KtvConfig
+public static class KtvConfig
 {
-    internal static KtvConfigDef? Config = null;
+    public static IEnumerable<Parser.Def> ParserDefs => _config?.parsers ?? new List<Parser.Def>();
+    private static KtvConfigDef? _config = null;
     static KtvConfig()
     {
-        Config = utl.Config.TryLoad<KtvConfigDef>(Program.Args.CalendarConfigPath);
+        _config = utl.Config.TryLoad<KtvConfigDef>(Program.Args.CalendarConfigPath);
     }
     #region google stuff
-    private static bool UseCalendar => Config is not null && GoogleUtils.HasValidAuthConfig;
-    private static string? CalendarId => Config?.Id;
-    private static bool Ignore(this string windowTitle) => Config?.Ignore.Contains(windowTitle) ?? false;
+    private static bool UseCalendar => _config is not null && GoogleUtils.HasValidAuthConfig;
+    private static string? CalendarId => _config?.Id;
+    private static bool Ignore(this string windowTitle) => _config?.Ignore.Contains(windowTitle) ?? false;
     private static string ColorIdFor(string activityName)
     {
-        GoogleUtils.EventColor color = Config!.EventColors.TryGetValue(activityName, out GoogleUtils.EventColor val) ? val : Config!.DefaultColor;
+        GoogleUtils.EventColor color = _config!.EventColors.TryGetValue(activityName, out GoogleUtils.EventColor val) ? val : _config!.DefaultColor;
         return ((int)color).ToString();
     }
-    public static GoogleUtils.EventColor DefaultColor = Config?.DefaultColor ?? default;   
+    public static GoogleUtils.EventColor DefaultColor = _config?.DefaultColor ?? default;   
     public static string? SendToCalendar(this Event @event, string calendarId, string? existingEventId = null)
     {
         //Console.WriteLine($"SendToCalendar({@event}, {calendarId}, {existingEventId.PrintNull()}");
@@ -65,5 +66,5 @@ internal class KtvConfigDef
     [JsonInclude]
     public Dictionary<string, GoogleUtils.EventColor> EventColors;
     [JsonInclude]
-    public List<Parser.Def> WindowNameParsers;
+    public List<Parser.Def> parsers;
 }

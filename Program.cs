@@ -29,7 +29,9 @@ public class Program
     {
         // https://stackoverflow.com/a/29511342
         // todo: add to utl
-        System.Runtime.CompilerServices.RuntimeHelpers.RunClassConstructor(typeof(KtvConfig).TypeHandle);
+        // no longer needed here because the config is accessed when initializing parsers
+        // System.Runtime.CompilerServices.RuntimeHelpers.RunClassConstructor(typeof(KtvConfig).TypeHandle);
+        Parsers.Initialize(KtvConfig.ParserDefs);
         if (Args.Test)
         {
             // print all window names

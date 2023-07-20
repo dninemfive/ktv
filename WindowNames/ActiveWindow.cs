@@ -28,7 +28,7 @@ public static partial class ActiveWindow
         {
             if (Title is string s)
             {
-                foreach (Parser wnp in Parser.List)
+                foreach (Parser wnp in Parsers.All)
                 {
                     if (wnp.Try(Title, out ActiveWindowInfo? result)) return result!;
                 }

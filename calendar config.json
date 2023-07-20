@@ -18,7 +18,7 @@
 	"Dorfromantik": "banana",
     "Warno": "banana"
   },
-  "windowNameParsers": [
+  "parsers": [
     {
       "title": "MINGW64",
       "delimiter": ":",

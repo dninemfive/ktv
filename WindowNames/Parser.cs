@@ -1,25 +1,28 @@
 ﻿using d9.utl;
 using System.Text.Json.Serialization;
 using System.Text.RegularExpressions;
+using static d9.utl.CommandLineArgs;
 
 namespace d9.ktv;
-
-public record Parser
+public static class Parsers
 {
-    public static IEnumerable<Parser> List => _list;
+    public static IEnumerable<Parser> All => _list;
     private static readonly List<Parser> _list = new();
-    public static void Initialize(IEnumerable<Parser> parsers)
+    public static void Initialize(IEnumerable<Parser.Def>? parsers)
     {
-        foreach (Parser p in parsers) _list.Add(p);
-        _list.Add(new(new(@".* \[foobar2000]", RegexOptions.Compiled), 
+        if(parsers is not null) foreach (Parser.Def p in parsers) _list.Add(p);
+        _list.Add(new(new(@".* \[foobar2000]", RegexOptions.Compiled),
                           s => ("foobar2000", s.SplitOn(" [", TitlePosition.Last)?.b)));
-        foreach(char c in Constants.Hyphens)
+        foreach (char c in Constants.Hyphens)
         {
             string delimiter = $".* {c} .*";
             _list.Add(new(new($".*{delimiter}.*", RegexOptions.Compiled), s => s.SplitOn(delimiter, TitlePosition.Last)));
         }
         _list.Add(new(new(".*", RegexOptions.Compiled), s => (s, null)));
     }
+}
+public record Parser
+{
     public Regex Matcher { get; private set; }
     public Func<string, ActiveWindowInfo?> Splitter { get; private set; }
     public Parser(Regex regex, Func<string, ActiveWindowInfo?> splitter)
