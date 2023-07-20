@@ -20,6 +20,7 @@ internal static class KtvConfig
             // the reverse is so that prepending doesn't change the order
             foreach(WindowNameParser.Def wnpd in Config.WindowNameParsers.Reverse<WindowNameParser.Def>())
             {
+                Console.WriteLine(wnpd);
                 WindowNameParser.List.Insert(0, wnpd);
             }
         }

@@ -27,7 +27,10 @@ public class Program
     public static string? LastEventId { get; private set; } = null;
     public static void Main()
     {
-        if(Args.Test)
+        // https://stackoverflow.com/a/29511342
+        // todo: add to utl
+        System.Runtime.CompilerServices.RuntimeHelpers.RunClassConstructor(typeof(KtvConfig).TypeHandle);
+        if (Args.Test)
         {
             // print all window names
             WindowNameParser.Def def = new("example", ":", TitlePosition.First);
