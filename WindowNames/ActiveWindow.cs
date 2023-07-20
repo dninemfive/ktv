@@ -34,7 +34,7 @@ public static partial class ActiveWindow
                 }
                 return new(s, alias: true);
             }
-            return ActiveWindowInfo.Invalid;
+            return new("");
         }
     }
 }

@@ -1,4 +1,5 @@
-﻿namespace d9.ktv;
+﻿using d9.utl;
+namespace d9.ktv;
 public class Activity
 {
     public readonly string Name;
@@ -21,7 +22,6 @@ public class Activity
         Start = start;
         End = end;
         Description = description;
-        //EventId = CalendarManager.PostOrUpdateEvent(name, start, end);
     }
     public override string ToString() => $"{Start} - {End}: {Name}{(!string.IsNullOrEmpty(Description) ? $" ({Description})" : "")}";
 }

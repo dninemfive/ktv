@@ -15,15 +15,6 @@ internal static class KtvConfig
     static KtvConfig()
     {
         Config = utl.Config.TryLoad<KtvConfigDef>(Program.Args.CalendarConfigPath);
-        if(Config is not null)
-        {
-            // the reverse is so that prepending doesn't change the order
-            foreach(Parser.Def wnpd in Config.WindowNameParsers.Reverse<Parser.Def>())
-            {
-                Console.WriteLine(wnpd);
-                Parser.List.Insert(0, wnpd);
-            }
-        }
     }
     #region google stuff
     private static bool UseCalendar => Config is not null && GoogleUtils.HasValidAuthConfig;
@@ -37,7 +28,7 @@ internal static class KtvConfig
     public static GoogleUtils.EventColor DefaultColor = Config?.DefaultColor ?? default;   
     public static string? SendToCalendar(this Event @event, string calendarId, string? existingEventId = null)
     {
-        Console.WriteLine($"SendToCalendar({@event}, {calendarId}, {existingEventId.PrintNull()}");
+        //Console.WriteLine($"SendToCalendar({@event}, {calendarId}, {existingEventId.PrintNull()}");
         if (!UseCalendar || Ignore(@event.Summary))
             return null;
         if (existingEventId is not null)
@@ -46,7 +37,7 @@ internal static class KtvConfig
     }
     internal static string? PostOrUpdateEvent(string name, DateTime start, DateTime end, string? existingId = null)
     {
-        Console.WriteLine($"PostOrUpdateEvent({name}, {start}, {end}, {existingId.PrintNull()})");
+        //Console.WriteLine($"PostOrUpdateEvent({name}, {start}, {end}, {existingId.PrintNull()})");
         if (!UseCalendar || Ignore(name))
             return null;
         Event ev = new()

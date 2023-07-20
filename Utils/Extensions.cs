@@ -20,49 +20,5 @@ internal static class Extensions
             _ => throw new ArgumentOutOfRangeException(nameof(titlePosition))
         };
     }
-    public static string Time(this DateTime time) => time.ToString(TimeFormats.Time);
-    /// <summary>
-    /// 
-    /// </summary>
-    /// <remarks>Code from <see href="https://stackoverflow.com/a/1393726">here</see>.</remarks>
-    /// <param name="time"></param>
-    /// <param name="span"></param>
-    /// <returns></returns>
-    public static DateTime Ceiling(this DateTime date, TimeSpan? span = null)
-    {
-        TimeSpan ts = span ?? TimeSpan.FromMinutes(1);
-        long ticks = (date.Ticks + ts.Ticks - 1) / ts.Ticks;
-        return new(ticks * ts.Ticks, date.Kind);
-    }
-    public static DateTime Floor(this DateTime date, TimeSpan? span = null)
-    {
-        TimeSpan ts = span ?? TimeSpan.FromMinutes(1);
-        return new((date.Ticks / ts.Ticks) * ts.Ticks, date.Kind);
-    }
-    public static DateTime Round(this DateTime date, TimeSpan? span = null)
-    {
-        TimeSpan ts = span ?? TimeSpan.FromMinutes(1);
-        if (date.Ticks % ts.Ticks < ts.Ticks / 2)
-            return Floor(date, span);
-        return Ceiling(date, span);
-    }    
-    public static string Natural(this TimeSpan ts)
-    {
-        static string? portion(int amt, string name) => amt switch
-        {
-            <= 0 => null,
-            1    => $"{amt} {name}",
-            _    => $"{amt} {name}s"
-        };
-        List<string?> portions = new()
-        {
-            portion(ts.Days, "day"),
-            portion(ts.Hours, "hour"),
-            portion(ts.Minutes, "minute"),
-            portion(ts.Seconds, "second")
-        };
-        return portions.Where(x => x is not null)
-                       .Aggregate((x, y) => $"{x}, {y}") 
-               ?? "";
-    }
+    public static string Time(this DateTime time) => time.ToString(TimeFormats.Time);    
 }
