@@ -2,11 +2,8 @@
 
 public record ActiveWindowInfo
 {
-    public bool IsInvalid => Program == string.Empty && Details == null;
     public string Program { get; private set; } = "";
     public string? Details { get; private set; } = null;
-    public static ActiveWindowInfo Invalid => new();
-    private ActiveWindowInfo() { }
     public ActiveWindowInfo(string program, string? details = null, bool alias = false)
     {
         Program = alias ? Alias.BestReplacement(program) : program;

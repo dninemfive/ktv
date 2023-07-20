@@ -28,12 +28,9 @@ public static partial class ActiveWindow
         {
             if (Title is string s)
             {
-                foreach (WindowNameParser wnp in WindowNameParser.List)
+                foreach (Parser wnp in Parser.List)
                 {
-                    if (wnp.Matches(s))
-                    {
-                        return wnp.Split(s);
-                    }
+                    if (wnp.Try(Title, out ActiveWindowInfo? result)) return result!;
                 }
                 return new(s, alias: true);
             }

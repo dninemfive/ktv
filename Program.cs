@@ -33,8 +33,6 @@ public class Program
         if (Args.Test)
         {
             // print all window names
-            WindowNameParser.Def def = new("example", ":", TitlePosition.First);
-            File.WriteAllText("assdfasdfafg.txt", JsonSerializer.Serialize(new List<WindowNameParser.Def>() { def }, Config.DefaultSerializerOptions));
             return;
         }
         if(1440 % Args.AggregationInterval.TotalMinutes != 0)

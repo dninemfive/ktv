@@ -18,10 +18,10 @@ internal static class KtvConfig
         if(Config is not null)
         {
             // the reverse is so that prepending doesn't change the order
-            foreach(WindowNameParser.Def wnpd in Config.WindowNameParsers.Reverse<WindowNameParser.Def>())
+            foreach(Parser.Def wnpd in Config.WindowNameParsers.Reverse<Parser.Def>())
             {
                 Console.WriteLine(wnpd);
-                WindowNameParser.List.Insert(0, wnpd);
+                Parser.List.Insert(0, wnpd);
             }
         }
     }
@@ -74,5 +74,5 @@ internal class KtvConfigDef
     [JsonInclude]
     public Dictionary<string, GoogleUtils.EventColor> EventColors;
     [JsonInclude]
-    public List<WindowNameParser.Def> WindowNameParsers;
+    public List<Parser.Def> WindowNameParsers;
 }

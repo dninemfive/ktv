@@ -21,7 +21,6 @@ internal static class Extensions
         };
     }
     public static string Time(this DateTime time) => time.ToString(TimeFormats.Time);
-    public static string Format(this DateTime time, string format) => time.ToString(format);
     /// <summary>
     /// 
     /// </summary>
