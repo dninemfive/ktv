@@ -73,10 +73,11 @@ public class Program
     private static void Aggregate(bool offAggregationTime = false)
     {
         RecordActivity(); // otherwise it doesn't get called before Aggregate :thonk:
-        Utils.Log($"{DateTime.Now.Time(),8} (Uptime: {(DateTime.Now - LaunchTime).Natural()}):");
+        Utils.Log($"\n{DateTime.Now.Time()} (Uptime: {(DateTime.Now - LaunchTime).Natural()}):");
         foreach ((Activity activity, float proportion) in Activities.Between(LastAggregationTime, offAggregationTime ? DateTime.Now : NextAggregationTime))
             Utils.Log($"\t{$"{proportion:p0}",-8}\t{activity}");
         LastAggregationTime = NextAggregationTime;
         NextAggregationTime += Args.AggregationInterval;
+        Console.WriteLine();
     }    
 }
