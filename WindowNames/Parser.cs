@@ -14,7 +14,7 @@ public static class Parsers
         _list.Add(new(new(@".* \[foobar2000]", RegexOptions.Compiled),
                           s => ("foobar2000", s.SplitOn(" [", TitlePosition.Last)?.b)));
         //reversed because `-` is more common than em/en dashes so it's more likely to be used e.g. in website titles on firefox
-        foreach (char c in Constants.Hyphens.Reverse<char>())
+        foreach (char c in Constants.Hyphens.Reverse())
         {
             string delimiter = $" {c} ";
             _list.Add(new(new($".*{delimiter}.*", RegexOptions.Compiled), s => s.SplitOn(delimiter, TitlePosition.Last)));
@@ -37,9 +37,7 @@ public record Parser
     {
         result = null;
         if (!Matcher.IsMatch(s)) return false;
-        Console.WriteLine($"{Matcher,-16}\t{s}");
         result = Split(s);
-        Console.WriteLine($"\t{result}");
         return result is not null;
     }
     public record Def

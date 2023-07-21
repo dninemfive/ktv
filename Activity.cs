@@ -7,7 +7,8 @@ public class Activity
     public string? EventId { get; private set; } = null;
     public readonly DateTime Start;
     private DateTime _end;
-    private bool _makeEvent;
+    public bool WasPosted => EventId is not null;
+    private readonly bool _makeEvent;
     public DateTime End
     {
         get => _end;
@@ -41,7 +42,7 @@ public static class Activities
         _activities[name] = result;
         return result;
     }
-    public static IEnumerable<(Activity activity, float proportion)> Between(DateTime start, DateTime end, float threshold = 0.4f, bool print = false)
+    public static IEnumerable<(Activity activity, float proportion)> Between(DateTime start, DateTime end, float threshold = 0.3f)
     {
         CountingDictionary<string, int> entryCounts = new();
         HashSet<string> activeActivities = new();
@@ -53,7 +54,7 @@ public static class Activities
             
             (string entry, int value) = kvp;
             float proportion = value / (float)sum;
-            yield return (GetOrMakeActivity(entry, start, end, $"{proportion:p2}", proportion > threshold), proportion);
+            yield return (GetOrMakeActivity(entry, start, end, makeEvent: proportion > threshold), proportion);
             if (proportion > threshold)
             {
                 _ = activeActivities.Add(entry);
