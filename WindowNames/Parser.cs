@@ -16,7 +16,7 @@ public static class Parsers
         //reversed because `-` is more common than em/en dashes so it's more likely to be used e.g. in website titles on firefox
         foreach (char c in Constants.Hyphens.Reverse<char>())
         {
-            string delimiter = $".* {c} .*";
+            string delimiter = $" {c} ";
             _list.Add(new(new($".*{delimiter}.*", RegexOptions.Compiled), s => s.SplitOn(delimiter, TitlePosition.Last)));
         }
         _list.Add(new(new(".*", RegexOptions.Compiled), s => (s, null)));
@@ -37,7 +37,9 @@ public record Parser
     {
         result = null;
         if (!Matcher.IsMatch(s)) return false;
+        Console.WriteLine($"{Matcher,-16}\t{s}");
         result = Split(s);
+        Console.WriteLine($"\t{result}");
         return result is not null;
     }
     public record Def
