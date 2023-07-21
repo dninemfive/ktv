@@ -15,10 +15,15 @@ public static partial class ActiveWindow
     {
         get
         {
+            Console.WriteLine("get_Title");
             StringBuilder buffer = new(MaxLength);
+            Console.WriteLine("get_Title:2");
             IntPtr handle = GetForegroundWindow();
-            if (GetWindowText(handle, buffer, MaxLength) > 0)
+            Console.WriteLine("get_Title:3");
+            int s = -1;
+            if ((s = GetWindowText(handle, buffer, MaxLength)) > 0)
                 return buffer.ToString();
+            Console.WriteLine($"read {s} bytes");
             return null;
         }
     }
@@ -26,11 +31,13 @@ public static partial class ActiveWindow
     {
         get
         {
-            if (Title is string s)
+            string? title = Title;
+            Console.WriteLine($"Info::{title}");
+            if (title is string s)
             {
                 foreach (Parser wnp in Parsers.All)
                 {
-                    if (wnp.Try(Title, out ActiveWindowInfo? result)) return result!;
+                    if (wnp.Try(title, out ActiveWindowInfo? result)) return result!;
                 }
                 return new(s, alias: true);
             }
