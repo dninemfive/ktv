@@ -35,7 +35,7 @@ public record Parser
     public bool Try(string s, out ActiveWindowInfo? result)
     {
         result = null;
-        if (Matcher.IsMatch(s)) return true;
+        if (!Matcher.IsMatch(s)) return false;
         result = Split(s);
         return result is not null;
     }
