@@ -13,7 +13,8 @@ public static class Parsers
         if(parsers is not null) foreach (Parser.Def p in parsers) _list.Add(p);
         _list.Add(new(new(@".* \[foobar2000]", RegexOptions.Compiled),
                           s => ("foobar2000", s.SplitOn(" [", TitlePosition.Last)?.b)));
-        foreach (char c in Constants.Hyphens)
+        //reversed because `-` is more common than em/en dashes so it's more likely to be used e.g. in website titles on firefox
+        foreach (char c in Constants.Hyphens.Reverse<char>())
         {
             string delimiter = $".* {c} .*";
             _list.Add(new(new($".*{delimiter}.*", RegexOptions.Compiled), s => s.SplitOn(delimiter, TitlePosition.Last)));

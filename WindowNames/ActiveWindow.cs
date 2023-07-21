@@ -11,7 +11,7 @@ public static partial class ActiveWindow
     [DllImport("user32.dll", CharSet = CharSet.Unicode)]
     // http://www.jasinskionline.com/windowsapi/ref/g/getwindowtext.html
     private static extern int GetWindowText(IntPtr hWnd, StringBuilder text, int count);
-    public const int MaxLength = 256;
+    public const int MaxLength = 512;
     public static string? Title
     {
         get

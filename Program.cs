@@ -2,6 +2,7 @@
 using d9.utl.compat;
 using System.Text.Json;
 using System.Text.Json.Serialization;
+using System.Diagnostics;
 
 namespace d9.ktv;
 
@@ -34,7 +35,11 @@ public class Program
         Parsers.Initialize(KtvConfig.ParserDefs);
         if (Args.Test)
         {
-            // print all window names
+            foreach(Process process in Process.GetProcesses().OrderBy(x => x.ProcessName))
+            {
+                if (string.IsNullOrWhiteSpace(process.MainWindowTitle)) continue;
+                Console.WriteLine($"{process.ProcessName,-24}{process.MainWindowTitle}");
+            }
             return;
         }
         if(1440 % Args.AggregationInterval.TotalMinutes != 0)
@@ -67,7 +72,7 @@ public class Program
     {
         ActiveWindowInfo info = ActiveWindow.Info;
         WindowNameLog.Log(info.Program);
-        Utils.Log($"{++LineNumber,8}\t{DateTime.Now}\t{info.PrintNull()}");
+        //Utils.Log($"{++LineNumber,8}\t{DateTime.Now}\t{info.PrintNull()}");
         NextLogTime = DateTime.Now.Ceiling(Args.LogInterval);
     }
     private static void Aggregate(bool offAggregationTime = false)
