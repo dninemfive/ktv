@@ -29,7 +29,6 @@ public static class KtvConfig
     public static GoogleUtils.EventColor DefaultColor = _config?.DefaultColor ?? default;   
     public static string? SendToCalendar(this Event @event, string calendarId, string? existingEventId = null)
     {
-        //Console.WriteLine($"SendToCalendar({@event}, {calendarId}, {existingEventId.PrintNull()}");
         if (!UseCalendar || Ignore(@event.Summary))
             return null;
         if (existingEventId is not null)
@@ -38,7 +37,6 @@ public static class KtvConfig
     }
     internal static string? PostOrUpdateEvent(string name, DateTime start, DateTime end, string? existingId = null)
     {
-        //Console.WriteLine($"PostOrUpdateEvent({name}, {start}, {end}, {existingId.PrintNull()})");
         if (!UseCalendar || Ignore(name))
             return null;
         Event ev = new()

@@ -65,7 +65,6 @@ public class Program
     }
     private static void RecordActivity()
     {
-        Console.WriteLine("RecordActivity()");
         ActiveWindowInfo info = ActiveWindow.Info;
         WindowNameLog.Log(info.Program);
         Utils.Log($"{++LineNumber,8}\t{DateTime.Now}\t{info.PrintNull()}");

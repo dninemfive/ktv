@@ -21,14 +21,9 @@ public static class WindowNameLog
     }
     public static void Log(string s)
     {
-        Console.Write("Log");
-        Console.WriteLine($"\t({s})");
         Entry entry = new(DateTime.Now, s);
-        Console.WriteLine("\t\tLog:2");
         _ = _rawData.Add(entry);
-        Console.WriteLine("\t\tLog:3");
         FileManager.Append(entry);
-        Console.WriteLine("\t\tLog:4");
     }
     public static IEnumerable<Entry> EntriesBetween(DateTime start, DateTime end)
         => _rawData.SkipWhile(x => x.Timestamp < start).TakeWhile(x => x.Timestamp < end);
