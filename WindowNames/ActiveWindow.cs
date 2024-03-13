@@ -33,9 +33,8 @@ public static partial class ActiveWindow
         {
             nint handle = GetForegroundWindow();
             foreach(Process process in Process.GetProcesses())
-            {
-                if (process.MainWindowHandle == handle) return process;
-            }
+                if (process.MainWindowHandle == handle)
+                    return process;
             return null;
         }
     }
@@ -47,9 +46,8 @@ public static partial class ActiveWindow
             if (title is string s)
             {
                 foreach (Parser wnp in Parsers.All)
-                {
-                    if (wnp.Try(title, out ActiveWindowInfo? result)) return result!;
-                }
+                    if (wnp.Try(title, out ActiveWindowInfo? result))
+                        return result!;
                 return new(s, alias: true);
             }
             return new("");

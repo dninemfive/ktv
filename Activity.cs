@@ -47,7 +47,7 @@ public static class Activities
         CountingDictionary<string, int> entryCounts = new();
         HashSet<string> activeActivities = new();
         foreach (WindowNameLog.Entry entry in WindowNameLog.EntriesBetween(start, end))
-            entryCounts.Add(entry.WindowName);
+            entryCounts.Add(entry.WindowName, 1);
         int sum = entryCounts.Total;
         foreach(KeyValuePair<string, int> kvp in entryCounts.Descending())
         {

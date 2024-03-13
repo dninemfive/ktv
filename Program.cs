@@ -35,8 +35,7 @@ public class Program
         Parsers.Initialize(KtvConfig.ParserDefs);
         if (Args.Test)
         {
-            DateTime delay = DateTime.Now + TimeSpan.FromSeconds(3);
-            while (DateTime.Now < delay) ;
+            SleepUntil(DateTime.Now + TimeSpan.FromSeconds(3));
             nint activeWindowHandle = ActiveWindow.Handle;
             Console.WriteLine($"Active window handle is {activeWindowHandle}.\n");
             bool? hasFocus(Process process)
@@ -84,6 +83,7 @@ public class Program
     }
     private static void MainLoop()
     {
+        SleepUntilEarlierOf(NextLogTime, NextAggregationTime);
         while (true)
         {
             if (DateTime.Now >= NextLogTime)
@@ -110,4 +110,11 @@ public class Program
         NextAggregationTime += Args.AggregationInterval;
         Console.WriteLine();
     }    
+    private static void SleepUntil(DateTime dt)
+    {
+        int delay = (int)(dt -  DateTime.Now).TotalMilliseconds;
+        Thread.Sleep(delay);
+    }
+    private static void SleepUntilEarlierOf(params DateTime[] dts)
+        => SleepUntil(dts.Min());
 }
