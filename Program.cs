@@ -35,7 +35,7 @@ public class Program
         Parsers.Initialize(KtvConfig.ParserDefs);
         if (Args.Test)
         {
-            DateTime delay = DateTime.Now + TimeSpan.FromSeconds(15);
+            DateTime delay = DateTime.Now + TimeSpan.FromSeconds(3);
             while (DateTime.Now < delay) ;
             nint activeWindowHandle = ActiveWindow.Handle;
             Console.WriteLine($"Active window handle is {activeWindowHandle}.\n");
@@ -43,23 +43,26 @@ public class Program
             {
                 try
                 {
-                    return process.Handle == activeWindowHandle;
+                    return process.MainWindowHandle == activeWindowHandle;
                 } 
                 catch
                 {
                     return null;
                 }
             }
-            foreach(Process process in Process.GetProcesses().OrderBy(x => x.ProcessName))
+            string desc(Process process) => hasFocus(process) switch
             {
-                if (hasFocus(process) is not true && string.IsNullOrWhiteSpace(process.MainWindowTitle)) continue;
-                Console.Write($"{process.Handle,-8}\t{process.ProcessName,-24}\t{process.MainWindowTitle,-40}");
-                Console.WriteLine(hasFocus(process) switch
-                {
-                    true  => "\t(has focus)",
-                    false => "",
-                    null  => "\t(handle access denied)"
-                });
+                true => "focus",
+                false => "",
+                null => "denied"
+            };
+            foreach (Process process in Process.GetProcesses()
+                                               .Where(x => x.MainWindowHandle > 0)
+                                               .OrderBy(x => x.MainWindowHandle))
+            {
+                
+                //if (hasFocus(process) is not true && string.IsNullOrWhiteSpace(process.MainWindowTitle)) continue;
+                Console.WriteLine($"{process.MainWindowHandle,12}{desc(process),-8}{process.ProcessName,-24}{process.MainWindowTitle,-40}");
             }
             return;
         }

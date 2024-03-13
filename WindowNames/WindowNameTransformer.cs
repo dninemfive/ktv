@@ -1,6 +1,7 @@
 ﻿using d9.utl;
 using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Linq;
 using System.Text;
 using System.Text.RegularExpressions;
@@ -20,3 +21,10 @@ internal class Rule
     public string? Try(string s) => _appliesTo(s) ? _transformer(s) : null;
     public static readonly Rule Mozilla = new(x => Regex.IsMatch(x, @"- Mozilla"), )
 }*/
+public class ProcessDetails
+{
+    int ct;
+    string name;
+
+}
+public delegate IEnumerable<ProcessDetails> ProcessTransformer(Process proc);

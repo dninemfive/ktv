@@ -1,4 +1,5 @@
-﻿using System.Runtime.InteropServices;
+﻿using System.Diagnostics;
+using System.Runtime.InteropServices;
 using System.Text;
 
 // https://stackoverflow.com/a/115905
@@ -22,6 +23,18 @@ public static partial class ActiveWindow
             if (GetWindowText(handle, buffer, MaxLength) > 0)
             {
                 return buffer.ToString();
+            }
+            return null;
+        }
+    }
+    public static Process? Process
+    {
+        get
+        {
+            nint handle = GetForegroundWindow();
+            foreach(Process process in Process.GetProcesses())
+            {
+                if (process.MainWindowHandle == handle) return process;
             }
             return null;
         }
