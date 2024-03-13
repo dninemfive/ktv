@@ -87,11 +87,31 @@ internal class KtvConfigDef2
 internal class ActivityDef
 {
     [JsonInclude]
-    public string? ProcessName;
-    [JsonInclude]
-    public string? Regex;
-    [JsonInclude]
-    public int? TitleMatchPosition;
-    [JsonInclude]
-    public string? Alias;
+    string? MatcherDefName;
+    [JsonConstructor]
+    public ActivityDef(string procName)
+    {
+        Matcher ??= new($"Matcher_Generated_{procName}", procName);
+    }
 }
+internal class MatcherDef
+{
+    [JsonInclude]
+    string DefName;
+    [JsonInclude]
+    MatcherTarget Target;
+    [JsonInclude]
+    MatcherType Type;
+    [JsonInclude]
+    string? Value;
+    [JsonConstructor]
+    internal MatcherDef(string defName, string comparisonValue, MatcherTarget target = MatcherTarget.ProcessName, MatcherType type = MatcherType.StringComparison)
+    {
+        DefName = defName;
+        Value = comparisonValue;
+        Target = target;
+        Type = type;
+    }
+}
+enum MatcherTarget { WindowTitle, ProcessName, ProcessLocation }
+enum MatcherType { Regex, StringComparison }
