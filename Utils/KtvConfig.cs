@@ -12,7 +12,7 @@ namespace d9.ktv;
 public static class KtvConfig
 {
     public static IEnumerable<Parser.Def> ParserDefs => _config?.parsers ?? new List<Parser.Def>();
-    private static KtvConfigDef? _config = null;
+    private static readonly KtvConfigDef? _config = null;
     static KtvConfig()
     {
         _config = utl.Config.TryLoad<KtvConfigDef>(Program.Args.CalendarConfigPath);
@@ -65,4 +65,33 @@ internal class KtvConfigDef
     public Dictionary<string, GoogleUtils.EventColor> EventColors;
     [JsonInclude]
     public List<Parser.Def> parsers;
+}
+internal class KtvConfigDef2
+{
+    internal class CategoryDef
+    {
+        [JsonInclude]
+        public GoogleUtils.EventColor Color;
+        [JsonInclude]
+        public List<ActivityDef> Activities;
+    }
+    [JsonInclude]
+    public string? GoogleCalendarId;
+    [JsonInclude]
+    public GoogleUtils.EventColor DefaultColor;
+    [JsonInclude]
+    public HashSet<string> Ignore;
+    [JsonInclude]
+    public Dictionary<string, CategoryDef> Categories;
+}
+internal class ActivityDef
+{
+    [JsonInclude]
+    public string? ProcessName;
+    [JsonInclude]
+    public string? Regex;
+    [JsonInclude]
+    public int? TitleMatchPosition;
+    [JsonInclude]
+    public string? Alias;
 }
