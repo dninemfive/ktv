@@ -78,9 +78,12 @@ public enum DaysOfWeek
     TuTh        = Tuesday | Thursday,
     All         = 0b01111111
 }
-public struct TimeRange(TimeOnly min, TimeOnly max)
+public struct TimeRange(TimeOnly start, TimeOnly end)
 {
-
+    public TimeOnly Start = start, End = end;
+    public readonly bool AppliesTo(TimeOnly time)
+        => Start < End ? time >= Start && time <= End
+                       : time <= Start && time >= End;
 }
 public class Schedule
 {
