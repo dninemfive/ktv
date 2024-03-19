@@ -20,101 +20,70 @@ public class Program
                                ?? "calendar config.json";
         public static readonly bool Test = CommandLineArgs.GetFlag(nameof(Test), 't');
     }
-    public static DateTime NextLogTime { get; private set; } = DateTime.Now.Ceiling(Args.LogInterval);
-    public static DateTime LastAggregationTime { get; private set; } = DateTime.Now;
-    public static DateTime NextAggregationTime { get; private set; } = DateTime.Now.Ceiling(Args.AggregationInterval);
-    //public static int LineNumber { get; private set; } = 0;
-    public static DateTime LaunchTime { get; } = DateTime.Now; 
-    public static string? LastEventId { get; private set; } = null;
+    public static DateTime LaunchTime { get; } = DateTime.Now;
+    public static SortedSet<ScheduledTask> ScheduledTasks { get; }
     public static void Main()
     {
-        // https://stackoverflow.com/a/29511342
-        // todo: add to utl
-        // no longer needed here because the config is accessed when initializing parsers
-        // System.Runtime.CompilerServices.RuntimeHelpers.RunClassConstructor(typeof(KtvConfig).TypeHandle);
-        Parsers.Initialize(KtvConfig.ParserDefs);
-        if (Args.Test)
-        {
-            SleepUntil(DateTime.Now + TimeSpan.FromSeconds(3));
-            nint activeWindowHandle = ActiveWindow.Handle;
-            Console.WriteLine($"Active window handle is {activeWindowHandle}.\n");
-            bool? hasFocus(Process process)
-            {
-                try
-                {
-                    return process.MainWindowHandle == activeWindowHandle;
-                } 
-                catch
-                {
-                    return null;
-                }
-            }
-            string desc(Process process) => hasFocus(process) switch
-            {
-                true => "focus",
-                false => "",
-                null => "denied"
-            };
-            foreach (Process process in Process.GetProcesses()
-                                               .Where(x => x.MainWindowHandle > 0)
-                                               .OrderBy(x => x.MainWindowHandle))
-            {
-                
-                //if (hasFocus(process) is not true && string.IsNullOrWhiteSpace(process.MainWindowTitle)) continue;
-                Console.WriteLine($"{process.MainWindowHandle,12}{desc(process),-8}{process.ProcessName,-24}{process.MainWindowTitle,-40}");
-            }
-            return;
-        }
-        if(1440 % Args.AggregationInterval.TotalMinutes != 0)
-        {
-            Console.WriteLine($"The aggregation interval must divide the number of minutes in a day evenly, but {Args.AggregationInterval} does not.");
-            return;
-        }
-        Utils.Log($"Logging to `{FileManager.LogFolder.Replace(@"\", "/")}` every {Args.LogInterval.Natural()}; aggregating every {Args.AggregationInterval.Natural()}, " +
-                          $"starting at {NextAggregationTime.Time()}.");
         try
         {
-            MainLoop();
+            while(true)
+            {
+                SleepUntilNext(ScheduledTasks);
+                foreach(ScheduledTask task in ScheduledTasks)
+                {
+                    if (DateTime.Now > task.Time)
+                    {
+                        task.Execute();
+                        ScheduledTasks.Remove(task);
+                    }
+                }
+            }
         }
         finally
         {
-            Aggregate(true);
+
         }
     }
-    private static void MainLoop()
-    {
-        SleepUntilEarlierOf(NextLogTime, NextAggregationTime);
-        while (true)
-        {
-            if (DateTime.Now >= NextLogTime)
-                RecordActivity();
-            if (DateTime.Now >= NextAggregationTime)
-                Aggregate();
-        }
-    }
-    private static void RecordActivity()
-    {
-        ActiveWindowInfo info = ActiveWindow.Info;
-        WindowNameLog.Log(info.Program);
-        // todo: utl: specify that utils.log always writes to console, it simply writes to a file in addition when specified
-        Utils.Log($"{DateTime.Now}\t{info.PrintNull()}");
-        NextLogTime = DateTime.Now.Ceiling(Args.LogInterval);
-    }
-    private static void Aggregate(bool offAggregationTime = false)
-    {
-        RecordActivity(); // otherwise it doesn't get called before Aggregate :thonk:
-        Utils.Log($"\n{DateTime.Now.Time()} (Uptime: {(DateTime.Now - LaunchTime).Natural()}):");
-        foreach ((Activity activity, float proportion) in Activities.Between(LastAggregationTime, offAggregationTime ? DateTime.Now : NextAggregationTime))
-            Utils.Log($"\t{$"{proportion:p0}",-4}\t{activity.WasPosted,-5}\t{activity}");
-        LastAggregationTime = NextAggregationTime;
-        NextAggregationTime += Args.AggregationInterval;
-        Console.WriteLine();
-    }    
     private static void SleepUntil(DateTime dt)
     {
-        int delay = (int)(dt -  DateTime.Now).TotalMilliseconds;
+        int delay = (int)(dt - DateTime.Now).TotalMilliseconds;
         Thread.Sleep(delay);
     }
-    private static void SleepUntilEarlierOf(params DateTime[] dts)
-        => SleepUntil(dts.Min());
+    private static void SleepUntilNext(IEnumerable<ScheduledTask> tasks)
+        => SleepUntil(tasks.Select(x => x.Time).Min());
+}
+public class ScheduledTask : IComparable<ScheduledTask>
+{
+    public DateTime Time;
+
+    public int CompareTo(ScheduledTask? other)
+        => Time.CompareTo(other?.Time);
+    public void Execute() { }
+}
+public interface IScheduleable { }
+[Flags]
+public enum DaysOfWeek
+{
+    None        = 0b00000000,
+    Sunday      = 0b00000001,
+    Monday      = 0b00000010,
+    Tuesday     = 0b00000100,
+    Wednesday   = 0b00001000,
+    Thursday    = 0b00010000,
+    Friday      = 0b00100000,
+    Saturday    = 0b01000000,
+    Weekdays    = Monday | Tuesday | Wednesday | Thursday | Friday,
+    Weekends    = Saturday | Sunday,
+    MWF         = Monday | Wednesday | Friday,
+    TuTh        = Tuesday | Thursday,
+    All         = 0b01111111
+}
+public struct TimeRange(TimeOnly min, TimeOnly max)
+{
+
+}
+public class Schedule
+{
+    public DaysOfWeek Days = DaysOfWeek.All;
+    
 }
