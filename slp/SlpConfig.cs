@@ -11,7 +11,7 @@ public class SlpConfig
         MinutesBetweenCloseAttempts = 10,
         Close = [new(ProcessTargetType.ProcessLocation, @"C:\Program Files (x86)\Steam"),
                  new(ProcessTargetType.MainWindowTitle, "Minecraft"),
-                 new(ProcessTargetType.MainWindowTitle, "Visual Studio", endEarlyAt: "7:00 AM")],
+                 new(ProcessTargetType.MainWindowTitle, "Visual Studio")],
         Allow = [new(ProcessTargetType.ProcessName, "CrashHandler")]
     };
     [JsonInclude]

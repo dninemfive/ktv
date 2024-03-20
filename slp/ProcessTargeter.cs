@@ -8,49 +8,16 @@ public class ProcessTargeter
     [JsonConstructor]
     public ProcessTargeter()
     { }
-    public ProcessTargeter(ProcessTargetType type, string value, string? startLateAt = null, string? endEarlyAt = null)
+    public ProcessTargeter(ProcessTargetType type, string value)
     {
         TargetType = type;
         Value = value;
-        StartLateAt = startLateAt;
-        EndEarlyAt = endEarlyAt;
     }
     [JsonInclude]
     public ProcessTargetType TargetType { get; private set; }
     [JsonInclude]
     public string Value { get; private set; }
-    [JsonInclude]
-    public string? StartLateAt { get; private set; }
-    [JsonIgnore]
-    private TimeOnly? _lateStartTime = null;
-    [JsonIgnore]
-    public TimeOnly? LateStartTime
-    {
-        get
-        {
-            if (_lateStartTime is null && StartLateAt is not null)
-                _lateStartTime = TimeOnly.Parse(StartLateAt);
-            return _lateStartTime;
-        }
-    }
-    [JsonInclude]
-    public string? EndEarlyAt { get; private set; }
-    [JsonIgnore]
-    private TimeOnly? _earlyEndTime = null;
-    [JsonIgnore]
-    public TimeOnly? EarlyEndTime
-    {
-        get
-        {
-            if (_earlyEndTime is null && EndEarlyAt is not null)
-                _earlyEndTime = TimeOnly.Parse(EndEarlyAt);
-            return _earlyEndTime;
-        }
-    }
-    internal static TimeOnly TimeNow => TimeOnly.FromDateTime(DateTime.Now);
-    [JsonIgnore]
-    public bool AppliesNow => (LateStartTime is null || TimeNow > LateStartTime) && (EarlyEndTime is null || TimeNow < EarlyEndTime);
-    public bool Matches(Process t) => AppliesNow && TargetType switch
+    public bool Matches(Process t) => TargetType switch
     {
         ProcessTargetType.MainWindowTitle => t.MainWindowTitleContains(Value),
         ProcessTargetType.ProcessName => t.NameContains(Value),
