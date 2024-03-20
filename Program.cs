@@ -77,15 +77,35 @@ public abstract class TaskScheduler
 {
     public abstract ScheduledTask NextTask(DateTime time);
 }
-public class ProcessCloser(IEnumerable<ProcessTargeter> processesToClose, IEnumerable<ProcessTargeter> processesToIgnore) : TaskScheduler
+// future optimization: merge all ProcessClosers into one which does a decision tree of what to close
+public class ProcessCloser(TimeOnly startTime,
+                           TimeOnly endTime,
+                           TimeSpan closePeriod,
+                           IEnumerable<ProcessTargeter> processesToClose,
+                           IEnumerable<ProcessTargeter> processesToIgnore) : TaskScheduler
 {
+    public TimeOnly StartTime { get; private set; } = startTime;
+    public TimeOnly EndTime { get; private set; } = endTime;
+    public TimeSpan ClosePeriod { get; private set; } = closePeriod;
     public List<ProcessTargeter> ProcessesToClose { get; private set; } = processesToClose.ToList();
     public List<ProcessTargeter> ProcessesToIgnore { get; private set; } = processesToIgnore.ToList();
     public override ScheduledTask NextTask(DateTime time)
     {
-        throw new NotImplementedException();
+        TimeOnly nextTime = TimeOnly.FromDateTime(time + ClosePeriod);
+        if(nextTime < StartTime || nextTime > EndTime) nextTime = StartTime;
+        DateTime nextDateTime = new(DateOnly.FromDateTime(time), nextTime);
+        if (nextDateTime < DateTime.Now)
+            nextDateTime += DateTime.Now.Date - nextDateTime.Date;
+        return new(new DateTime(DateOnly.FromDateTime(time), nextTime), CloseApplicableProcesses, this);
     }
-    
+    public void CloseApplicableProcesses()
+    {
+        foreach(Process process in Process.GetProcesses())
+        {
+            if (ProcessesToClose.Any(x => x.Matches(process)) && !ProcessesToIgnore.Any(x => x.Matches(process)))
+                Console.WriteLine($"Close {process.ProcessName} ({process.MainWindowTitle})");
+        }
+    }
 }
 public class ActiveWindowLogger(TimeSpan logPeriod, TimeSpan aggregationPeriod) : TaskScheduler
 {
@@ -113,6 +133,6 @@ public class ActiveWindowLogger(TimeSpan logPeriod, TimeSpan aggregationPeriod) 
     }
     public void LogActiveWindow()
     {
-
+        Console.WriteLine($"{DateTime.Now} {ActiveWindow.Process?.ProcessName.PrintNull()}");
     }
 }
