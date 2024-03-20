@@ -1,19 +1,15 @@
 ﻿namespace d9.ktv;
 public static class WindowNameLog
 {
-    public class Entry : IComparable<Entry>
+    public class Entry(DateTime timestamp, string windowName) : IComparable<Entry>
     {
-        public DateTime Timestamp { get; private set; }
-        public string WindowName { get; private set; }
-        public Entry(DateTime timestamp, string windowName)
-        {
-            Timestamp = timestamp;
-            WindowName = windowName;
-        }
+        public DateTime Timestamp { get; private set; } = timestamp;
+        public string WindowName { get; private set; } = windowName;
+
         public int CompareTo(Entry? other) => Timestamp.CompareTo(other?.Timestamp);
         public override string ToString() => $"Entry({WindowName}, {Timestamp})";
     }
-    private static readonly SortedSet<Entry> _rawData = new();
+    private static readonly SortedSet<Entry> _rawData = [];
     static WindowNameLog()
     {
         foreach (Entry entry in FileManager.LoadEntries())

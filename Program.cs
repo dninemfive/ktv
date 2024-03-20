@@ -52,41 +52,26 @@ public class Program
     private static void SleepUntilNext(IEnumerable<ScheduledTask> tasks)
         => SleepUntil(tasks.Select(x => x.Time).Min());
 }
-public class ScheduledTask : IComparable<ScheduledTask>
+public class ScheduledTask(DateTime time, Action execute) : IComparable<ScheduledTask>
 {
-    public DateTime Time;
-
+    public DateTime Time = time;
+    public void Execute() => execute();
     public int CompareTo(ScheduledTask? other)
         => Time.CompareTo(other?.Time);
-    public void Execute() { }
 }
-public interface IScheduleable { }
-[Flags]
-public enum DaysOfWeek
+public interface IScheduleable
 {
-    None        = 0b00000000,
-    Sunday      = 0b00000001,
-    Monday      = 0b00000010,
-    Tuesday     = 0b00000100,
-    Wednesday   = 0b00001000,
-    Thursday    = 0b00010000,
-    Friday      = 0b00100000,
-    Saturday    = 0b01000000,
-    Weekdays    = Monday | Tuesday | Wednesday | Thursday | Friday,
-    Weekends    = Saturday | Sunday,
-    MWF         = Monday | Wednesday | Friday,
-    TuTh        = Tuesday | Thursday,
-    All         = 0b01111111
+    public ScheduledTask NextTask(DateTime time);
 }
-public struct TimeRange(TimeOnly start, TimeOnly end)
+public class ProgramCloser : IScheduleable
 {
-    public TimeOnly Start = start, End = end;
-    public readonly bool AppliesTo(TimeOnly time)
-        => Start < End ? time >= Start && time <= End
-                       : time <= Start && time >= End;
-}
-public class Schedule
-{
-    public DaysOfWeek Days = DaysOfWeek.All;
-    
+    public TimeSpan TimeBetweenCloseAttempts;
+    public TimeOnly StartTime, EndTime;
+    public ScheduledTask NextTask(DateTime time)
+    {
+        TimeOnly now = TimeOnly.FromDateTime(time);
+        if (now < StartTime)
+            return new(time + (StartTime - now), ClosePrograms);
+    }
+    public void ClosePrograms() { }
 }

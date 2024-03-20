@@ -38,19 +38,4 @@ public static partial class ActiveWindow
             return null;
         }
     }
-    public static ActiveWindowInfo Info
-    {
-        get
-        {
-            string? title = Title;
-            if (title is string s)
-            {
-                foreach (Parser wnp in Parsers.All)
-                    if (wnp.Try(title, out ActiveWindowInfo? result))
-                        return result!;
-                return new(s, alias: true);
-            }
-            return new("");
-        }
-    }
 }
