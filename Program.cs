@@ -33,7 +33,7 @@ public class Program
                 {
                     if (DateTime.Now > task.Time)
                     {
-                        task.Execute();
+                        ScheduledTasks.Add(task.ExecuteAndReschedule());
                         ScheduledTasks.Remove(task);
                     }
                 }
@@ -52,26 +52,17 @@ public class Program
     private static void SleepUntilNext(IEnumerable<ScheduledTask> tasks)
         => SleepUntil(tasks.Select(x => x.Time).Min());
 }
-public class ScheduledTask(DateTime time, Action execute) : IComparable<ScheduledTask>
+public abstract class ScheduledTask(DateTime time) : IComparable<ScheduledTask>
 {
     public DateTime Time = time;
-    public void Execute() => execute();
+    public abstract ScheduledTask ExecuteAndReschedule();
     public int CompareTo(ScheduledTask? other)
         => Time.CompareTo(other?.Time);
 }
-public interface IScheduleable
+public class LogActiveWindow(DateTime time) : ScheduledTask(time)
 {
-    public ScheduledTask NextTask(DateTime time);
-}
-public class ProgramCloser : IScheduleable
-{
-    public TimeSpan TimeBetweenCloseAttempts;
-    public TimeOnly StartTime, EndTime;
-    public ScheduledTask NextTask(DateTime time)
+    public override ScheduledTask ExecuteAndReschedule()
     {
-        TimeOnly now = TimeOnly.FromDateTime(time);
-        if (now < StartTime)
-            return new(time + (StartTime - now), ClosePrograms);
+        return new LogActiveWindow(Time + TimeSpan.FromSeconds(15));
     }
-    public void ClosePrograms() { }
 }
