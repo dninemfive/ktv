@@ -11,7 +11,7 @@ using System.Threading.Tasks;
 namespace d9.ktv;
 public static class KtvConfig
 {
-    public static IEnumerable<Parser.Def> ParserDefs => _config?.parsers ?? new List<Parser.Def>();
+    public static IEnumerable<object> ParserDefs => _config?.parsers ?? new List<object>();
     private static readonly KtvConfigDef? _config = null;
     static KtvConfig()
     {
@@ -64,7 +64,7 @@ internal class KtvConfigDef
     [JsonInclude]
     public Dictionary<string, GoogleUtils.EventColor> EventColors;
     [JsonInclude]
-    public List<Parser.Def> parsers;
+    public List<object> parsers;
 }
 internal class KtvConfigDef2
 {
@@ -91,7 +91,7 @@ internal class ActivityDef
     [JsonConstructor]
     public ActivityDef(string procName)
     {
-        Matcher ??= new($"Matcher_Generated_{procName}", procName);
+        // Matcher ??= new($"Matcher_Generated_{procName}", procName);
     }
 }
 internal class MatcherDef

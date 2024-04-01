@@ -22,11 +22,24 @@ public class Program
         public static readonly bool Test = CommandLineArgs.GetFlag(nameof(Test), 't');
     }
     public static DateTime LaunchTime { get; } = DateTime.Now;
-    public static SortedSet<ScheduledTask> ScheduledTasks { get; }
-    public static List<TaskScheduler> Schedulers { get; }
+    public static SortedSet<ScheduledTask> ScheduledTasks { get; } = new();
+    public static List<TaskScheduler> Schedulers { get; } = new();
     public static void Main()
     {
         DateTime now = DateTime.Now;
+        Schedulers.Add(new ProcessCloser(startTime: new(0, 30), 
+                                         endTime:   new(10, 0),
+                                         closePeriod: TimeSpan.FromMinutes(1),
+                                         processesToClose:  [new(ProcessTargetType.ProcessLocation, @"C:\Program Files (x86)\Steam"),
+                                                             new(ProcessTargetType.MainWindowTitle, "Minecraft")],
+                                         processesToIgnore: [new(ProcessTargetType.ProcessName, "CrashHandler")]));
+        Schedulers.Add(new ProcessCloser(startTime: new(0, 30),
+                                         endTime:   new(7, 0),
+                                         closePeriod: TimeSpan.FromMinutes(1),
+                                         processesToClose: [new(ProcessTargetType.MainWindowTitle, "Visual Studio")],
+                                         []));
+        Schedulers.Add(new ActiveWindowLogger(TimeSpan.FromSeconds(15), TimeSpan.FromMinutes(15)));
+        Console.WriteLine($"Schedulers: {Schedulers.ListNotation()}");
         foreach(TaskScheduler scheduler in  Schedulers)
         {
             ScheduledTasks.Add(scheduler.NextTask(now));
@@ -36,19 +49,12 @@ public class Program
             while(true)
             {
                 SleepUntilNext(ScheduledTasks);
-                foreach(ScheduledTask task in ScheduledTasks)
+                now = DateTime.Now;
+                foreach (ScheduledTask task in ScheduledTasks.Where(x => x.ScheduledTime < now).ToList())
                 {
-                    now = DateTime.Now;
-                    if (task.ScheduledTime < now)
-                    {
-                        task.Execute();
-                        ScheduledTasks.Add(task.Scheduler.NextTask(task.ScheduledTime));
-                        ScheduledTasks.Remove(task);
-                    } 
-                    else
-                    {
-                        break;
-                    }
+                    task.Execute();
+                    ScheduledTasks.Add(task.Scheduler.NextTask(task.ScheduledTime));
+                    ScheduledTasks.Remove(task);
                 }
             }
         }
@@ -59,6 +65,7 @@ public class Program
     }
     private static void SleepUntil(DateTime dt)
     {
+        Console.WriteLine($"SleepUntil({dt:G})");
         int delay = (int)(dt - DateTime.Now).TotalMilliseconds;
         Thread.Sleep(delay);
     }
@@ -94,9 +101,9 @@ public class ProcessCloser(TimeOnly startTime,
         TimeOnly nextTime = TimeOnly.FromDateTime(time + ClosePeriod);
         if(nextTime < StartTime || nextTime > EndTime) nextTime = StartTime;
         DateTime nextDateTime = new(DateOnly.FromDateTime(time), nextTime);
-        if (nextDateTime < DateTime.Now)
-            nextDateTime += DateTime.Now.Date - nextDateTime.Date;
-        return new(new DateTime(DateOnly.FromDateTime(time), nextTime), CloseApplicableProcesses, this);
+        if (nextDateTime <= DateTime.Now)
+            nextDateTime += (DateTime.Now.Date - nextDateTime.Date) + TimeSpan.FromDays(1);
+        return new(nextDateTime, CloseApplicableProcesses, this);
     }
     public void CloseApplicableProcesses()
     {
@@ -106,6 +113,8 @@ public class ProcessCloser(TimeOnly startTime,
                 Console.WriteLine($"Close {process.ProcessName} ({process.MainWindowTitle})");
         }
     }
+    public override string ToString()
+        => $"ProcessCloser {StartTime}-{EndTime}x{ClosePeriod:g}";
 }
 public class ActiveWindowLogger(TimeSpan logPeriod, TimeSpan aggregationPeriod) : TaskScheduler
 {
@@ -121,18 +130,59 @@ public class ActiveWindowLogger(TimeSpan logPeriod, TimeSpan aggregationPeriod) 
     }
     public int LogsPerAggregation { get; private set; } = InitializeLogsPerAggregation(logPeriod, aggregationPeriod);
     public int LogsSinceLastAggregation { get; private set; } = 0;
+    public string? FileName { get; private set; } = null;
     public override ScheduledTask NextTask(DateTime time)
     {
         if (++LogsSinceLastAggregation >= LogsPerAggregation)
             Aggregate();
+        FileName ??= CreateNewFile(time);
+        // todo: if LogPeriod divides a day evenly and time does not line up with (now % LogPeriod), align
         return new(time + LogPeriod, LogActiveWindow, this);
     }
-    public void Aggregate()
+    private void Aggregate()
     {
-
+        IEnumerable<ActiveWindowLogEntry?> entries = File.ReadAllLines(FileName!)
+                                                         .Select(x => JsonSerializer.Deserialize<ActiveWindowLogEntry>(x));
+        // todo: set up a syntax to parse the active window process name and window name
+        CountingDictionary<string, int> dict = new();
+        foreach (string? s in entries.Select(x => x?.ProcessName))
+            if (s is not null)
+                dict.Increment(s);
+        int maxCt = dict.Select(x => x.Value).Max();
+        Console.WriteLine($"{DateTime.Now:g} most common processes in the last {LogsPerAggregation} logs ({maxCt} items each):");
+        foreach((string key, int value) in (IEnumerable<KeyValuePair<string, int>>)dict)
+        {
+            if (value == maxCt)
+                Console.WriteLine($"\t{key}");
+        }
+        // dirty the file name so it is updated in NextTask
+        FileName = null;
     }
-    public void LogActiveWindow()
+    private void LogActiveWindow()
     {
-        Console.WriteLine($"{DateTime.Now} {ActiveWindow.Process?.ProcessName.PrintNull()}");
+        Process? activeWindowProcess = ActiveWindow.Process;
+        ActiveWindowLogEntry entry = new(DateTime.Now, activeWindowProcess?.ProcessName, activeWindowProcess?.MainWindowTitle);
+        Console.WriteLine(entry);
+        File.AppendAllText(FileName!, $"{JsonSerializer.Serialize(entry)}\n");
     }
+    private static string CreateNewFile(DateTime startTime)
+    {
+        string fileName = $"{startTime:yyyy'-'MM'-'dd' 'HH'-'mm'-'ss}.ktv.log".FileNameSafe();
+        if (!File.Exists(fileName))
+            File.AppendAllText(fileName, "");
+        return fileName;
+    }
+    public override string ToString()
+        => $"ActiveWindowLogger {LogPeriod}@{LogsPerAggregation}";
+}
+public class ActiveWindowLogEntry(DateTime dateTime, string? processName, string? mainWindowTitle)
+{
+    [JsonInclude]
+    public DateTime DateTime { get; private set; } = dateTime;
+    [JsonInclude]
+    public string? ProcessName { get; private set; } = processName;
+    [JsonInclude]
+    public string? MainWindowTitle { get; private set; } = mainWindowTitle;
+    public override string ToString()
+        => $"{DateTime:g}\t{ProcessName.PrintNull()}\t{MainWindowTitle.PrintNull()}";
 }

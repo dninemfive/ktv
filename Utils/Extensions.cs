@@ -20,5 +20,11 @@ internal static class Extensions
             _ => throw new ArgumentOutOfRangeException(nameof(titlePosition))
         };
     }
-    public static string Time(this DateTime time) => time.ToString(TimeFormats.Time);    
+    public static string Time(this DateTime time) => time.ToString(TimeFormats.Time);
+    public static string FileNameSafe(this string s, string replaceWith = "")
+    {
+        foreach (char c in Path.GetInvalidFileNameChars())
+            s = s.Replace($"{c}", replaceWith);
+        return s;
+    }
 }
