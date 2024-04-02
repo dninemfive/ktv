@@ -38,7 +38,7 @@ public class Program
                                          closePeriod: TimeSpan.FromMinutes(1),
                                          processesToClose: [new(ProcessTargetType.MainWindowTitle, "Visual Studio")],
                                          []));
-        Schedulers.Add(new ActiveWindowLogger(TimeSpan.FromSeconds(15), TimeSpan.FromMinutes(5)));
+        Schedulers.Add(new ActiveWindowLogger(TimeSpan.FromSeconds(15), TimeSpan.FromMinutes(15)));
         Console.WriteLine($"Schedulers: {Schedulers.ListNotation()}");
         foreach(TaskScheduler scheduler in  Schedulers)
         {
@@ -137,7 +137,6 @@ public class ActiveWindowLogger(TimeSpan logPeriod, TimeSpan aggregationPeriod) 
             Aggregate();
         FileName ??= CreateNewFile(time);
         // todo: if LogPeriod divides a day evenly and time does not line up with (now % LogPeriod), align
-        // do the same with LogsSinceLastAggregation
         return new(time + LogPeriod, LogActiveWindow, this);
     }
     private void Aggregate()
@@ -149,15 +148,15 @@ public class ActiveWindowLogger(TimeSpan logPeriod, TimeSpan aggregationPeriod) 
         foreach (string? s in entries.Select(x => x?.ProcessName))
             if (s is not null)
                 dict.Increment(s);
-        int totalCt = dict.Total;
-        Console.WriteLine($"Aggregation at {DateTime.Now:g}:");
-        foreach((string key, int value) in dict.OrderByDescending(x => x.Value))
+        int maxCt = dict.Select(x => x.Value).Max();
+        Console.WriteLine($"{DateTime.Now:g} most common processes in the last {LogsPerAggregation} logs ({maxCt} items each):");
+        foreach((string key, int value) in (IEnumerable<KeyValuePair<string, int>>)dict)
         {
-            Console.WriteLine($"\t{value} ({value/(float)totalCt:P0})\t{key}");
+            if (value == maxCt)
+                Console.WriteLine($"\t{key}");
         }
         // dirty the file name so it is updated in NextTask
         FileName = null;
-        LogsSinceLastAggregation = 0;
     }
     private void LogActiveWindow()
     {
@@ -168,7 +167,6 @@ public class ActiveWindowLogger(TimeSpan logPeriod, TimeSpan aggregationPeriod) 
     }
     private static string CreateNewFile(DateTime startTime)
     {
-        // todo: put logs in a folder
         string fileName = $"{startTime:yyyy'-'MM'-'dd' 'HH'-'mm'-'ss}.ktv.log".FileNameSafe();
         if (!File.Exists(fileName))
             File.AppendAllText(fileName, "");
@@ -186,5 +184,5 @@ public class ActiveWindowLogEntry(DateTime dateTime, string? processName, string
     [JsonInclude]
     public string? MainWindowTitle { get; private set; } = mainWindowTitle;
     public override string ToString()
-        => $"{DateTime:g}\t{ProcessName.PrintNull(),-40}\t{MainWindowTitle.PrintNull()}";
+        => $"{DateTime:g}\t{ProcessName.PrintNull()}\t{MainWindowTitle.PrintNull()}";
 }
