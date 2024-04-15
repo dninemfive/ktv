@@ -26,6 +26,9 @@ public class Program
     public static List<TaskScheduler> Schedulers { get; } = new();
     public static void Main()
     {
+        foreach (Process process in Process.GetProcesses())
+            Console.WriteLine($"{process.ProcessName,-32}\t{process.MainWindowTitle,-60}\t{process.ProcessExample()}");
+        return;
         DateTime now = DateTime.Now;
         Schedulers.Add(new ProcessCloser(startTime: new(0, 30), 
                                          endTime:   new(10, 0),

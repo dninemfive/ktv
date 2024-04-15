@@ -49,5 +49,5 @@ public static class Expressions
         { "mainWindowTitle", process.MainWindowTitle }
     };
     public static bool ProcessExample(this Process process)
-        => Or(process.Assignment(), Contains("processName", "minecraft"), IsIn("fileName", "C:/Program Files (x86)/Steam"));
+        => Or(process.Assignment(), Contains("mainWindowTitle", "Minecraft"), IsIn("fileName", "C:/Program Files (x86)/Steam"));
 }
