@@ -8,21 +8,29 @@ using System.Text;
 using System.Text.RegularExpressions;
 using System.Threading.Tasks;
 
-namespace d9.ktv.slp;
+namespace d9.ktv;
 /*
  * Goal: flexibly and serializably express conditions in a convenient way
  * e.g. for processes:  "(processName contains "minecraft") or (processFolder isIn "C:/Program Files (x86)/Steam")"
  *      for scheduling: "((time after 12:30AM) and (time before 10:00AM)) or not(day is Sunday)"
  */
-public class ProcessExpression
+public class Assignment<T>(IReadOnlyDictionary<string, T?> dict)
 {
-    public Func<Process, string> Selector;
-    public Func<string, string, bool> Operand;
-    public string Value;
-    public bool Evaluate(Process process) => Operand(Selector(process), Value);
+    private IReadOnlyDictionary<string, T?> _dict = dict;
+    public T? this[string key] => _dict.TryGetValue(key, out T? result) ? result : default;
+    public static implicit operator Assignment<T>(IReadOnlyDictionary<string, T?> dict)
+        => new(dict);
 }
-public class ProcessExpressionExpression
+public abstract class Expression<T>
 {
-    public ProcessExpression[] Expressions;
-    public Func<bool[], bool> Operand;
+    public abstract bool Matches(Assignment<T> assignment);
+}
+public class ProcessExpression : Expression<string>
+{
+    public static Assignment<string> AssignmentFor(Process process) => new Dictionary<string, string?>()
+    {
+        { "processName", process.ProcessName },
+        { "fileName", process.FileName() },
+
+    };
 }

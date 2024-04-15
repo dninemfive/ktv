@@ -15,9 +15,10 @@ internal static class ProcessExtensions
             return null;
         }
     }
+    internal static string? FileName(this Process process)
+        => process.TryGetProcessModule()?.FileName;
     internal static bool IsInFolder(this Process process, string folder)
-        => process.TryGetProcessModule()?
-                  .FileName
+        => process.FileName()?
                   .IsInFolder(folder)
             ?? false;
     internal static bool NameContains(this Process process, string name)
