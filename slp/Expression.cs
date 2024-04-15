@@ -14,23 +14,36 @@ namespace d9.ktv;
  * e.g. for processes:  "(processName contains "minecraft") or (processFolder isIn "C:/Program Files (x86)/Steam")"
  *      for scheduling: "((time after 12:30AM) and (time before 10:00AM)) or not(day is Sunday)"
  */
-public class Assignment<T>(IReadOnlyDictionary<string, T?> dict)
+public abstract class Expression
 {
-    private IReadOnlyDictionary<string, T?> _dict = dict;
-    public T? this[string key] => _dict.TryGetValue(key, out T? result) ? result : default;
-    public static implicit operator Assignment<T>(IReadOnlyDictionary<string, T?> dict)
-        => new(dict);
+    public abstract bool Evaluate(IReadOnlyDictionary<string, object?> assignment, params Expression[] children);
 }
-public abstract class Expression<T>
+public class NotExpression : Expression
 {
-    public abstract bool Matches(Assignment<T> assignment);
-}
-public class ProcessExpression : Expression<string>
-{
-    public static Assignment<string> AssignmentFor(Process process) => new Dictionary<string, string?>()
+    public override bool Evaluate(IReadOnlyDictionary<string, object?> assignment, params Expression[] children)
     {
-        { "processName", process.ProcessName },
-        { "fileName", process.FileName() },
-
-    };
+        if (children.Length != 1)
+            throw new ArgumentException($"Not expression must have exactly one child!", nameof(children));
+        return !children.First().Evaluate(assignment);
+    }
+}
+public class OrExpression : Expression
+{
+    public override bool Evaluate(IReadOnlyDictionary<string, object?> assignment, params Expression[] children)
+        => children.EvaluateCollection(assignment, true, true);
+}
+public class AndExpression : Expression
+{
+    public override bool Evaluate(IReadOnlyDictionary<string, object?> assignment, params Expression[] children)
+        => children.EvaluateCollection(assignment, false, false);
+}
+public static class ExpressionExtensions
+{
+    public static bool EvaluateCollection(this IEnumerable<Expression> children, IReadOnlyDictionary<string, object?> assignment, bool successValue, bool anySucceeded)
+    {
+        foreach (Expression child in children)
+            if (child.Evaluate(assignment) == successValue)
+                return anySucceeded;
+        return !anySucceeded;
+    }
 }
