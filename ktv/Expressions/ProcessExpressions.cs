@@ -1,20 +1,15 @@
 ﻿using d9.utl;
-using System;
-using System.Collections.Generic;
 using System.Diagnostics;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace d9.ktv;
 public static class ProcessExpressions
 {
+    private static ExpressionDelegate<AndExpression> And => Expressions.And;
+    private static ExpressionDelegate<OrExpression> Or => Expressions.Or;
     public static Expression Contains(string variableName, string expectedValue)
-        => (assignment, children)
-        => assignment[variableName] is string s && s.Contains(expectedValue);
+        => variableName.Lambda(x => x is string s && s.Contains(expectedValue));
     public static Expression IsIn(string variableName, string expectedValue)
-        => (assignment, children)
-        => assignment[variableName] is string s && s.IsInFolder(expectedValue);
+        => variableName.Lambda(x => x is string s && s.IsInFolder(expectedValue));
     public static IReadOnlyDictionary<string, object?> Assignment(this Process process) => new Dictionary<string, object?>()
     {
         { "processName", process.ProcessName },
@@ -22,6 +17,6 @@ public static class ProcessExpressions
         { "mainWindowTitle", process.MainWindowTitle }
     };
     public static bool ProcessExample(this Process process)
-        => Or(process.Assignment(), Contains("mainWindowTitle", "Minecraft"), IsIn("fileName", "C:/Program Files (x86)/Steam"));
+        => Or(Contains("mainWindowTitle", "Minecraft"), IsIn("fileName", "C:/Program Files (x86)/Steam")).Evaluate(process.Assignment());
 
 }

@@ -1,9 +1,4 @@
 ﻿using d9.utl;
-using d9.utl.compat;
-using System.Text.Json;
-using System.Text.Json.Serialization;
-using System.Diagnostics;
-using d9.slp;
 
 namespace d9.ktv;
 
@@ -26,9 +21,6 @@ public class Program
     public static List<TaskScheduler> Schedulers { get; } = new();
     public static void Main()
     {
-        DateTime valid = new(2024, 4, 14, 0, 35, 0), invalid = DateTime.Now;
-        Console.WriteLine($"{valid.DateTimeExample(),5} {invalid.DateTimeExample(),5}");
-        return;
         DateTime now = DateTime.Now;
         Schedulers.Add(new ProcessCloser(startTime: new(0, 30), 
                                          endTime:   new(10, 0),
