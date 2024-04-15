@@ -35,20 +35,6 @@ public static class Expressions
         => CollectionExpressionBase(assignment, children, true, true);
     public static bool And(IReadOnlyDictionary<string, object?> assignment, params Expression[] children)
         => CollectionExpressionBase(assignment, children, false, false);
-    public static Expression Contains(string variableName, string expectedValue) 
-        => (assignment, children) 
-        => assignment[variableName] is string s && s.Contains(expectedValue);
-    public static Expression IsIn(string variableName, string expectedValue)
-        => (assignment, children)
-        => assignment[variableName] is string s && s.IsInFolder(expectedValue);
-    public static IReadOnlyDictionary<string, object?> Assignment(this Process process) => new Dictionary<string, object?>()
-    {
-        { "processName", process.ProcessName },
-        { "fileName", process.FileName() },
-        { "mainWindowTitle", process.MainWindowTitle }
-    };
-    public static bool ProcessExample(this Process process)
-        => Or(process.Assignment(), Contains("mainWindowTitle", "Minecraft"), IsIn("fileName", "C:/Program Files (x86)/Steam"));
     public static Expression IsBefore(string variableName, TimeOnly expectedValue)
         => (assignment, children)
         => assignment[variableName] is DateTime dt && TimeOnly.FromDateTime(dt) < expectedValue;

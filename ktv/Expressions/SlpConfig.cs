@@ -1,6 +1,6 @@
 ﻿using System.Text.Json.Serialization;
 
-namespace d9.slp;
+namespace d9.ktv;
 #pragma warning disable CS8618 // properties are initialized by JSON serialization
 public class SlpConfig
 {

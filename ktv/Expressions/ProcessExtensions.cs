@@ -1,7 +1,7 @@
 ﻿using d9.utl;
 using System.Diagnostics;
 
-namespace d9.slp;
+namespace d9.ktv;
 internal static class ProcessExtensions
 {
     private static ProcessModule? TryGetProcessModule(this Process process)
