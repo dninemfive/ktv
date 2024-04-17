@@ -7,8 +7,10 @@ namespace d9.ktv.ActivityLogger;
 /// was happening during the specified time period.
 /// </summary>
 /// <param name="period">The length of time over which to summarize the raw active window data.</param>
-public class ActiveWindowAggregator(TimeSpan period) : FixedPeriodTaskScheduler(period)
+public class ActiveWindowAggregator(TimeSpan period) : TaskScheduler
 {
+    /// <summary><inheritdoc cref="ActiveWindowAggregator" path="/param[@name='period']"/></summary>
+    public TimeSpan Period => period;
     /// <summary>
     ///     Gets the <see cref="ActiveWindowLogEntry">ActiveWindowLogEntries</see> during the
     ///     specified time period.
@@ -43,8 +45,8 @@ public class ActiveWindowAggregator(TimeSpan period) : FixedPeriodTaskScheduler(
             }
         }
     }
-    protected override ScheduledTask NextTaskInternal(DateTime dateTime)
-        => new(dateTime, () => Aggregate(dateTime), this);    
+    public override ScheduledTask NextTask(DateTime dateTime)
+        => new(dateTime.NextDayAlignedTime(Period), () => Aggregate(nextTime), this);    
     private void Aggregate(DateTime time)
     {
         IEnumerable<ActiveWindowLogEntry> entries = EntriesBetween(time, time + Period);
