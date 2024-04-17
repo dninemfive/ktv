@@ -48,7 +48,7 @@ public class ActiveWindowLogger(TimeSpan logPeriod, TimeSpan aggregationPeriod) 
     private void LogActiveWindow()
     {
         Process? activeWindowProcess = ActiveWindow.Process;
-        ActiveWindowLogEntry entry = new(DateTime.Now, activeWindowProcess?.ProcessName, activeWindowProcess?.MainWindowTitle);
+        ActiveWindowLogEntry entry = new(DateTime.Now, activeWindowProcess);
         Console.WriteLine(entry);
         File.AppendAllText(FileName!, $"{JsonSerializer.Serialize(entry)}\n");
     }
