@@ -7,5 +7,5 @@ public class ScheduledTask(DateTime time, Action execute, TaskScheduler schedule
     public int CompareTo(ScheduledTask? other)
         => ScheduledTime.CompareTo(other?.ScheduledTime);
     public override string ToString()
-        => $"{GetType().Name} @ {ScheduledTime}";
+        => $"{GetType().Name} @ {ScheduledTime} ({Scheduler.GetType().Name})";
 }

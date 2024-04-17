@@ -18,7 +18,7 @@ public class Program
         public static readonly bool Test = CommandLineArgs.GetFlag(nameof(Test), 't');
     }
     public static DateTime LaunchTime { get; } = DateTime.Now;
-    public static SortedSet<ScheduledTask> ScheduledTasks { get; } = new();
+    public static List<ScheduledTask> ScheduledTasks { get; } = new();
     public static List<TaskScheduler> Schedulers { get; private set; } = [
         new ProcessCloser(startTime: new(0, 30),
                           endTime: new(10, 0),
@@ -37,14 +37,14 @@ public class Program
     public static void Main()
     {
         DateTime now = DateTime.Now;
-        Console.WriteLine($"Schedulers: {Schedulers.ListNotation()}");
+        Console.WriteLine(Schedulers.MultilineListWithAlignedTitle("schedulers:"));
         foreach(TaskScheduler scheduler in  Schedulers)
             ScheduledTasks.Add(scheduler.NextTask(now));
         try
         {
             while(true)
             {
-                Console.WriteLine($"{"ScheduledTasks:",-20}{ScheduledTasks.Select(x => $"{x}").Aggregate((x, y) => $"{x}\n{"",-20}{y}")}");
+                Console.WriteLine(ScheduledTasks.OrderBy(x => x.ScheduledTime).MultilineListWithAlignedTitle("scheduled tasks:"));
                 SleepUntilNext(ScheduledTasks);
                 now = DateTime.Now;
                 foreach (ScheduledTask task in ScheduledTasks.Where(x => x.ScheduledTime < now).ToList())
