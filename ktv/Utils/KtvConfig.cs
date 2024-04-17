@@ -11,11 +11,11 @@ using System.Threading.Tasks;
 namespace d9.ktv;
 public static class KtvConfig
 {
-    public static IEnumerable<object> ParserDefs => _config?.parsers ?? new List<object>();
+    public static IEnumerable<object> ParserDefs => _config?.parsers ?? [];
     private static readonly KtvConfigDef? _config = null;
     static KtvConfig()
     {
-        _config = utl.Config.TryLoad<KtvConfigDef>(Program.Args.CalendarConfigPath);
+        _config = Config.TryLoad<KtvConfigDef>(Program.Args.CalendarConfigPath);
     }
     #region google stuff
     private static bool UseCalendar => _config is not null && GoogleUtils.HasValidAuthConfig;

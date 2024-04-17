@@ -1,10 +1,5 @@
 ﻿using d9.utl;
 using System.Text.Json;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace d9.ktv;
 internal static class FileManager
@@ -35,10 +30,5 @@ internal static class FileManager
             yield return s;
     }
     private static void AppendObj(object obj, LogFile file, DateTime? date = null) 
-        => File.AppendAllText(file.FilePath(date), $"{JsonSerializer.Serialize(obj)}\n");    
-    public static IEnumerable<WindowNameLog.Entry> LoadEntries(DateTime? date = null) 
-        => Load(LogFile.Raw, date)
-            .Select(x => JsonSerializer.Deserialize<WindowNameLog.Entry>(x))
-            .Where(x => x is not null)!;
-    public static void Append(WindowNameLog.Entry entry, DateTime? date = null) => AppendObj(entry, LogFile.Raw, date);
+        => File.AppendAllText(file.FilePath(date), $"{JsonSerializer.Serialize(obj)}\n");
 }

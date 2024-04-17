@@ -1,4 +1,5 @@
-﻿using d9.utl;
+﻿using d9.ktv.ActivityLogger;
+using d9.utl;
 
 namespace d9.ktv;
 
@@ -18,27 +19,27 @@ public class Program
     }
     public static DateTime LaunchTime { get; } = DateTime.Now;
     public static SortedSet<ScheduledTask> ScheduledTasks { get; } = new();
-    public static List<TaskScheduler> Schedulers { get; } = new();
+    public static List<TaskScheduler> Schedulers { get; private set; } = [
+        new ProcessCloser(startTime: new(0, 30),
+                          endTime: new(10, 0),
+                          closePeriod: TimeSpan.FromMinutes(1),
+                          processesToClose:  [new(ProcessTargetType.ProcessLocation, @"C:\Program Files (x86)\Steam"),
+                                              new(ProcessTargetType.MainWindowTitle, "Minecraft")],
+                          processesToIgnore: [new(ProcessTargetType.ProcessName, "CrashHandler")]),
+        new ProcessCloser(startTime: new(0, 30),
+                          endTime: new(7, 0),
+                          closePeriod: TimeSpan.FromMinutes(1),
+                          processesToClose:  [new(ProcessTargetType.MainWindowTitle, "Visual Studio")],
+                          processesToIgnore: []),
+        new ActiveWindowLogger(TimeSpan.FromSeconds(15)),
+        new ActiveWindowAggregator(TimeSpan.FromMinutes(15))
+    ];
     public static void Main()
     {
         DateTime now = DateTime.Now;
-        Schedulers.Add(new ProcessCloser(startTime: new(0, 30), 
-                                         endTime:   new(10, 0),
-                                         closePeriod: TimeSpan.FromMinutes(1),
-                                         processesToClose:  [new(ProcessTargetType.ProcessLocation, @"C:\Program Files (x86)\Steam"),
-                                                             new(ProcessTargetType.MainWindowTitle, "Minecraft")],
-                                         processesToIgnore: [new(ProcessTargetType.ProcessName, "CrashHandler")]));
-        Schedulers.Add(new ProcessCloser(startTime: new(0, 30),
-                                         endTime:   new(7, 0),
-                                         closePeriod: TimeSpan.FromMinutes(1),
-                                         processesToClose: [new(ProcessTargetType.MainWindowTitle, "Visual Studio")],
-                                         []));
-        Schedulers.Add(new ActiveWindowLogger(TimeSpan.FromSeconds(15), TimeSpan.FromMinutes(15)));
         Console.WriteLine($"Schedulers: {Schedulers.ListNotation()}");
         foreach(TaskScheduler scheduler in  Schedulers)
-        {
             ScheduledTasks.Add(scheduler.NextTask(now));
-        }
         try
         {
             while(true)

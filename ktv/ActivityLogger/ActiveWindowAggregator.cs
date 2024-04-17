@@ -2,8 +2,9 @@
 using System.Text.Json;
 
 namespace d9.ktv.ActivityLogger;
-public class ActiveWindowAggregator : TaskScheduler
+public class ActiveWindowAggregator(TimeSpan period) : TaskScheduler
 {
+    public TimeSpan Period => period;
     public static IEnumerable<ActiveWindowLogEntry> EntriesBetween(DateTime start, DateTime end)
     {
         foreach(string fileName in ActiveWindowLogUtils.FileNamesFor(start, end))
@@ -21,17 +22,21 @@ public class ActiveWindowAggregator : TaskScheduler
             }
         }
     }
-    private void Aggregate()
+    public override ScheduledTask NextTask(DateTime time)
     {
-        IEnumerable<ActiveWindowLogEntry> entries = File.ReadAllLines(FileName!)
-                                                         .Select(x => JsonSerializer.Deserialize<ActiveWindowLogEntry>(x));
+        DateTime nextTime = time + Period;
+        return new(nextTime, () => Aggregate(nextTime), this);
+    }
+    private void Aggregate(DateTime time)
+    {
+        IEnumerable<ActiveWindowLogEntry> entries = EntriesBetween(time, time + Period);
         // todo: set up a syntax to parse the active window process name and window name
         CountingDictionary<string, int> dict = new();
         foreach (string? s in entries.Select(x => x?.ProcessName))
             if (s is not null)
                 dict.Increment(s);
         int maxCt = dict.Select(x => x.Value).Max();
-        Console.WriteLine($"{DateTime.Now:g} most common processes in the last {LogsPerAggregation} logs ({maxCt} items each):");
+        Console.WriteLine($"{DateTime.Now:g} most common processes in the last {Period.Natural()} ({maxCt} items each):");
         foreach ((string key, int value) in (IEnumerable<KeyValuePair<string, int>>)dict)
         {
             if (value == maxCt)

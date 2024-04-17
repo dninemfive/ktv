@@ -1,6 +1,5 @@
 ﻿using System.Diagnostics;
 using System.Runtime.InteropServices;
-using System.Text;
 
 // https://stackoverflow.com/a/115905
 namespace d9.ktv;
