@@ -26,16 +26,16 @@ public class ActiveWindowAggregator(TimeSpan period) : FixedPeriodTaskScheduler(
     /// </remarks>
     public static IEnumerable<ActiveWindowLogEntry> EntriesBetween(DateTime start, DateTime end)
     {
-        foreach(string fileName in ActiveWindowLogUtils.FileNamesFor(start, end))
+        foreach (string fileName in ActiveWindowLogUtils.FileNamesFor(start, end))
         {
             if (!File.Exists(fileName))
                 continue;
-            foreach(string line in File.ReadAllLines(fileName))
+            foreach (string line in File.ReadAllLines(fileName))
             {
                 ActiveWindowLogEntry? entry = JsonSerializer.Deserialize<ActiveWindowLogEntry>(line);
-                if(entry is not null && entry.DateTime >= start)
+                if (entry is not null && entry.DateTime >= start)
                 {
-                    if(entry.DateTime <= end)
+                    if (entry.DateTime <= end)
                         yield return entry;
                     if (entry.DateTime >= end)
                         break;
@@ -45,20 +45,20 @@ public class ActiveWindowAggregator(TimeSpan period) : FixedPeriodTaskScheduler(
     }
     protected override ScheduledTask NextTaskInternal(DateTime dateTime)
         => new(dateTime, () => Aggregate(dateTime), this);
+    private DateTime? _lastAggregationTime = null;
     private void Aggregate(DateTime time)
     {
-        IEnumerable<ActiveWindowLogEntry> entries = EntriesBetween(time - Period, time);
+        _lastAggregationTime ??= time - Period;
+        IEnumerable<ActiveWindowLogEntry> entries = EntriesBetween(_lastAggregationTime.Value, time);
         // todo: set up a syntax to parse the active window process name and window name
         CountingDictionary<string, int> dict = new();
         foreach (string? s in entries.Select(x => x?.ProcessName))
             if (s is not null)
                 dict.Increment(s);
         int maxCt = dict.Select(x => x.Value).Max();
-        Console.WriteLine($"{DateTime.Now:g} most common processes in the last {Period.Natural()} ({maxCt} items each):");
-        foreach ((string key, int value) in (IEnumerable<KeyValuePair<string, int>>)dict)
-        {
-            if (value == maxCt)
-                Console.WriteLine($"\t{key}");
-        }
+        Console.WriteLine($"{DateTime.Now:g} most common processes in the last {(time - _lastAggregationTime.Value).Natural()}:");
+        foreach ((string key, int value) in (IEnumerable<KeyValuePair<string, int>>)dict.OrderByDescending(x => x.Value))
+            Console.WriteLine($"\t{value / (double)dict.Total,-5:P1}\t{key}");
+        _lastAggregationTime = time;
     }
 }

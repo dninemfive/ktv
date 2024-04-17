@@ -44,7 +44,7 @@ public class Program
         {
             while(true)
             {
-                Console.WriteLine(ScheduledTasks.OrderBy(x => x.ScheduledTime).MultilineListWithAlignedTitle("scheduled tasks:"));
+                // Console.WriteLine(ScheduledTasks.OrderBy(x => x.ScheduledTime).MultilineListWithAlignedTitle("scheduled tasks:"));
                 SleepUntilNext(ScheduledTasks);
                 now = DateTime.Now;
                 foreach (ScheduledTask task in ScheduledTasks.Where(x => x.ScheduledTime < now).ToList())
@@ -57,14 +57,15 @@ public class Program
         }
         finally
         {
-
+            // todo: some sort of TryExecuteEarly on ScheduledTask
         }
     }
     private static void SleepUntil(DateTime dt)
     {
         // Console.WriteLine($"SleepUntil({dt:G})");
         int delay = (int)(dt - DateTime.Now).TotalMilliseconds;
-        Thread.Sleep(delay);
+        if(delay > 0)
+            Thread.Sleep(delay);
     }
     private static void SleepUntilNext(IEnumerable<ScheduledTask> tasks)
         => SleepUntil(tasks.Select(x => x.ScheduledTime).Min());

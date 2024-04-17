@@ -9,8 +9,15 @@ public class ActivityCategoryDef
     [JsonInclude]
     public required string Name { get; set; }
 }
-public class Activity
+public class Activity(string name, string category, string? eventId = null)
 {
-    public string? EventId { get; private set; } = null;
-    public ActivityCategoryDef Category { get; private set; }
+    public string Name { get; private set; } = name;
+    public string Category { get; private set; } = category;
+    public string? EventId { get; private set; } = eventId;
 }
+public class ProcessTransformer
+{
+
+}
+// [javaw, Minecraft* 1.20.1 - Singleplayer, java path] -> (Games, Minecraft* 1.20.1)
+// [any executable name, any executable window title, path in steam folder] -> (executable name, 

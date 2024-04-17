@@ -94,24 +94,3 @@ internal class ActivityDef
         // Matcher ??= new($"Matcher_Generated_{procName}", procName);
     }
 }
-internal class MatcherDef
-{
-    [JsonInclude]
-    string DefName;
-    [JsonInclude]
-    MatcherTarget Target;
-    [JsonInclude]
-    MatcherType Type;
-    [JsonInclude]
-    string? Value;
-    [JsonConstructor]
-    internal MatcherDef(string defName, string comparisonValue, MatcherTarget target = MatcherTarget.ProcessName, MatcherType type = MatcherType.StringComparison)
-    {
-        DefName = defName;
-        Value = comparisonValue;
-        Target = target;
-        Type = type;
-    }
-}
-enum MatcherTarget { WindowTitle, ProcessName, ProcessLocation }
-enum MatcherType { Regex, StringComparison }
