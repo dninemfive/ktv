@@ -44,10 +44,10 @@ public class ActiveWindowAggregator(TimeSpan period) : FixedPeriodTaskScheduler(
         }
     }
     protected override ScheduledTask NextTaskInternal(DateTime dateTime)
-        => new(dateTime, () => Aggregate(dateTime), this);    
+        => new(dateTime, () => Aggregate(dateTime), this);
     private void Aggregate(DateTime time)
     {
-        IEnumerable<ActiveWindowLogEntry> entries = EntriesBetween(time, time + Period);
+        IEnumerable<ActiveWindowLogEntry> entries = EntriesBetween(time - Period, time);
         // todo: set up a syntax to parse the active window process name and window name
         CountingDictionary<string, int> dict = new();
         foreach (string? s in entries.Select(x => x?.ProcessName))

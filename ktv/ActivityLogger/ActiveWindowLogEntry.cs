@@ -3,16 +3,18 @@ using System.Diagnostics;
 using System.Text.Json.Serialization;
 
 namespace d9.ktv;
-public class ActiveWindowLogEntry(DateTime dateTime, Process? process)
+[method: JsonConstructor]
+public class ActiveWindowLogEntry(DateTime dateTime, string? processName, string? mainWindowTitle, string? fileName)
 {
+    public ActiveWindowLogEntry(DateTime dateTime, Process? process) : this(dateTime, process?.ProcessName, process?.MainWindowTitle, process?.FileName()) { }
     [JsonInclude]
     public DateTime DateTime { get; private set; } = dateTime;
     [JsonInclude]
-    public string? ProcessName { get; private set; } = process?.ProcessName;
+    public string? ProcessName { get; private set; } = processName;
     [JsonInclude]
-    public string? MainWindowTitle { get; private set; } = process?.MainWindowTitle;
+    public string? MainWindowTitle { get; private set; } = mainWindowTitle;
     [JsonInclude]
-    public string? FileName { get; private set; } = process?.FileName();
+    public string? FileName { get; private set; } = fileName;
     public override string ToString()
-        => $"{DateTime:g}\t{ProcessName.PrintNull()}\t{MainWindowTitle.PrintNull()}\t{FileName.PrintNull()}";
+        => $"{DateTime,-20:g}{ProcessName.PrintNull()}\n{"",-20}{MainWindowTitle.PrintNull()}\n{"",-20}{FileName.PrintNull()}";
 }

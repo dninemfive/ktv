@@ -44,6 +44,7 @@ public class Program
         {
             while(true)
             {
+                Console.WriteLine($"{"ScheduledTasks:",-20}{ScheduledTasks.Select(x => $"{x}").Aggregate((x, y) => $"{x}\n{"",-20}{y}")}");
                 SleepUntilNext(ScheduledTasks);
                 now = DateTime.Now;
                 foreach (ScheduledTask task in ScheduledTasks.Where(x => x.ScheduledTime < now).ToList())
@@ -61,7 +62,7 @@ public class Program
     }
     private static void SleepUntil(DateTime dt)
     {
-        Console.WriteLine($"SleepUntil({dt:G})");
+        // Console.WriteLine($"SleepUntil({dt:G})");
         int delay = (int)(dt - DateTime.Now).TotalMilliseconds;
         Thread.Sleep(delay);
     }

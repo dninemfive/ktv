@@ -32,5 +32,5 @@ public class ProcessCloser(TimeOnly startTime,
         }
     }
     public override string ToString()
-        => $"ProcessCloser {StartTime}-{EndTime}x{ClosePeriod:g}";
+        => $"ProcessCloser({StartTime} - {EndTime}, {ClosePeriod:g})";
 }

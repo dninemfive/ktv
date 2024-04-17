@@ -4,7 +4,6 @@ using System.Text.Json;
 namespace d9.ktv;
 public class ActiveWindowLogger(TimeSpan period) : FixedPeriodTaskScheduler(period)
 {
-    public int LogsSinceLastAggregation { get; private set; } = 0;
     protected override ScheduledTask NextTaskInternal(DateTime time)
     {
         string fileName = ActiveWindowLogUtils.FileNameFor(time);
@@ -17,6 +16,4 @@ public class ActiveWindowLogger(TimeSpan period) : FixedPeriodTaskScheduler(peri
         Console.WriteLine(entry);
         File.AppendAllText(fileName, $"{JsonSerializer.Serialize(entry)}\n");
     }
-    public override string ToString()
-        => $"ActiveWindowLogger({Period})";
 }
