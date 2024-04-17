@@ -3,15 +3,14 @@ using System.Diagnostics;
 using System.Text.Json;
 
 namespace d9.ktv;
-public class ActiveWindowLogger(TimeSpan logPeriod) : TaskScheduler
+public class ActiveWindowLogger(TimeSpan period) : TaskScheduler
 {
-    public TimeSpan LogPeriod { get; private set; } = logPeriod;
+    public TimeSpan Period { get; private set; } = period;
     public int LogsSinceLastAggregation { get; private set; } = 0;
     public override ScheduledTask NextTask(DateTime time)
     {
         string fileName = ActiveWindowLogUtils.FileNameFor(time);
-        // todo: if LogPeriod divides a day evenly and time does not line up with (now % LogPeriod), align
-        return new(time + LogPeriod, () => LogActiveWindow(fileName), this);
+        return new(time.NextDayAlignedTime(Period), () => LogActiveWindow(fileName), this);
     }
     private void LogActiveWindow(string fileName)
     {
@@ -21,5 +20,5 @@ public class ActiveWindowLogger(TimeSpan logPeriod) : TaskScheduler
         File.AppendAllText(fileName, $"{JsonSerializer.Serialize(entry)}\n");
     }
     public override string ToString()
-        => $"ActiveWindowLogger({LogPeriod})";
+        => $"ActiveWindowLogger({Period})";
 }

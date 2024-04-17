@@ -1,5 +1,5 @@
-﻿using d9.utl.compat;
-using Google.Apis.Calendar.v3.Data;
+﻿using d9.utl;
+using System.Numerics;
 
 namespace d9.ktv;
 
@@ -26,5 +26,20 @@ internal static class Extensions
         foreach (char c in Path.GetInvalidFileNameChars())
             s = s.Replace($"{c}", replaceWith);
         return s;
+    }
+    public static double DivideBy(this TimeOnly dividend, TimeSpan divisor)
+        => dividend.ToTimeSpan() / divisor;
+    public static double DivideBy(this DateTime dt, TimeSpan divisor)
+        => TimeOnly.FromDateTime(dt).DivideBy(divisor);
+    public static bool IsInt(this double d)
+        => Math.Abs(d - (int)d) < double.Epsilon;
+    private static TimeSpan OneDay = TimeSpan.FromHours(24);
+    public static bool DividesDayEvenly(this TimeSpan divisor)
+        => (OneDay / divisor).IsInt();
+    public static DateTime NextDayAlignedTime(this DateTime dt, TimeSpan ts)
+    {
+        if (!DividesDayEvenly(ts))
+            return dt + ts;
+        return dt.Floor(ts) + ts;
     }
 }
