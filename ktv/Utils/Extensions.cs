@@ -1,5 +1,6 @@
 ﻿using d9.utl;
 using System.Numerics;
+using System.Text.RegularExpressions;
 
 namespace d9.ktv;
 
@@ -49,4 +50,6 @@ internal static class Extensions
         string result = title.PadRight(padWidth);
         return result + objects.Select(x => x.PrintNull()).Aggregate((x, y) => $"{x}\n{padding}{y}");
     }
+    public static bool Matches(this string s, string? regex)
+        => regex is not null && Regex.IsMatch(s, regex);
 }
