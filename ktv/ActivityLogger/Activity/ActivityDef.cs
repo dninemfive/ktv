@@ -8,7 +8,6 @@ public class ActivityDef
     public string? MainWindowTitleRegex { get; set; }
     public string? ProcessNameRegex { get; set; }
     public required string Pattern { get; set; }
-    public string? Category { get; set; }
     public string? Name(Process? p)
     {
         if (!Matcher.Matches(p))
@@ -18,6 +17,6 @@ public class ActivityDef
             ("mainWindowTitle", p.MainWindowTitle, MainWindowTitleRegex),
             ("processName", p.ProcessName, ProcessNameRegex)
         ];
-        return Pattern.RegexReplace(sourceVariables);
+        return Pattern.RegexReplace(sourceVariables, "(.+)");
     }
 }

@@ -66,21 +66,3 @@ internal class KtvConfigDef
     [JsonInclude]
     public List<object> parsers;
 }
-internal class KtvConfigDef2
-{
-    internal class CategoryDef
-    {
-        [JsonInclude]
-        public GoogleUtils.EventColor Color;
-        [JsonInclude]
-        public List<ActivityDef> Activities;
-    }
-    [JsonInclude]
-    public string? GoogleCalendarId;
-    [JsonInclude]
-    public GoogleUtils.EventColor DefaultColor;
-    [JsonInclude]
-    public HashSet<string> Ignore;
-    [JsonInclude]
-    public Dictionary<string, CategoryDef> Categories;
-}

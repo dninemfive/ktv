@@ -1,5 +1,7 @@
 ﻿using d9.ktv.ActivityLogger;
 using d9.utl;
+using d9.utl.compat;
+using System.Text.Json;
 
 namespace d9.ktv;
 
@@ -36,6 +38,52 @@ public class Program
     ];
     public static void Main()
     {
+        KtvConfigDef2 testCfg = new()
+        {
+            Activities = new()
+            {
+                GoogleCalendarId = "<id>",
+                DefaultCategory = new()
+                {
+                    Name = "Default",
+                    EventColor = GoogleUtils.EventColor.Graphite
+                },
+                CategoryDefs = new()
+                {
+                    { "Games", new()
+                        {
+                            EventColor = GoogleUtils.EventColor.Flamingo,
+                            ActivityDefs =
+                            [
+                                new()
+                                {
+                                    Matcher = new()
+                                    {
+                                        FileNameMatcher = new()
+                                        {
+                                            ParentFolder = "C:/Program Files (x86)/Steam"
+                                        }
+                                    },
+                                    Pattern = @"{processName:0} {mainWindowTitle:0}"
+                                }
+                            ]
+                        }
+                    }
+                },
+                Ignore = 
+                [
+                    new()
+                    {
+                        FileNameMatcher = new()
+                        {
+                            Regex = ".+\\.scr"
+                        }
+                    }
+                ]
+            }
+        };
+        File.WriteAllText($"ExampleConfig.json", JsonSerializer.Serialize(testCfg, Config.DefaultSerializerOptions));
+        return;
         DateTime now = DateTime.Now;
         Console.WriteLine(Schedulers.MultilineListWithAlignedTitle("schedulers:"));
         foreach(TaskScheduler scheduler in  Schedulers)

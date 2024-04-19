@@ -52,10 +52,10 @@ internal static class Extensions
     }
     public static bool Matches(this string s, string? regex)
         => regex is not null && Regex.IsMatch(s, regex);
-    public static string RegexReplace(this string pattern, IEnumerable<(string variableName, string? variableValue, string? regex)> variables)
+    public static string RegexReplace(this string pattern, IEnumerable<(string variableName, string? variableValue, string? regex)> variables, string? defaultRegex = null)
     {
         foreach ((string name, string? value, string? regex) in variables)
-            pattern = pattern.RegexReplace(name, value, regex);
+            pattern = pattern.RegexReplace(name, value, regex ?? defaultRegex);
         return pattern;
     }
     public static string RegexReplace(this string pattern, string variableName, string? variableValue, string? regex)
