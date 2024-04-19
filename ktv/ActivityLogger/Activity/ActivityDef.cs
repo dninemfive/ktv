@@ -20,10 +20,4 @@ public class ActivityDef
         ];
         return Pattern.RegexReplace(sourceVariables);
     }
-    public Activity? CreateActivityFrom(Process? p, ActivityConfig cfg)
-    {
-        if (!Matcher.Matches(p))
-            return null;
-        return new(Name(p)!, cfg.CategoryDefOf(Category));
-    }
 }
