@@ -17,24 +17,12 @@ public class ProcessToActivityTransformer
     {
         if (!Matcher.Matches(p))
             return null;
-        string result = Pattern;
         List<(string name, string? regex, string? value)> sourceVariables = [
             ("fileName", p.FileName(), FileNameRegex),
             ("mainWindowTitle", p.MainWindowTitle, MainWindowTitleRegex),
             ("processName", p.ProcessName, ProcessNameRegex)
-            ];
-        foreach ((string name, string? regex, string? value) in sourceVariables)
-            result = Replace(result, name, value, regex);
-        return result;
-    }
-    private static string Replace(string pattern, string variableName, string? variableValue, string? regex)
-    {
-        if (variableValue is null || regex is null)
-            return pattern;
-        MatchCollection matches = Regex.Matches(variableValue, regex);
-        for (int i = 0; i < matches.Count; i++)
-            pattern = pattern.Replace($"{{{variableName}:{i}}}", matches[i].Value);
-        return pattern;
+        ];
+        return Pattern.RegexReplace(sourceVariables);
     }
     public Activity? CreateActivityFrom(Process? p)
     {
