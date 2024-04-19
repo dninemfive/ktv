@@ -21,9 +21,9 @@ public class ProcessMatcher
     public FileName? FileNameMatcher { get; set; }
     public string? MainWindowTitleRegex { get; set; }
     public string? ProcessNameRegex { get; set; }
-    public bool Matches([NotNullWhen(true)] Process? p)
-        => p is not null
-           && (FileNameMatcher?.Matches(p.FileName()) ?? true)
-           && p.MainWindowTitle.Matches(MainWindowTitleRegex)
-           && p.ProcessName.Matches(ProcessNameRegex);
+    public bool Matches([NotNullWhen(true)] ActiveWindowLogEntry? awle)
+        => awle is not null
+           && (FileNameMatcher?.Matches(awle.FileName) ?? true)
+           && (MainWindowTitleRegex is null || awle.MainWindowTitle.Matches(MainWindowTitleRegex))
+           && (ProcessNameRegex is null || awle.ProcessName.Matches(ProcessNameRegex));
 }

@@ -8,14 +8,14 @@ public class ActivityDef
     public string? MainWindowTitleRegex { get; set; }
     public string? ProcessNameRegex { get; set; }
     public required string Pattern { get; set; }
-    public string? Name(Process? p)
+    public string? Name(ActiveWindowLogEntry? awle)
     {
-        if (!Matcher.Matches(p))
+        if (!Matcher.Matches(awle))
             return null;
         List<(string name, string? regex, string? value)> sourceVariables = [
-            ("fileName", p.FileName(), FileNameRegex),
-            ("mainWindowTitle", p.MainWindowTitle, MainWindowTitleRegex),
-            ("processName", p.ProcessName, ProcessNameRegex)
+            ("fileName", awle.FileName, FileNameRegex),
+            ("mainWindowTitle", awle.MainWindowTitle, MainWindowTitleRegex),
+            ("processName", awle.ProcessName, ProcessNameRegex)
         ];
         return Pattern.RegexReplace(sourceVariables, "(.+)");
     }

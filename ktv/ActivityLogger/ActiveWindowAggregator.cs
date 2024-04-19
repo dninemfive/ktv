@@ -7,8 +7,9 @@ namespace d9.ktv.ActivityLogger;
 /// was happening during the specified time period.
 /// </summary>
 /// <param name="period">The length of time over which to summarize the raw active window data.</param>
-public class ActiveWindowAggregator(TimeSpan period) : FixedPeriodTaskScheduler(period)
+public class ActiveWindowAggregator(TimeSpan period, ActivityConfig config) : FixedPeriodTaskScheduler(period)
 {
+    public ActivityConfig Config { get; private set; } = config;
     /// <summary>
     ///     Gets the <see cref="ActiveWindowLogEntry">ActiveWindowLogEntries</see> during the
     ///     specified time period.
@@ -51,14 +52,14 @@ public class ActiveWindowAggregator(TimeSpan period) : FixedPeriodTaskScheduler(
         _lastAggregationTime ??= time - Period;
         IEnumerable<ActiveWindowLogEntry> entries = EntriesBetween(_lastAggregationTime.Value, time);
         // todo: set up a syntax to parse the active window process name and window name
-        CountingDictionary<string, int> dict = new();
-        foreach (string? s in entries.Select(x => x?.ProcessName))
-            if (s is not null)
-                dict.Increment(s);
+        CountingDictionary<Activity, int> dict = new();
+        foreach (Activity? a in entries.Select(Config.ActivityFor))
+            if (a is not null)
+                dict.Increment(a);
         int maxCt = dict.Select(x => x.Value).Max();
-        Console.WriteLine($"{DateTime.Now:g} most common processes in the last {(time - _lastAggregationTime.Value).Natural()}:");
-        foreach ((string key, int value) in (IEnumerable<KeyValuePair<string, int>>)dict.OrderByDescending(x => x.Value))
-            Console.WriteLine($"\t{value / (double)dict.Total,-5:P1}\t{key}");
+        Console.WriteLine($"{DateTime.Now:g} most common activities in the last {(time - _lastAggregationTime.Value).Natural()}:");
+        foreach ((Activity key, int value) in (IEnumerable<KeyValuePair<Activity, int>>)dict.OrderByDescending(x => x.Value))
+            Console.WriteLine($"\t{value / (double)dict.Total,-5:P1}\t{key.Name}");
         _lastAggregationTime = time;
     }
 }

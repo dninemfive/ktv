@@ -34,7 +34,9 @@ public class Program
                           processesToClose:  [new(ProcessTargetType.MainWindowTitle, "Visual Studio")],
                           processesToIgnore: []),
         new ActiveWindowLogger(TimeSpan.FromSeconds(15)),
-        new ActiveWindowAggregator(TimeSpan.FromMinutes(15))
+        new ActiveWindowAggregator(TimeSpan.FromMinutes(15), 
+                                   Config.TryLoad<KtvConfigDef2>(CommandLineArgs.TryGet("config", 
+                                                                 CommandLineArgs.Parsers.FilePath))!.Activities)
     ];
     public static void Main()
     {
