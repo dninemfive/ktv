@@ -84,13 +84,3 @@ internal class KtvConfigDef2
     [JsonInclude]
     public Dictionary<string, CategoryDef> Categories;
 }
-internal class ActivityDef
-{
-    [JsonInclude]
-    string? MatcherDefName;
-    [JsonConstructor]
-    public ActivityDef(string procName)
-    {
-        // Matcher ??= new($"Matcher_Generated_{procName}", procName);
-    }
-}

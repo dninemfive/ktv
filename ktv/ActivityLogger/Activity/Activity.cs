@@ -1,13 +1,20 @@
 ﻿using d9.utl;
-using System.Diagnostics;
-using System.Diagnostics.CodeAnalysis;
-using System.Text.Json.Serialization;
-using System.Text.RegularExpressions;
+using d9.utl.compat;
+using Google.Apis.Calendar.v3.Data;
 
 namespace d9.ktv;
-public class Activity(string name, string category, string? eventId = null)
+public class Activity(string name, ActivityCategoryDef category, string? eventId = null)
 {
     public string Name { get; private set; } = name;
-    public string Category { get; private set; } = category;
+    public ActivityCategoryDef Category { get; private set; } = category;
     public string? EventId { get; private set; } = eventId;
+    public Event ToEvent(DateTime startTime, DateTime? endTime)
+        => new()
+        {
+            Summary = Name,
+            Start = startTime.Round().ToEventDateTime(),
+            EndTimeUnspecified = endTime is null,
+            End = endTime?.Round().ToEventDateTime(),
+            ColorId = ((int)Category.EventColor).ToString()
+        };
 }
