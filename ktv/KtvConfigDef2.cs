@@ -9,5 +9,8 @@ using System.Threading.Tasks;
 namespace d9.ktv;
 internal class KtvConfigDef2
 {
-    public required ActivityConfig Activities { get; set; }
+    [JsonPropertyName("activityLogging")]
+    public ActivityTrackerConfig? ActivityTracker { get; set; }
+    [JsonPropertyName("closeProcesses")]
+    public List<ProcessCloserConfig>? ProcessClosers { get; set; }
 }

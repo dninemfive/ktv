@@ -1,14 +1,15 @@
 ﻿using d9.utl;
 using System.Text.Json.Serialization;
 namespace d9.ktv;
-public class ActivityConfig
+public class ActivityAggregationConfig
 {
     [JsonInclude]
     public string? GoogleCalendarId;
     public required DefaultCategoryDef DefaultCategory { get; set; }
     [JsonPropertyName("categories")]
     public required Dictionary<string, ActivityCategoryDef> CategoryDefs { get; set; }
-    public List<ActiveWindowMatcher>? Ignore { get; set; }
+    public List<ProcessMatcher>? Ignore { get; set; }
+    public required float PeriodMinutes { get; set; }
     public Activity? ActivityFor(ActiveWindowLogEntry awle)
     {
         if (Ignore?.Any(x => x.Matches(awle)) ?? false)

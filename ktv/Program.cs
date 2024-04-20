@@ -36,13 +36,13 @@ public class Program
         new ActiveWindowLogger(TimeSpan.FromSeconds(15)),
         new ActiveWindowAggregator(TimeSpan.FromMinutes(15), 
                                    Config.TryLoad<KtvConfigDef2>(CommandLineArgs.TryGet("config", 
-                                                                 CommandLineArgs.Parsers.FilePath))!.Activities)
+                                                                 CommandLineArgs.Parsers.FilePath))!.ActivityTracker)
     ];
     public static void Main()
     {
         KtvConfigDef2 testCfg = new()
         {
-            Activities = new()
+            ActivityTracker = new()
             {
                 GoogleCalendarId = "<id>",
                 DefaultCategory = new()
@@ -53,9 +53,9 @@ public class Program
                 CategoryDefs = new()
                 {
                     { "Games", new()
-                        {
-                            EventColor = GoogleUtils.EventColor.Flamingo,
-                            ActivityDefs =
+                    {
+                        EventColor = GoogleUtils.EventColor.Flamingo,
+                        ActivityDefs =
                             [
                                 new()
                                 {
@@ -69,10 +69,10 @@ public class Program
                                     Pattern = @"{processName:0} {mainWindowTitle:0}"
                                 }
                             ]
-                        }
+                    }
                     }
                 },
-                Ignore = 
+                Ignore =
                 [
                     new()
                     {
@@ -82,7 +82,27 @@ public class Program
                         }
                     }
                 ]
-            }
+            },
+            ProcessClosers = [
+                new()
+                {
+                    TimeConstraint = new()
+                    {
+                        DaysOfWeek = [
+                            DayOfWeek.Monday, DayOfWeek.Tuesday, DayOfWeek.Wednesday, DayOfWeek.Thursday, DayOfWeek.Friday
+                            ],
+                        StartTime = new(0, 30),
+                        EndTime = new(10, 0)
+                    },
+                    CloseProcesses = new()
+                    {
+                        FileNameMatcher = new()
+                        {
+                            ParentFolder = "C:/Program Files (x86)/Steam"
+                        }
+                    }
+                }
+            ]
         };
         File.WriteAllText($"ExampleConfig.json", JsonSerializer.Serialize(testCfg, Config.DefaultSerializerOptions));
         return;
@@ -109,6 +129,13 @@ public class Program
         {
             // todo: some sort of TryExecuteEarly on ScheduledTask
         }
+    }
+    public static IEnumerable<TaskScheduler> LoadSchedulers(KtvConfigDef2 config)
+    {
+        if(config.ActivityTracker is not null)
+        {
+
+        } 
     }
     private static void SleepUntil(DateTime dt)
     {
