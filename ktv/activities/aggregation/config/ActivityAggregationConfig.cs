@@ -17,16 +17,17 @@ public class ActivityAggregationConfig
         // todo: document that this is how things are ordered since the dictionary is unordered
         foreach((string name, ActivityCategoryDef def) in CategoryDefs.OrderBy(x => x.Key))
         {
-            if (CreateActivityFrom(awle, name, def) is Activity a)
+            if (def.CreateActivityFrom(awle, name) is Activity a)
                 return a;
         }
         return new((awle.ProcessName ?? awle.MainWindowTitle ?? awle.FileName).PrintNull(), DefaultCategory.Name, DefaultCategory.EventColor);
     }
-    private static Activity? CreateActivityFrom(ActiveWindowLogEntry awle, string categoryName, ActivityCategoryDef category)
+    public override string ToString()
     {
-        foreach (ActivityDef activityDef in category.ActivityDefs)
-            if (activityDef.Name(awle) is string name)
-                return new(name, categoryName, category.EventColor);
-        return null;
+        List<string?> items = [
+            $"Google calendar? {GoogleCalendarId is not null}",
+            DefaultCategory.ToString(),
+            [..CategoryDefs.Select(x => $"{x.Key}: {x.Value}")]
+        ];
     }
 }

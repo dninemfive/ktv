@@ -1,15 +1,9 @@
-﻿using d9.utl.compat;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Text.Json.Serialization;
-using System.Threading.Tasks;
+﻿using System.Text.Json.Serialization;
 
 namespace d9.ktv;
-internal class KtvConfigDef2
+public class KtvConfigDef2
 {
-    [JsonPropertyName("activityLogging")]
+    [JsonPropertyName("logActivities")]
     public ActivityTrackerConfig? ActivityTracker { get; set; }
     [JsonPropertyName("closeProcesses")]
     public List<ProcessCloserConfig>? ProcessClosers { get; set; }

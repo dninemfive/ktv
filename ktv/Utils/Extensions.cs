@@ -43,7 +43,7 @@ internal static class Extensions
             return dt + ts;
         return dt.Floor(ts) + ts;
     }
-    public static string MultilineListWithAlignedTitle(this IEnumerable<object?> objects, string title, int tabWidth = 2)
+    public static string MultilineListWithAlignedTitle<T>(this IEnumerable<T?> objects, string title, int tabWidth = 2)
     {
         int padWidth = title.Length + tabWidth + (title.Length % tabWidth);
         string padding = " ".Repeated(padWidth);

@@ -1,12 +1,7 @@
 ﻿using d9.utl;
 using d9.utl.compat;
 using Google.Apis.Calendar.v3.Data;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
 using System.Text.Json.Serialization;
-using System.Threading.Tasks;
 
 namespace d9.ktv;
 public static class KtvConfig
@@ -15,7 +10,7 @@ public static class KtvConfig
     private static readonly KtvConfigDef? _config = null;
     static KtvConfig()
     {
-        _config = Config.TryLoad<KtvConfigDef>(Program.Args.CalendarConfigPath);
+        _config = Config.TryLoad<KtvConfigDef>(Program.Args.ConfigPath);
     }
     #region google stuff
     private static bool UseCalendar => _config is not null && GoogleUtils.HasValidAuthConfig;

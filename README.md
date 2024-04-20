@@ -12,5 +12,6 @@ A program which runs in the background keeping track of what processes are runni
   - [x] program matching
   - [~] some kind of expression syntax?
   - [ ] close programs based on how long they've been running in a given period of time
+  - [ ] close programs based on their ktv categorization?
 - [~] structure config files for json use
 - [ ] pin the program to the taskbar notification section and have a UI which can be used to manage it

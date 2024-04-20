@@ -25,14 +25,14 @@ public class TimeConstraint
     }
     public bool Matches(DateTime dt)
         => DayOfWeekMatches(dt) && TimeMatches(dt);
-    public DateTime NextMatchingTime(DateTime dt)
+    public DateTime NextMatchingDateTime(DateTime dt)
     {
         if (Matches(dt))
             return dt;
         DateTime matchingTime = new(DateOnly.FromDateTime(dt), StartTime ?? TimeOnly.MinValue);
         if (matchingTime < dt)
             matchingTime += TimeSpan.FromDays(1);
-        if (DaysOfWeek is not null && DaysOfWeek.Any() && !DaysOfWeek.Contains(matchingTime.DayOfWeek))
+        if (DaysOfWeek is not null && DaysOfWeek.Count != 0 && !DaysOfWeek.Contains(matchingTime.DayOfWeek))
         {
             int ct = 0;
             while (ct++ < 7 && !DaysOfWeek.Contains(matchingTime.DayOfWeek))

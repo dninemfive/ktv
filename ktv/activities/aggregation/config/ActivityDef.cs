@@ -1,7 +1,10 @@
-﻿namespace d9.ktv;
+﻿using System.Text.Json.Serialization;
+
+namespace d9.ktv;
 public class ActivityDef
 {
-    public required ActiveWindowMatcher Matcher { get; set; }
+    [JsonPropertyName("match")]
+    public required ProcessMatcher Matcher { get; set; }
     public string? FileNameRegex { get; set; }
     public string? MainWindowTitleRegex { get; set; }
     public string? ProcessNameRegex { get; set; }

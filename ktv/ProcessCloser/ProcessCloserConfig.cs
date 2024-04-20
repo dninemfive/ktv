@@ -6,7 +6,7 @@ public class ProcessCloserConfig
 {
     [JsonPropertyName("when")]
     public TimeConstraint? TimeConstraint { get; set; }
-    [JsonPropertyName("close")]
+    [JsonPropertyName("match")]
     public ProcessMatcher? CloseProcesses { get; set; }
     [JsonPropertyName("except")]
     public ProcessMatcher? IgnoreProcesses { get; set; }

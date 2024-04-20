@@ -12,9 +12,9 @@ public class ProcessCloser(ProcessCloserConfig config) : TaskScheduler
     public override ScheduledTask NextTask(DateTime time)
     {
         TimeOnly nextTime = TimeOnly.FromDateTime(time + ClosePeriod);
-        if (nextTime < StartTime || nextTime > EndTime)
-            nextTime = StartTime;
         DateTime nextDateTime = new(DateOnly.FromDateTime(time), nextTime);
+        if (TimeConstraint is not null)
+            nextDateTime = TimeConstraint.NextMatchingDateTime(nextDateTime);
         if (nextDateTime <= DateTime.Now)
             nextDateTime += (DateTime.Now.Date - nextDateTime.Date) + TimeSpan.FromDays(1);
         return new(nextDateTime, CloseApplicableProcesses, this);
