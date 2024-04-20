@@ -32,9 +32,20 @@ public class TimeConstraint
         DateTime matchingTime = new(DateOnly.FromDateTime(dt), StartTime ?? TimeOnly.MinValue);
         if (matchingTime < dt)
             matchingTime += TimeSpan.FromDays(1);
-        if (DaysOfWeek is null || (DaysOfWeek.Any() && !DaysOfWeek.Contains(matchingTime.DayOfWeek)))
+        if (DaysOfWeek is not null && DaysOfWeek.Any() && !DaysOfWeek.Contains(matchingTime.DayOfWeek))
         {
-            
+            int ct = 0;
+            while (ct++ < 7 && !DaysOfWeek.Contains(matchingTime.DayOfWeek))
+                matchingTime += TimeSpan.FromDays(1);
         }
+        return matchingTime;
     }
+    public override string ToString()
+        => $"{DaysOfWeek?.Abbreviation()} {(StartTime is not null, EndTime is not null) switch
+        {
+            (true, true) => $"{StartTime:g} - {EndTime:g}",
+            (true, false) => $"{StartTime:g}",
+            (false, true) => $"{EndTime:g}",
+            _ => ""
+        }}".Trim();
 }

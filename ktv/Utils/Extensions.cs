@@ -77,4 +77,8 @@ internal static class Extensions
         foreach (T value in allValues.TakeWhile(lessThanInitialValue))
             yield return value;
     }
+    public static string Abbreviation(this DayOfWeek dow)
+        => dow.ToString()[0..2];
+    public static string Abbreviation(this IEnumerable<DayOfWeek> dows)
+        => dows.Distinct().Order().Select(Abbreviation).Aggregate((x, y) => $"{x}{y}");
 }
