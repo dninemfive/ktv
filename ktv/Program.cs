@@ -132,10 +132,19 @@ public class Program
     }
     public static IEnumerable<TaskScheduler> LoadSchedulers(KtvConfigDef2 config)
     {
-        if(config.ActivityTracker is not null)
+        if(config.ActivityTracker is ActivityTrackerConfig atc)
         {
-
-        } 
+            TimeSpan logPeriod = TimeSpan.FromMinutes(atc.LogPeriodMinutes);
+            yield return new ActiveWindowLogger(logPeriod);
+            if(atc.AggregationConfig is ActivityAggregationConfig aac)
+                yield return new ActiveWindowAggregator(aac);
+        }
+        if (config.ProcessClosers is List<ProcessCloserConfig> pccs)
+        {
+            foreach (ProcessCloserConfig pcc in pccs)
+                if (pcc.CloseProcesses is not null || pcc.IgnoreProcesses is not null)
+                    yield return new ProcessCloser(pcc);
+        }
     }
     private static void SleepUntil(DateTime dt)
     {

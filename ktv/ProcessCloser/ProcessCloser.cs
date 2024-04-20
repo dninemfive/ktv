@@ -1,18 +1,14 @@
-﻿using System.Diagnostics;
+﻿using d9.utl;
+using System.Diagnostics;
 
 namespace d9.ktv;
 // future optimization: merge all ProcessClosers into one which does a decision tree of what to close
-public class ProcessCloser(TimeOnly startTime,
-                           TimeOnly endTime,
-                           TimeSpan closePeriod,
-                           IEnumerable<ProcessTargeter> processesToClose,
-                           IEnumerable<ProcessTargeter> processesToIgnore) : TaskScheduler
+public class ProcessCloser(ProcessCloserConfig config) : TaskScheduler
 {
-    public TimeOnly StartTime { get; private set; } = startTime;
-    public TimeOnly EndTime { get; private set; } = endTime;
-    public TimeSpan ClosePeriod { get; private set; } = closePeriod;
-    public List<ProcessTargeter> ProcessesToClose { get; private set; } = processesToClose.ToList();
-    public List<ProcessTargeter> ProcessesToIgnore { get; private set; } = processesToIgnore.ToList();
+    public TimeConstraint? TimeConstraint = config.TimeConstraint;
+    public TimeSpan ClosePeriod { get; private set; } = TimeSpan.FromMinutes(config.PeriodMinutes);
+    public ProcessMatcher? ProcessesToClose { get; private set; } = config.CloseProcesses;
+    public ProcessMatcher? ProcessesToIgnore { get; private set; } = config.IgnoreProcesses;
     public override ScheduledTask NextTask(DateTime time)
     {
         TimeOnly nextTime = TimeOnly.FromDateTime(time + ClosePeriod);
@@ -27,10 +23,10 @@ public class ProcessCloser(TimeOnly startTime,
     {
         foreach (Process process in Process.GetProcesses())
         {
-            if (ProcessesToClose.Any(x => x.Matches(process)) && !ProcessesToIgnore.Any(x => x.Matches(process)))
+            if (!(ProcessesToIgnore?.Matches(process) ?? false) && (ProcessesToClose?.Matches(process) ?? false))
                 Console.WriteLine($"Close {process.ProcessName} ({process.MainWindowTitle})");
         }
     }
     public override string ToString()
-        => $"ProcessCloser({StartTime} - {EndTime}, {ClosePeriod:g})";
+        => $"ProcessCloser({TimeConstraint.PrintNull()}, {ClosePeriod:g})";
 }

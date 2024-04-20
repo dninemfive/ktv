@@ -67,4 +67,14 @@ internal static class Extensions
             pattern = pattern.Replace($"{{{variableName}:{i}}}", matches[i].Value);
         return pattern;
     }
+    public static IEnumerable<T> Cycle<T>(this T initialValue)
+        where T : struct, Enum
+    {
+        IEnumerable<T> allValues = Enum.GetValues<T>();
+        bool lessThanInitialValue(T x) => x.CompareTo(initialValue) < 0;
+        foreach (T value in allValues.SkipWhile(lessThanInitialValue))
+            yield return value;
+        foreach (T value in allValues.TakeWhile(lessThanInitialValue))
+            yield return value;
+    }
 }

@@ -7,7 +7,7 @@ namespace d9.ktv.ActivityLogger;
 /// was happening during the specified time period.
 /// </summary>
 /// <param name="period">The length of time over which to summarize the raw active window data.</param>
-public class ActiveWindowAggregator(TimeSpan period, ActivityAggregationConfig config) : FixedPeriodTaskScheduler(period)
+public class ActiveWindowAggregator(ActivityAggregationConfig config) : FixedPeriodTaskScheduler(TimeSpan.FromMinutes(config.PeriodMinutes))
 {
     public ActivityAggregationConfig Config { get; private set; } = config;
     private DateTime _lastAggregationTime = DateTime.Now;
