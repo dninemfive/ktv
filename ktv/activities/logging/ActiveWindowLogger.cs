@@ -16,4 +16,6 @@ public class ActiveWindowLogger(TimeSpan period) : FixedPeriodTaskScheduler(peri
         Console.WriteLine(entry);
         File.AppendAllText(fileName, $"{JsonSerializer.Serialize(entry)}\n");
     }
+    public override string ToString()
+        => $"{typeof(ActiveWindowLogger).Name}({Period})";
 }

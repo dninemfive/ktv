@@ -1,4 +1,5 @@
 ﻿using d9.utl;
+using System.Text.Json;
 using System.Text.Json.Serialization;
 namespace d9.ktv;
 public class ActivityAggregationConfig
@@ -23,11 +24,5 @@ public class ActivityAggregationConfig
         return new((awle.ProcessName ?? awle.MainWindowTitle ?? awle.FileName).PrintNull(), DefaultCategory.Name, DefaultCategory.EventColor);
     }
     public override string ToString()
-    {
-        List<string?> items = [
-            $"Google calendar? {GoogleCalendarId is not null}",
-            DefaultCategory.ToString(),
-            [..CategoryDefs.Select(x => $"{x.Key}: {x.Value}")]
-        ];
-    }
+        => JsonSerializer.Serialize(this, Config.DefaultSerializerOptions);
 }

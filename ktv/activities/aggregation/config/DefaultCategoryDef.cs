@@ -6,6 +6,4 @@ public class DefaultCategoryDef
 {
     public required string Name { get; set; }
     public GoogleUtils.EventColor? EventColor { get; set; }
-    public override string ToString()
-        => $"Default category: {Name}/{EventColor.PrintNull()}";
 }

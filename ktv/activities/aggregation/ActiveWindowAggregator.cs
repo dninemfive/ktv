@@ -61,4 +61,6 @@ public class ActiveWindowAggregator(ActivityAggregationConfig config) : FixedPer
             Console.WriteLine($"\t{value / (double)dict.Total,-5:P1}\t{key.Name}");
         _lastAggregationTime = time;
     }
+    public override string ToString()
+        => $"{nameof(ActiveWindowAggregator)}({Config})";
 }
