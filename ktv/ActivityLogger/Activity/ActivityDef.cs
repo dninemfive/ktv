@@ -1,9 +1,7 @@
-﻿using System.Diagnostics;
-
-namespace d9.ktv;
+﻿namespace d9.ktv;
 public class ActivityDef
 {
-    public required ProcessMatcher Matcher { get; set; }
+    public required ActiveWindowMatcher Matcher { get; set; }
     public string? FileNameRegex { get; set; }
     public string? MainWindowTitleRegex { get; set; }
     public string? ProcessNameRegex { get; set; }

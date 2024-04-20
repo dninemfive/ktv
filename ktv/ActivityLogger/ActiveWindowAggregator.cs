@@ -10,6 +10,7 @@ namespace d9.ktv.ActivityLogger;
 public class ActiveWindowAggregator(TimeSpan period, ActivityConfig config) : FixedPeriodTaskScheduler(period)
 {
     public ActivityConfig Config { get; private set; } = config;
+    private DateTime _lastAggregationTime = DateTime.Now;
     /// <summary>
     ///     Gets the <see cref="ActiveWindowLogEntry">ActiveWindowLogEntries</see> during the
     ///     specified time period.
@@ -46,18 +47,16 @@ public class ActiveWindowAggregator(TimeSpan period, ActivityConfig config) : Fi
     }
     protected override ScheduledTask NextTaskInternal(DateTime dateTime)
         => new(dateTime, () => Aggregate(dateTime), this);
-    private DateTime? _lastAggregationTime = null;
     private void Aggregate(DateTime time)
     {
-        _lastAggregationTime ??= time - Period;
-        IEnumerable<ActiveWindowLogEntry> entries = EntriesBetween(_lastAggregationTime.Value, time);
+        IEnumerable<ActiveWindowLogEntry> entries = EntriesBetween(_lastAggregationTime, time);
         // todo: set up a syntax to parse the active window process name and window name
         CountingDictionary<Activity, int> dict = new();
         foreach (Activity? a in entries.Select(Config.ActivityFor))
             if (a is not null)
                 dict.Increment(a);
         int maxCt = dict.Select(x => x.Value).Max();
-        Console.WriteLine($"{DateTime.Now:g} most common activities in the last {(time - _lastAggregationTime.Value).Natural()}:");
+        Console.WriteLine($"{DateTime.Now:g} most common activities in the last {(time - _lastAggregationTime).Natural()}:");
         foreach ((Activity key, int value) in (IEnumerable<KeyValuePair<Activity, int>>)dict.OrderByDescending(x => x.Value))
             Console.WriteLine($"\t{value / (double)dict.Total,-5:P1}\t{key.Name}");
         _lastAggregationTime = time;

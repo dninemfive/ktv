@@ -17,14 +17,17 @@ public class Activity(string name, string category, GoogleUtils.EventColor? colo
         => obj is Activity other && this == other;
     public bool Equals(Activity? other)
         => other is not null && this == other;
+
+    public override int GetHashCode()
+        => HashCode.Combine(Name, Category, Color);
     /*
 public Event ToEvent(DateTime startTime, DateTime? endTime)
-   => new()
-   {
-       Summary = Name,
-       Start = startTime.Round().ToEventDateTime(),
-       EndTimeUnspecified = endTime is null,
-       End = endTime?.Round().ToEventDateTime(),
-       ColorId = ((int)Category.EventColor).ToString()
-   };*/
+=> new()
+{
+  Summary = Name,
+  Start = startTime.Round().ToEventDateTime(),
+  EndTimeUnspecified = endTime is null,
+  End = endTime?.Round().ToEventDateTime(),
+  ColorId = ((int)Category.EventColor).ToString()
+};*/
 }

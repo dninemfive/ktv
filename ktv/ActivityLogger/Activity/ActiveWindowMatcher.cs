@@ -1,10 +1,9 @@
 ﻿using d9.utl;
-using System.Diagnostics;
 using System.Diagnostics.CodeAnalysis;
 using System.Text.Json.Serialization;
 
 namespace d9.ktv;
-public class ProcessMatcher
+public class ActiveWindowMatcher
 {
     public class FileName
     {

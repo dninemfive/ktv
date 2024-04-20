@@ -1,7 +1,4 @@
 ﻿using d9.utl;
-using d9.utl.compat;
-using Google.Apis.Calendar.v3.Data;
-using System.Diagnostics;
 using System.Text.Json.Serialization;
 namespace d9.ktv;
 public class ActivityConfig
@@ -11,10 +8,10 @@ public class ActivityConfig
     public required DefaultCategoryDef DefaultCategory { get; set; }
     [JsonPropertyName("categories")]
     public required Dictionary<string, ActivityCategoryDef> CategoryDefs { get; set; }
-    public List<ProcessMatcher>? Ignore { get; set; }
-    public Activity? ActivityFor(ActiveWindowLogEntry? awle)
+    public List<ActiveWindowMatcher>? Ignore { get; set; }
+    public Activity? ActivityFor(ActiveWindowLogEntry awle)
     {
-        if (awle is null || (Ignore?.Any(x => x.Matches(awle)) ?? false))
+        if (Ignore?.Any(x => x.Matches(awle)) ?? false)
             return null;
         // todo: document that this is how things are ordered since the dictionary is unordered
         foreach((string name, ActivityCategoryDef def) in CategoryDefs.OrderBy(x => x.Key))
@@ -22,8 +19,7 @@ public class ActivityConfig
             if (CreateActivityFrom(awle, name, def) is Activity a)
                 return a;
         }
-        return awle is not null ? new((awle.ProcessName ?? awle.MainWindowTitle ?? awle.FileName).PrintNull(), DefaultCategory.Name, DefaultCategory.EventColor)
-                             : null;
+        return new((awle.ProcessName ?? awle.MainWindowTitle ?? awle.FileName).PrintNull(), DefaultCategory.Name, DefaultCategory.EventColor);
     }
     private static Activity? CreateActivityFrom(ActiveWindowLogEntry awle, string categoryName, ActivityCategoryDef category)
     {
