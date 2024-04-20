@@ -1,9 +1,10 @@
 ﻿using d9.utl;
+using System.Diagnostics;
 using System.Diagnostics.CodeAnalysis;
 using System.Text.Json.Serialization;
 
 namespace d9.ktv;
-public class ActiveWindowMatcher
+public class ProcessMatcher
 {
     public class FileName
     {
@@ -20,9 +21,12 @@ public class ActiveWindowMatcher
     public FileName? FileNameMatcher { get; set; }
     public string? MainWindowTitleRegex { get; set; }
     public string? ProcessNameRegex { get; set; }
+    public bool Matches(string? fileName, string? mainWindowTitle, string? processName)
+        => (FileNameMatcher?.Matches(fileName) ?? true)
+           && (MainWindowTitleRegex is null || mainWindowTitle.Matches(MainWindowTitleRegex))
+           && (ProcessNameRegex is null || processName.Matches(ProcessNameRegex));
+    public bool Matches([NotNullWhen(true)] Process? p)
+        => p is not null && Matches(p.FileName(), p.MainWindowTitle, p.ProcessName);
     public bool Matches([NotNullWhen(true)] ActiveWindowLogEntry? awle)
-        => awle is not null
-           && (FileNameMatcher?.Matches(awle.FileName) ?? true)
-           && (MainWindowTitleRegex is null || awle.MainWindowTitle.Matches(MainWindowTitleRegex))
-           && (ProcessNameRegex is null || awle.ProcessName.Matches(ProcessNameRegex));
+        => awle is not null && Matches(awle.FileName, awle.MainWindowTitle, awle.ProcessName);
 }
