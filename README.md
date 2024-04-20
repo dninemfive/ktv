@@ -1,20 +1,15 @@
 # ktv - Command-Line A<ins>ct</ins>i<ins>v</ins>ity Tracker
-A (relatively) simple script to track what program i'm using in various time blocks, to try and shame myself into actually doing work.
+A program which runs in the background keeping track of what processes are running productivity purposes. In this branch, i am merging it with [slp](https://github.com/dninemfive/slp), which similarly runs in the background and shuts down programs when i need to sleep. This ended up being a total rewrite, drastically improving ktv's performance by getting rid of the weird spooling loop i used in my first version, as well as implementing a scheduling logic which is honestly pretty cool.
 
-Usage (using [utl](https://github.com/dninemfive/utl)'s command-line arg parsing):
-
-```
-./ktv.exe [--LogInterval <double>] [--AggregationInterval <double>]
-```
-
-`LogInterval`: the amount of time, in minutes, the program waits between logging your current active window title. The default is `0.5`, or 30 seconds.
-
-`AggregationInterval`: the amount of time, in minutes, the program waits between aggregating the logged window titles, to better summarize your activity. The default is `15` minutes.
-
-Once started, the program waits five seconds before logging anything. It aggregates each time the current time is evenly divisible by the aggregation interval, starting at the earliest such time.
-
-For example, if started at 1:37pm, the first aggregation time with the default settings would be 1:45pm.
-
----
-
-i would like to make this into a GUI program at some point, but that'd probably be even more procrastination than this script has been.
+## Todo:
+- [x] TaskScheduler class to generalize the concept of running things later
+- [~] ktv features - logging programs
+  - [x] log raw data to a file
+  - [~] periodically load data from a file
+  - [~] generalize program details to merge them
+  - [ ] convert generalized details to Google Calendar events
+- [~] slp features - closing programs
+  - [x] program matching
+  - [~] some kind of expression syntax?
+- [~] structure config files for json use
+- [ ] pin the program to the taskbar notification section and have a UI which can be used to manage it
