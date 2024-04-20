@@ -1,40 +1,30 @@
-﻿namespace d9.ktv;
+﻿using System.Text.Json.Serialization;
+
+namespace d9.ktv;
 public class ProcessCloserConfig
 {
+    [JsonPropertyName("when")]
+    public TimeConstraint? TimeConstraint;
     
 }
-public abstract class TimeConstraint
+public class TimeConstraint
 {
-    public abstract bool Matches(DateTime dt);
-}
-public class TimeOfDayConstraint : TimeConstraint
-{
-    public required TimeOnly StartTime { get; set; }
-    public required TimeOnly EndTime { get; set; }
-    public override bool Matches(DateTime dt)
+    public List<DayOfWeek>? DaysOfWeek { get; set; }
+    public TimeOnly? StartTime { get; set; }
+    public TimeOnly? EndTime { get; set; }
+    public bool DayOfWeekMatches(DateTime dt)
+        => DaysOfWeek is null || !DaysOfWeek.Any() || DaysOfWeek.Contains(dt.DayOfWeek);
+    public bool TimeMatches(DateTime dt)
     // if start time is less than end time, treat normally
     // if start time is greater than end time, look at the other half of the day
     // e.g. 11 pm - 12:30 am 
     {
-        TimeOnly currentTime = TimeOnly.FromDateTime(dt);
-        return StartTime < EndTime ? currentTime >= StartTime && currentTime <= EndTime
-                                   : currentTime >= EndTime   || currentTime <= StartTime;
+        TimeOnly currentTime = TimeOnly.FromDateTime(dt),
+                 startTime = StartTime ?? TimeOnly.MinValue,
+                 endTime = EndTime ?? TimeOnly.MaxValue;
+        return startTime < endTime ? currentTime >= startTime && currentTime <= endTime
+                                   : currentTime >= endTime || currentTime <= startTime;
     }
-}
-public class DayOfWeekConstraint : TimeConstraint
-{
-    public required List<DayOfWeek> DaysOfWeek { get; set; }
-    public override bool Matches(DateTime dt)
-        => DaysOfWeek.Contains(dt.DayOfWeek);
-}
-public class EveryNthDayConstraint : TimeConstraint
-{
-    public DateTime? RelativeTo { get; set; }
-    public required int N { get; set; }
-    public override bool Matches(DateTime dt)
-    {
-        DateTime baseline = RelativeTo ?? Program.LaunchTime;
-        int daysSince = (int)(dt - baseline).TotalDays;
-        return daysSince % N == 0;
-    }
+    public bool Matches(DateTime dt)
+        => DayOfWeekMatches(dt) && TimeMatches(dt);
 }
