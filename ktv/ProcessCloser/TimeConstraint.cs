@@ -43,9 +43,9 @@ public class TimeConstraint
     public override string ToString()
         => $"{DaysOfWeek?.Abbreviation()} {(StartTime is not null, EndTime is not null) switch
         {
-            (true, true) => $"{StartTime:g} - {EndTime:g}",
-            (true, false) => $"{StartTime:g}",
-            (false, true) => $"{EndTime:g}",
+            (true, true) => $"{StartTime} - {EndTime}",
+            (true, false) => $"{StartTime}",
+            (false, true) => $"{EndTime}",
             _ => ""
         }}".Trim();
 }

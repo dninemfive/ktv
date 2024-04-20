@@ -16,5 +16,5 @@ public class ActiveWindowLogEntry(DateTime dateTime, string? processName, string
     [JsonInclude]
     public string? FileName { get; private set; } = fileName;
     public override string ToString()
-        => new object?[] { ProcessName, MainWindowTitle, FileName }.MultilineListWithAlignedTitle($"{DateTime:g}");
+        => new object?[] { ProcessName, MainWindowTitle, FileName }.MultilineListWithAlignedTitle($"{DateTime:G}");
 }

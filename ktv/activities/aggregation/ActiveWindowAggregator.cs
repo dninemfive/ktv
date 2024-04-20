@@ -49,16 +49,16 @@ public class ActiveWindowAggregator(ActivityAggregationConfig config) : FixedPer
         => new(dateTime, () => Aggregate(dateTime), this);
     private void Aggregate(DateTime time)
     {
-        IEnumerable<ActiveWindowLogEntry> entries = EntriesBetween(_lastAggregationTime, time);
+        IEnumerable<ActiveWindowLogEntry> entries = EntriesBetween(time - Period, time);
         // todo: set up a syntax to parse the active window process name and window name
         CountingDictionary<Activity, int> dict = new();
         foreach (Activity? a in entries.Select(Config.ActivityFor))
             if (a is not null)
                 dict.Increment(a);
         int maxCt = dict.Select(x => x.Value).Max();
-        Console.WriteLine($"{DateTime.Now:g} most common activities in the last {(time - _lastAggregationTime).Natural()}:");
+        Console.WriteLine($"{DateTime.Now:g} most common activities in the last {(time - entries.Select(x => x.DateTime).Min()).Natural()}:");
         foreach ((Activity key, int value) in (IEnumerable<KeyValuePair<Activity, int>>)dict.OrderByDescending(x => x.Value))
-            Console.WriteLine($"\t{value / (double)dict.Total,-5:P1}\t{key.Name}");
+            Console.WriteLine($"\t{value / (double)dict.Total,-5:P1}\t{key}");
         _lastAggregationTime = time;
     }
     public override string ToString()

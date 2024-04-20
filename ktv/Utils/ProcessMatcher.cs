@@ -15,7 +15,7 @@ public class ProcessMatcher
         public bool Matches(string? fileName)
             => fileName is null
                || ((ParentFolder is null || fileName.IsInFolder(ParentFolder))
-               && fileName.Matches(Regex));
+               && (Regex is null || fileName.Matches(Regex)));
     }
     [JsonPropertyName("fileName")]
     public FileName? FileNameMatcher { get; set; }

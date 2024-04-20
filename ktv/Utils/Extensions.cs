@@ -60,6 +60,7 @@ internal static class Extensions
     }
     public static string RegexReplace(this string pattern, string variableName, string? variableValue, string? regex)
     {
+        Console.WriteLine($"RegexReplace({pattern}, {variableName}, {variableValue.PrintNull()}, {regex.PrintNull()})");
         if (variableValue is null || regex is null)
             return pattern;
         MatchCollection matches = Regex.Matches(variableValue, regex);

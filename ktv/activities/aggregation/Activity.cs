@@ -17,6 +17,8 @@ public class Activity(string name, string category, GoogleUtils.EventColor? colo
         => other is not null && this == other;
     public override int GetHashCode()
         => HashCode.Combine(Name, Category, Color);
+    public override string ToString()
+        => $"[{Category}] {Name}";
     /*
 public Event ToEvent(DateTime startTime, DateTime? endTime)
 => new()
