@@ -24,6 +24,78 @@ public class Program
     public static List<TaskScheduler> Schedulers { get; private set; } = [];
     public static void Main()
     {
+        KtvConfigDef2 exampleConfig = new()
+        {
+            ActivityTracker = new()
+            {
+                LogPeriodMinutes = 0.25f,
+                AggregationConfig = new()
+                {
+                    PeriodMinutes = 15,
+                    GoogleCalendarId = "<hash>.calendar.google.com",
+                    DefaultCategory = new()
+                    {
+                        Name = "Default",
+                        EventColor = GoogleUtils.EventColor.Graphite
+                    },
+                    CategoryDefs = new()
+                    {
+                        { 
+                            "games", 
+                            new()
+                            {
+                                EventColor = GoogleUtils.EventColor.Banana,
+                                ActivityDefs = [
+                                    new()
+                                    {
+                                        Matcher = new()
+                                        {
+                                            FileNameMatcher = new()
+                                            {
+                                                ParentFolder = @"C:\Program Files (x86)\Steam\steamapps\common"
+                                            }
+                                        },
+                                        FileNameRegex = @"C:[\\\/]Program Files \(x86\)[\\\/]Steam[\\\/]steamapps[\\\/]common[\\\/](.+)",
+                                        Pattern = "{fileName:0}"
+                                    }
+                                ]
+                            } 
+                        }
+                    }
+                }
+            },
+            ProcessClosers = [
+                    new()
+                    {
+                        PeriodMinutes = 1,
+                        TimeConstraint = new()
+                        {
+                            DaysOfWeek = [
+                                DayOfWeek.Monday,
+                                DayOfWeek.Tuesday,
+                                DayOfWeek.Wednesday,
+                                DayOfWeek.Thursday,
+                                DayOfWeek.Friday
+                            ],
+                            StartTime = new(0, 30),
+                            EndTime = new(10, 0)
+                        },
+                        CloseProcesses = new()
+                        {
+                            FileNameMatcher = new()
+                            {
+                                ParentFolder = @"C:\Program Files (x86)\Steam\steamapps\common"
+                            }
+                        },
+                        IgnoreProcesses = new()
+                        {
+                            ProcessNameRegex = @".+[Cc]rash.?[Hh]andler.+"
+                        }
+                    }
+                ]
+        };
+        File.WriteAllText("config.json", JsonSerializer.Serialize(exampleConfig, Config.DefaultSerializerOptions));
+        return;
         DateTime now = DateTime.Now;
         if (Config.TryLoad<KtvConfigDef2>(Args.ConfigPath) is not KtvConfigDef2 config)
         {
