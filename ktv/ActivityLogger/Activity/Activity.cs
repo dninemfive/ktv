@@ -1,6 +1,4 @@
-﻿using d9.utl;
-using d9.utl.compat;
-using Google.Apis.Calendar.v3.Data;
+﻿using d9.utl.compat;
 
 namespace d9.ktv;
 public class Activity(string name, string category, GoogleUtils.EventColor? color)
@@ -17,7 +15,6 @@ public class Activity(string name, string category, GoogleUtils.EventColor? colo
         => obj is Activity other && this == other;
     public bool Equals(Activity? other)
         => other is not null && this == other;
-
     public override int GetHashCode()
         => HashCode.Combine(Name, Category, Color);
     /*
