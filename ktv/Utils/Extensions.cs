@@ -6,20 +6,6 @@ namespace d9.ktv;
 public enum TitlePosition { First, Last }
 public static class Extensions
 {
-    public static (string a, string? b)? SplitOn(this string str, string separator, TitlePosition titlePosition)
-    {
-        if (str is null)
-            return null;
-        string[] split = str.Split(separator);
-        return (split.Length, titlePosition) switch
-        {
-            (0, _) => null,
-            (1, _) => (str.Trim(), null),
-            (_, TitlePosition.First) => (split.First().Trim(), str[(split.First().Length + separator.Length)..].Trim()),
-            (_, TitlePosition.Last) => (split.Last().Trim(), str[..^(split.Last().Length + separator.Length)].Trim()),
-            _ => throw new ArgumentOutOfRangeException(nameof(titlePosition))
-        };
-    }
     public static string Time(this DateTime time) => time.ToString(TimeFormats.Time);
     public static string FileNameSafe(this string s, string replaceWith = "")
     {
@@ -33,9 +19,9 @@ public static class Extensions
         => TimeOnly.FromDateTime(dt).DivideBy(divisor);
     public static bool IsInt(this double d)
         => Math.Abs(d - (int)d) < double.Epsilon;
-    private static TimeSpan OneDay = TimeSpan.FromHours(24);
+    private static readonly TimeSpan _oneDay = TimeSpan.FromDays(1);
     public static bool DividesDayEvenly(this TimeSpan divisor)
-        => (OneDay / divisor).IsInt();
+        => (_oneDay / divisor).IsInt();
     public static DateTime NextDayAlignedTime(this DateTime dt, TimeSpan ts)
     {
         if (!DividesDayEvenly(ts))
@@ -58,21 +44,50 @@ public static class Extensions
         return format;
     }
     /// <summary>
-    /// Replaces a key in the given <paramref name="format"/> consisting of 
-    /// <paramref name="keyName"/> with the corresponding match of the given 
-    /// <paramref name="regex"/> on <paramref name="variableValue"/>, if any.
+    /// Replaces every key in the given <paramref name="format"/> consisting of 
+    /// <paramref name="key"/> with the corresponding match(es) of the given 
+    /// <paramref name="regex"/> on <paramref name="value"/>, if any.
     /// </summary>
-    /// <param name="format"></param>
-    /// <param name="keyName"></param>
-    /// <param name="variableValue"></param>
-    /// <param name="regex"></param>
+    /// <param name="format">The format string in which keys will be replaced.</param>
+    /// <param name="key">
+    /// The key to replace. Must be wrapped in curly braces, and may optionally specify a match
+    /// index and group index, which are both <b>zero-indexed</b>.<br/><br/>See the description of 
+    /// <see cref="RegexReplace(string, string, string?, string?)"/> for examples.
+    /// </param>
+    /// <param name="value">
+    /// The string on which the regex will operate in order to produce matches
+    /// and groups to replace the specified <paramref name="key"/> with. If this parameter is
+    /// <see langword="null"/>, the original <paramref name="format"/> string will be returned
+    /// without modification.
+    /// </param>
+    /// <param name="regex">The regex with which to produce matches and groups from the specified
+    /// <paramref name="value"/>. If this parameter is <see langword="null"/>, the original
+    /// <paramref name="format"/> string will be returned without modification.</param>
+    /// <remarks>
+    /// To specify a key to replace, you must include the key wrapped in curly braces with optional
+    /// <b>zero-based</b> match and group indices.<br/><br/>
+    /// <para>
+    /// For example:
+    /// <list type="bullet">
+    /// <item>
+    /// To specify a variable named "example" to be replaced by
+    /// the first match of a regex, you can write <c>{example}</c>, <c>{example:0}</c>, or
+    /// <c>{example:0,0}</c>;
+    /// </item>
+    /// <item>
+    /// To specify a variable named "test" to be replaced by the second group of the second match
+    /// of the regex, you can write <c>{test:1,1}</c>.
+    /// </item>
+    /// </list>
+    /// </para>
+    /// </remarks>
     /// <returns></returns>
-    public static string RegexReplace(this string format, string keyName, string? variableValue, string? regex)
+    public static string RegexReplace(this string format, string key, string? value, string? regex)
     {
-        Console.WriteLine($"RegexReplace({format}, {keyName}, {variableValue.PrintNull()}, {regex.PrintNull()})");
-        if (variableValue is null || regex is null)
+        Console.WriteLine($"RegexReplace({format}, {key}, {value.PrintNull()}, {regex.PrintNull()})");
+        if (value is null || regex is null)
             return format;
-        MatchCollection matches = Regex.Matches(variableValue, regex);
+        MatchCollection matches = Regex.Matches(value, regex);
         Console.WriteLine($"\tmatches: {matches.ListNotation()}");
         for (int match = 0; match < matches.Count; match++)
         {
@@ -81,7 +96,7 @@ public static class Extensions
             {
                 foreach(string indices in ValidReplacementTargetsIndicesFor(match, group))
                 {
-                    format = format.Replace($"{{{keyName}{indices}}}", groups[group].Value);
+                    format = format.Replace($"{{{key}{indices}}}", groups[group].Value);
                 }
             }
         }
