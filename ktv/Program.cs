@@ -24,6 +24,122 @@ public class Program
     public static List<TaskScheduler> Schedulers { get; private set; } = [];
     public static void Main()
     {
+        KtvConfig example = new()
+        {
+            ActivityTracker = new()
+            {
+                LogPeriodMinutes = 0.25f,
+                AggregationConfig = new()
+                {
+                    GoogleCalendar = new()
+                    {
+                        Id = "<id>",
+                        DefaultColor = GoogleUtils.EventColor.Graphite,
+                        ActivityColors = new()
+                        {
+                            { "games", GoogleUtils.EventColor.Banana },
+                            { "social", GoogleUtils.EventColor.Blueberry },
+                            { "productivity", GoogleUtils.EventColor.Sage },
+                            { "media", GoogleUtils.EventColor.Tangerine },
+                            { "programming", GoogleUtils.EventColor.Grape }
+                        }
+                    },
+                    DefaultCategoryName = "default",
+                    CategoryDefs = new()
+                    {
+                        { 
+                            "games",
+                            new()
+                            {
+                                ActivityDefs = [
+                                    new()
+                                    {
+                                        Matcher = new()
+                                        {
+                                            FileNameMatcher = new()
+                                            {
+                                                ParentFolder = @"C:\Program Files (x86)\Steam\steamapps\common"
+                                            }
+                                        },
+                                        FileNameRegex = @"C:\\Program Files \(x86\)\\Steam\\steamapps\\common\\(.+)\\.+",
+                                        Format = "{fileName:0,1}"
+                                    },
+                                    new()
+                                    {
+                                        Matcher = new()
+                                        {
+                                            MainWindowTitleRegex = ".+Minecraft.+"
+                                        },
+                                        MainWindowTitleRegex = @".+(Minecraft \d+\.\d+).+",
+                                        Format = "{mainWindowTitle:0,1}"
+                                    }
+                                ]
+                            }
+                        },
+                        {
+                            "programming",
+                            new()
+                            {
+                                ActivityDefs = [
+                                    new()
+                                    {
+                                        Matcher = new()
+                                        {
+                                            FileNameMatcher = new()
+                                            {
+                                                ParentFolder = @"C:\Program Files\Microsoft Visual Studio"
+                                            }
+                                        },
+                                        Format = "Visual Studio"
+                                    }
+                                ]
+                            }
+                        },
+                        {
+                            "social",
+                            new()
+                            {
+                                ActivityDefs = [
+                                    new()
+                                    {
+                                        Matcher = new()
+                                        {
+                                            ProcessNameRegex = ".+Discord.+"
+                                        },
+                                        Format = "Discord"
+                                    }
+                                ]
+                            }
+                        }
+                    },
+                    PeriodMinutes = 15,
+                }
+            },
+            ProcessClosers = [
+                new()
+                {
+                    TimeConstraint = new()
+                    {
+                        DaysOfWeek = [ DayOfWeek.Monday, DayOfWeek.Tuesday, DayOfWeek.Wednesday, DayOfWeek.Thursday, DayOfWeek.Friday ],
+                        StartTime = new(0, 30),
+                        EndTime = new(10, 0)
+                    },
+                    CloseProcesses = new()
+                    {
+                        FileNameMatcher = new()
+                        {
+                            ParentFolder = @"C:\Program Files (x86)\Steam\steamapps\common"
+                        }
+                    },
+                    IgnoreProcesses = new()
+                    {
+                        ProcessNameRegex = @".+[Cc]rash.?[Hh]andler.+"
+                    },
+                    PeriodMinutes = 1
+                }
+            ]
+        };
+        return;
         DateTime now = DateTime.Now;
         if (Config.TryLoad<KtvConfig>(Args.ConfigPath) is not KtvConfig config)
         {

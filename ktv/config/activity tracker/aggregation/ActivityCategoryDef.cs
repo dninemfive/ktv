@@ -11,4 +11,6 @@ public class ActivityCategoryDef
     /// Should try removing once i put a UI together.
     /// </summary>
     public GoogleUtils.EventColor? EventColor { get; set; }
+    public static implicit operator ActivityCategoryDef(List<ActivityDef> activityDefs)
+        => new() { ActivityDefs = activityDefs };
 }

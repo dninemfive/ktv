@@ -8,7 +8,7 @@ public class ActivityDef
     public string? FileNameRegex { get; set; }
     public string? MainWindowTitleRegex { get; set; }
     public string? ProcessNameRegex { get; set; }
-    public required string Pattern { get; set; }
+    public required string Format { get; set; }
     public string? Name(ActiveWindowLogEntry? awle)
     {
         if (!Matcher.Matches(awle))
@@ -18,6 +18,6 @@ public class ActivityDef
             ("mainWindowTitle", awle.MainWindowTitle, MainWindowTitleRegex),
             ("processName", awle.ProcessName, ProcessNameRegex)
         ];
-        return Pattern.RegexReplace(sourceVariables, "(.+)");
+        return Format.RegexReplace(sourceVariables, "(.+)");
     }
 }
