@@ -58,26 +58,42 @@ public static class Extensions
         return pattern;
     }
     /// <summary>
-    /// Replaces a key in the given <paramref name="pattern"/> consisting of 
-    /// <paramref name="variableName"/> with the corresponding match of the given 
+    /// Replaces a key in the given <paramref name="format"/> consisting of 
+    /// <paramref name="keyName"/> with the corresponding match of the given 
     /// <paramref name="regex"/> on <paramref name="variableValue"/>, if any.
     /// </summary>
-    /// <param name="pattern"></param>
-    /// <param name="variableName"></param>
+    /// <param name="format"></param>
+    /// <param name="keyName"></param>
     /// <param name="variableValue"></param>
     /// <param name="regex"></param>
     /// <returns></returns>
-    public static string RegexReplace(this string pattern, string variableName, string? variableValue, string? regex)
+    public static string RegexReplace(this string format, string keyName, string? variableValue, string? regex)
     {
-        Console.WriteLine($"RegexReplace({pattern}, {variableName}, {variableValue.PrintNull()}, {regex.PrintNull()})");
+        Console.WriteLine($"RegexReplace({format}, {keyName}, {variableValue.PrintNull()}, {regex.PrintNull()})");
         if (variableValue is null || regex is null)
-            return pattern;
+            return format;
         MatchCollection matches = Regex.Matches(variableValue, regex);
         Console.WriteLine($"\tmatches: {matches.ListNotation()}");
         for (int i = 0; i < matches.Count; i++)
-            pattern = pattern.Replace($"{{{variableName}:{i}}}", matches[i].Value);
-        Console.WriteLine($"\tresult: {pattern}");
-        return pattern;
+        {
+            Match match = matches[i];
+            Console.WriteLine($"\tMatch {i}:");
+            Console.WriteLine($"\t\t{match.Groups.Keys.Zip(match.Groups.Values).Select(x => $"{x.First}: {x.Second}").ListNotation()}");
+        }
+        Console.WriteLine($"\tresult: {format}");
+        return format;
+    }
+    public static string MatchReplace(this string format, string variableName, MatchCollection matches, int? match = null, int? group = null)
+    {
+        string value = matches[match ?? 0].Groups[group ?? 0].Value;
+        string target = $"{{{variableName}{(match, group) switch
+        {
+            (null, null) => "",
+            (not null, null) => $":{match}",
+            (not null, not null) => $":{match},{group}",
+            _ => throw new ArgumentException("`match` must be non-null if `group` is non-null!", nameof(match))
+        }}}}";
+        return format.Replace(target, value);
     }
     public static IEnumerable<T> Cycle<T>(this T initialValue)
         where T : struct, Enum
