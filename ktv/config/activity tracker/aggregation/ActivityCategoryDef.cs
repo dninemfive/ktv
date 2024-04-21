@@ -4,14 +4,11 @@ using System.Text.Json.Serialization;
 namespace d9.ktv;
 public class ActivityCategoryDef
 {
-    public GoogleUtils.EventColor? EventColor { get; set; }
     [JsonPropertyName("activities")]
     public required List<ActivityDef> ActivityDefs { get; set; }
-    public Activity? CreateActivityFrom(ActiveWindowLogEntry awle, string categoryName)
-    {
-        foreach (ActivityDef activityDef in ActivityDefs)
-            if (activityDef.Name(awle) is string name)
-                return new(name, categoryName, EventColor);
-        return null;
-    }
+    /// <summary>
+    /// Retained to simplify JSON configuration at the expense of more complicated code around getting colors.
+    /// Should try removing once i put a UI together.
+    /// </summary>
+    public GoogleUtils.EventColor? EventColor { get; set; }
 }
