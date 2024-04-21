@@ -1,11 +1,10 @@
 ﻿using d9.utl;
-using System.Numerics;
 using System.Text.RegularExpressions;
 
 namespace d9.ktv;
 
 public enum TitlePosition { First, Last }
-internal static class Extensions
+public static class Extensions
 {
     public static (string a, string? b)? SplitOn(this string str, string separator, TitlePosition titlePosition)
     {
@@ -58,14 +57,26 @@ internal static class Extensions
             pattern = pattern.RegexReplace(name, value, regex ?? defaultRegex);
         return pattern;
     }
+    /// <summary>
+    /// Replaces a key in the given <paramref name="pattern"/> consisting of 
+    /// <paramref name="variableName"/> with the corresponding match of the given 
+    /// <paramref name="regex"/> on <paramref name="variableValue"/>, if any.
+    /// </summary>
+    /// <param name="pattern"></param>
+    /// <param name="variableName"></param>
+    /// <param name="variableValue"></param>
+    /// <param name="regex"></param>
+    /// <returns></returns>
     public static string RegexReplace(this string pattern, string variableName, string? variableValue, string? regex)
     {
         Console.WriteLine($"RegexReplace({pattern}, {variableName}, {variableValue.PrintNull()}, {regex.PrintNull()})");
         if (variableValue is null || regex is null)
             return pattern;
         MatchCollection matches = Regex.Matches(variableValue, regex);
+        Console.WriteLine($"\tmatches: {matches.ListNotation()}");
         for (int i = 0; i < matches.Count; i++)
             pattern = pattern.Replace($"{{{variableName}:{i}}}", matches[i].Value);
+        Console.WriteLine($"\tresult: {pattern}");
         return pattern;
     }
     public static IEnumerable<T> Cycle<T>(this T initialValue)
