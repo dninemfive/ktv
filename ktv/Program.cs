@@ -24,7 +24,39 @@ public class Program
     public static List<TaskScheduler> Schedulers { get; private set; } = [];
     public static void Main()
     {
-        KtvConfig example = new()
+        DateTime now = DateTime.Now;
+        if (Config.TryLoad<KtvConfig>(Args.ConfigPath) is not KtvConfig config)
+        {
+            Console.WriteLine($"Could not find valid config at expected path {Path.GetFullPath(Args.ConfigPath)}!");
+            return;
+        }
+        Schedulers = LoadSchedulers(config).ToList();
+        Console.WriteLine(Schedulers.MultilineListWithAlignedTitle("schedulers:"));
+        foreach(TaskScheduler scheduler in  Schedulers)
+            ScheduledTasks.Add(scheduler.NextTask(now));
+        try
+        {
+            while(true)
+            {
+                // Console.WriteLine(ScheduledTasks.OrderBy(x => x.ScheduledTime).MultilineListWithAlignedTitle("scheduled tasks:"));
+                SleepUntilNext(ScheduledTasks);
+                now = DateTime.Now;
+                foreach (ScheduledTask task in ScheduledTasks.Where(x => x.ScheduledTime < now).ToList())
+                {
+                    task.Execute();
+                    ScheduledTasks.Add(task.Scheduler.NextTask(task.ScheduledTime));
+                    ScheduledTasks.Remove(task);
+                }
+            }
+        }
+        finally
+        {
+            // todo: some sort of TryExecuteEarly on ScheduledTask
+        }
+    }
+    public static void WriteConfig()
+    {
+        KtvConfig config = new()
         {
             ActivityTracker = new()
             {
@@ -47,7 +79,7 @@ public class Program
                     DefaultCategoryName = "default",
                     CategoryDefs = new()
                     {
-                        { 
+                        {
                             "games",
                             new()
                             {
@@ -139,36 +171,7 @@ public class Program
                 }
             ]
         };
-        return;
-        DateTime now = DateTime.Now;
-        if (Config.TryLoad<KtvConfig>(Args.ConfigPath) is not KtvConfig config)
-        {
-            Console.WriteLine($"Could not find valid config at expected path {Path.GetFullPath(Args.ConfigPath)}!");
-            return;
-        }
-        Schedulers = LoadSchedulers(config).ToList();
-        Console.WriteLine(Schedulers.MultilineListWithAlignedTitle("schedulers:"));
-        foreach(TaskScheduler scheduler in  Schedulers)
-            ScheduledTasks.Add(scheduler.NextTask(now));
-        try
-        {
-            while(true)
-            {
-                // Console.WriteLine(ScheduledTasks.OrderBy(x => x.ScheduledTime).MultilineListWithAlignedTitle("scheduled tasks:"));
-                SleepUntilNext(ScheduledTasks);
-                now = DateTime.Now;
-                foreach (ScheduledTask task in ScheduledTasks.Where(x => x.ScheduledTime < now).ToList())
-                {
-                    task.Execute();
-                    ScheduledTasks.Add(task.Scheduler.NextTask(task.ScheduledTime));
-                    ScheduledTasks.Remove(task);
-                }
-            }
-        }
-        finally
-        {
-            // todo: some sort of TryExecuteEarly on ScheduledTask
-        }
+        File.WriteAllText("config.json", JsonSerializer.Serialize(config, Config.DefaultSerializerOptions));
     }
     public static IEnumerable<TaskScheduler> LoadSchedulers(KtvConfig config)
     {
