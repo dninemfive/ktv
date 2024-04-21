@@ -51,11 +51,11 @@ public static class Extensions
     }
     public static bool Matches(this string? s, string? regex)
         => s is not null && regex is not null && Regex.IsMatch(s, regex);
-    public static string RegexReplace(this string pattern, IEnumerable<(string variableName, string? variableValue, string? regex)> variables, string? defaultRegex = null)
+    public static string RegexReplace(this string format, IEnumerable<(string key, string? value, string? regex)> variables, string? defaultRegex = null)
     {
-        foreach ((string name, string? value, string? regex) in variables)
-            pattern = pattern.RegexReplace(name, value, regex ?? defaultRegex);
-        return pattern;
+        foreach ((string key, string? value, string? regex) in variables)
+            format = format.RegexReplace(key, value, regex ?? defaultRegex);
+        return format;
     }
     /// <summary>
     /// Replaces a key in the given <paramref name="format"/> consisting of 
