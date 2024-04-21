@@ -1,14 +1,13 @@
 ﻿using d9.utl.compat;
 
 namespace d9.ktv;
-public class Activity(string name, string category, GoogleUtils.EventColor? color)
+public class Activity(string name, string category)
     : IEquatable<Activity>
 {
     public string Name { get; private set; } = name;
     public string Category { get; private set; } = category;
-    public GoogleUtils.EventColor? Color { get; private set; } = color;
     public static bool operator ==(Activity a, Activity b)
-        => a.Name == b.Name && a.Category == b.Category && a.Color == b.Color;
+        => a.Name == b.Name && a.Category == b.Category;
     public static bool operator !=(Activity a, Activity b)
         => !(a == b);
     public override bool Equals(object? obj)
@@ -16,7 +15,7 @@ public class Activity(string name, string category, GoogleUtils.EventColor? colo
     public bool Equals(Activity? other)
         => other is not null && this == other;
     public override int GetHashCode()
-        => HashCode.Combine(Name, Category, Color);
+        => HashCode.Combine(Name, Category);
     public override string ToString()
         => $"[{Category}] {Name}";
     /*

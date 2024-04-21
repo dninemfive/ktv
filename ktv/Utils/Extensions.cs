@@ -1,4 +1,5 @@
 ﻿using d9.utl;
+using d9.utl.compat;
 using System.Text.RegularExpressions;
 
 namespace d9.ktv;
@@ -119,4 +120,6 @@ public static class Extensions
         => dow.ToString()[0..2];
     public static string Abbreviation(this IEnumerable<DayOfWeek> dows)
         => dows.Distinct().Order().Select(Abbreviation).Aggregate((x, y) => $"{x}{y}");
+    public static string ToColorId(this GoogleUtils.EventColor color)
+        => ((int)color).ToString();
 }
