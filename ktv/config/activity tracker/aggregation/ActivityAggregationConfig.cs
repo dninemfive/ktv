@@ -21,7 +21,7 @@ public class ActivityAggregationConfig
         foreach ((string categoryName, ActivityCategoryDef category) in CategoryDefs.OrderBy(x => x.Key))
             foreach (ActivityDef activity in category.ActivityDefs)
                 if (activity.Name(awle) is string name)
-                    return new(name, categoryName, category.EventColor ?? GoogleCalendar?.GetColorFor(categoryName));
-        return new((awle.ProcessName ?? awle.MainWindowTitle ?? awle.FileName).PrintNull(), DefaultCategoryName, GoogleCalendar?.DefaultColor);
+                    return new(name, categoryName);
+        return new((awle.ProcessName ?? awle.MainWindowTitle ?? awle.FileName).PrintNull(), DefaultCategoryName);
     }
 }

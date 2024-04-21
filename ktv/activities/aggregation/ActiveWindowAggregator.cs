@@ -10,6 +10,7 @@ namespace d9.ktv.ActivityLogger;
 public class ActiveWindowAggregator(ActivityAggregationConfig config) : FixedPeriodTaskScheduler(TimeSpan.FromMinutes(config.PeriodMinutes))
 {
     public ActivityAggregationConfig Config { get; private set; } = config;
+    public GoogleCalendarEventManager? CalendarEventManager { get; private set; } = GoogleCalendarEventManager.From(config);
     private DateTime _lastAggregationTime = DateTime.Now;
     /// <summary>
     ///     Gets the <see cref="ActiveWindowLogEntry">ActiveWindowLogEntries</see> during the
@@ -50,15 +51,23 @@ public class ActiveWindowAggregator(ActivityAggregationConfig config) : FixedPer
     private void Aggregate(DateTime time)
     {
         IEnumerable<ActiveWindowLogEntry> entries = EntriesBetween(time - Period, time);
+        if(!entries.Any())
+        {
+            Console.WriteLine($"Cannot aggregate 0 entries!");
+            return;
+        }
+        DateTime minEntryTime = entries.Select(x => x.DateTime).Min();
         // todo: set up a syntax to parse the active window process name and window name
         CountingDictionary<Activity, int> dict = new();
         foreach (Activity? a in entries.Select(Config.ActivityFor))
             if (a is not null)
                 dict.Increment(a);
+        Dictionary<Activity, float> percentages = dict.Select(x => new KeyValuePair<Activity, float>(x.Key, x.Value / (float)dict.Total)).ToDictionary();
+        CalendarEventManager?.PostFromSummary(new(percentages, time - Period, time));
         int maxCt = dict.Select(x => x.Value).Max();
         Console.WriteLine($"{DateTime.Now:g} most common activities in the last {(time - entries.Select(x => x.DateTime).Min()).Natural()}:");
-        foreach ((Activity key, int value) in (IEnumerable<KeyValuePair<Activity, int>>)dict.OrderByDescending(x => x.Value))
-            Console.WriteLine($"\t{value / (double)dict.Total,-5:P1}\t{key}");
+        foreach ((Activity key, float percentage) in percentages.OrderByDescending(x => x.Value))
+            Console.WriteLine($"\t{percentage,-5:P1}\t{key}");
         _lastAggregationTime = time;
     }
     public override string ToString()

@@ -1,4 +1,7 @@
-﻿using d9.utl.compat;
+﻿using d9.utl;
+using d9.utl.compat;
+using Google.Apis.Calendar.v3.Data;
+using System.Diagnostics;
 
 namespace d9.ktv;
 public class Activity(string name, string category)
@@ -18,14 +21,13 @@ public class Activity(string name, string category)
         => HashCode.Combine(Name, Category);
     public override string ToString()
         => $"[{Category}] {Name}";
-    /*
-public Event ToEvent(DateTime startTime, DateTime? endTime)
-=> new()
-{
-  Summary = Name,
-  Start = startTime.Round().ToEventDateTime(),
-  EndTimeUnspecified = endTime is null,
-  End = endTime?.Round().ToEventDateTime(),
-  ColorId = ((int)Category.EventColor).ToString()
-};*/
+    public Event ToEvent(DateTime start, DateTime end, GoogleUtils.EventColor color)
+        => new()
+        {
+            Summary = Name,
+            Description = $"{Category} (posted by ktv 2.0)",
+            Start = start.Floor().ToEventDateTime(),
+            End = end.Floor().ToEventDateTime(),
+            ColorId = color.ToColorId()
+        };
 }

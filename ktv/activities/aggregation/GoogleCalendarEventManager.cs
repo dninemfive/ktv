@@ -1,17 +1,12 @@
-﻿using d9.utl;
-using d9.utl.compat;
+﻿using d9.utl.compat;
 using Google.Apis.Calendar.v3.Data;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace d9.ktv;
 public class GoogleCalendarEventManager
 {
     public ActivityAggregationConfig Config { get; private set; }
-    private static readonly Dictionary<Activity, GoogleCalendarEventInfo> _activitiesInProgress = new();
+    private readonly Dictionary<Activity, DateTime> _startTimes = new();
+    private readonly Dictionary<Activity, string?> _eventIds = new();
     private GoogleCalendarEventManager(ActivityAggregationConfig cfg)
         => Config = cfg;
     public static GoogleCalendarEventManager? From(ActivityAggregationConfig config)
@@ -20,46 +15,42 @@ public class GoogleCalendarEventManager
             return null;
         return new(config);
     }
-    public IEnumerable<Event> EventsFrom(ActivitySummary summary, float threshold = 0.3f)
+    public void PostFromSummary(ActivitySummary summary, float threshold = 0.3f)
     {
         foreach (Activity activity in summary)
         {
-            float pct = summary[activity];
-            if (pct < threshold)
+            if (!_startTimes.TryGetValue(activity, out DateTime start))
             {
-                // the activity has ended, post a final time and remove it from _activitiesInProgress
+                start = summary.Start;
+                _startTimes[activity] = start;
+            }
+            if (summary[activity] < threshold)
+            {
+                Remove(activity);
                 continue;
             }
-            _activitiesInProgress.TryGetValue(activity, out GoogleCalendarEventInfo? info);
-            info ??= new(summary.Start, summary.End);
-            info.EndTime = summary.End;
-            _activitiesInProgress[activity] = info;
+            _eventIds[activity] = TryPostEvent(activity, start, summary.End);
         }
     }
-    public void PostEvent(Activity activity, GoogleCalendarEventInfo info)
+    private void Remove(Activity activity)
     {
-        Event @event = new ()
-        {
-            Summary = activity.Name,
-            Description = activity.Category,
-            Start = info.StartTime.Floor().ToEventDateTime(),
-            End = info.EndTime.Floor().ToEventDateTime(),
-            ColorId = Config.GoogleCalendar!.GetColorFor(activity.Category).ToColorId()
-        };
+        _startTimes.Remove(activity);
+        _eventIds.Remove(activity);
+    }
+    public string? TryPostEvent(Activity activity, DateTime start, DateTime end)
+    {
+        _eventIds.TryGetValue(activity, out string? existingId);
+        Event @event = activity.ToEvent(start, end, Config.GoogleCalendar!.ColorFor(activity.Category));
+        string calendarId = Config.GoogleCalendar!.Id;
         try
         {
-            if (info.Id is not null)
-            {
-                GoogleUtils.UpdateEvent(Config.GoogleCalendar!.Id, info.Id, @event);
-            }
-            else
-            {
-                info.Id = GoogleUtils.AddEventTo(Config.GoogleCalendar!.Id, @event).Id;
-            }
+            return existingId is null ? GoogleUtils.AddEventTo(calendarId, @event).Id
+                                      : GoogleUtils.UpdateEvent(calendarId, existingId, @event).Id;
         } 
         catch(Exception e)
         {
             Console.Error.WriteLine($"{e.GetType().Name}: {e.Message}");
         }
+        return null;
     }
 }

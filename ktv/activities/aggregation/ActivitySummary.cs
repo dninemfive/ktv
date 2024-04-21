@@ -6,10 +6,10 @@ using System.Text;
 using System.Threading.Tasks;
 
 namespace d9.ktv;
-public class ActivitySummary(IEnumerable<(Activity activity, float percentage)> activities, DateTime start, DateTime end)
+public class ActivitySummary(IReadOnlyDictionary<Activity, float> activities, DateTime start, DateTime end)
     : IEnumerable<Activity>
 {
-    public IReadOnlyDictionary<Activity, float> Activities { get; private set; } = activities.ToDictionary();
+    public IReadOnlyDictionary<Activity, float> Activities { get; private set; } = activities;
     public DateTime Start { get; private set; } = start;
     public DateTime End { get; private set; } = end;
     public float this[Activity activity] => Activities[activity];
