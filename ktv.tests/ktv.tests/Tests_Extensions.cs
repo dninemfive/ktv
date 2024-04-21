@@ -23,6 +23,13 @@ public class Tests_Extensions
     [TestMethod]
     public void Test_RegexReplace_OneMatch()
     {
-        Assert.AreEqual("asdfty", "asdf{test:1}".RegexReplace("test", "qwerty", "qwer(.+)"));
+        Assert.AreEqual("asdfqwerty", "asdf{test}".RegexReplace("test", "qwerty", "qwer(.+)"));
+        Assert.AreEqual("asdfqwerty", "asdf{test:0}".RegexReplace("test", "qwerty", "qwer(.+)"));
+        Assert.AreEqual("asdfqwerty", "asdf{test:0,0}".RegexReplace("test", "qwerty", "qwer(.+)"));
+    }
+    [TestMethod]
+    public void Test_RegexReplace_OneMatchOneGroup()
+    {
+        Assert.AreEqual("asdfty", "asdf{test:0,1}".RegexReplace("test", "qwerty", "qwer(.+)"));
     }
 }

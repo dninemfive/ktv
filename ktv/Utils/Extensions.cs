@@ -74,27 +74,29 @@ public static class Extensions
             return format;
         MatchCollection matches = Regex.Matches(variableValue, regex);
         Console.WriteLine($"\tmatches: {matches.ListNotation()}");
-        for (int i = 0; i < matches.Count; i++)
+        for (int match = 0; match < matches.Count; match++)
         {
-            Match match = matches[i];
-            Console.WriteLine($"\tMatch {i}:");
-            Console.WriteLine($"\t\t{match.Groups.Keys.Zip(match.Groups.Values).Select(x => $"{x.First}: {x.Second}").ListNotation()}");
+            GroupCollection groups = matches[match].Groups;
+            for(int group = 0; group < groups.Count; group++)
+            {
+                foreach(string indices in ValidReplacementTargetsIndicesFor(match, group))
+                {
+                    format = format.Replace($"{{{keyName}{indices}}}", groups[group].Value);
+                }
+            }
         }
         Console.WriteLine($"\tresult: {format}");
         return format;
     }
-    public static string MatchReplace(this string format, string variableName, MatchCollection matches, int? match = null, int? group = null)
-    {
-        string value = matches[match ?? 0].Groups[group ?? 0].Value;
-        string target = $"{{{variableName}{(match, group) switch
+    private static List<string> ValidReplacementTargetsIndicesFor(int match, int group)
+        => (match, group) switch
         {
-            (null, null) => "",
-            (not null, null) => $":{match}",
-            (not null, not null) => $":{match},{group}",
-            _ => throw new ArgumentException("`match` must be non-null if `group` is non-null!", nameof(match))
-        }}}}";
-        return format.Replace(target, value);
-    }
+            ( < 0, _) => throw new IndexOutOfRangeException(nameof(match)),
+            (_, < 0) => throw new IndexOutOfRangeException(nameof(group)),
+            (0, 0) => ["", ":0", ":0,0"],
+            (_, 0) => [$":{match}", $":{match},0"],
+            _ => [$":{match},{group}"]
+        };
     public static IEnumerable<T> Cycle<T>(this T initialValue)
         where T : struct, Enum
     {
