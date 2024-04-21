@@ -1,7 +1,7 @@
 ﻿using System.Text.Json.Serialization;
 
 namespace d9.ktv;
-public class KtvConfigDef2
+public class KtvConfig
 {
     [JsonPropertyName("logActivities")]
     public ActivityTrackerConfig? ActivityTracker { get; set; }

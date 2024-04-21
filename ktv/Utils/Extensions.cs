@@ -84,23 +84,16 @@ public static class Extensions
     /// <returns></returns>
     public static string RegexReplace(this string format, string key, string? value, string? regex)
     {
-        Console.WriteLine($"RegexReplace({format}, {key}, {value.PrintNull()}, {regex.PrintNull()})");
         if (value is null || regex is null)
             return format;
         MatchCollection matches = Regex.Matches(value, regex);
-        Console.WriteLine($"\tmatches: {matches.ListNotation()}");
         for (int match = 0; match < matches.Count; match++)
         {
             GroupCollection groups = matches[match].Groups;
             for(int group = 0; group < groups.Count; group++)
-            {
-                foreach(string indices in ValidReplacementTargetsIndicesFor(match, group))
-                {
+                foreach (string indices in ValidReplacementTargetsIndicesFor(match, group))
                     format = format.Replace($"{{{key}{indices}}}", groups[group].Value);
-                }
-            }
         }
-        Console.WriteLine($"\tresult: {format}");
         return format;
     }
     private static List<string> ValidReplacementTargetsIndicesFor(int match, int group)

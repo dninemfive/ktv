@@ -23,6 +23,4 @@ public class ActivityAggregationConfig
         }
         return new((awle.ProcessName ?? awle.MainWindowTitle ?? awle.FileName).PrintNull(), DefaultCategory.Name, DefaultCategory.EventColor);
     }
-    public override string ToString()
-        => JsonSerializer.Serialize(this, Config.DefaultSerializerOptions);
 }

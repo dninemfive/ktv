@@ -25,7 +25,7 @@ public class Program
     public static void Main()
     {
         DateTime now = DateTime.Now;
-        if (Config.TryLoad<KtvConfigDef2>(Args.ConfigPath) is not KtvConfigDef2 config)
+        if (Config.TryLoad<KtvConfig>(Args.ConfigPath) is not KtvConfig config)
         {
             Console.WriteLine($"Could not find valid config at expected path {Path.GetFullPath(Args.ConfigPath)}!");
             return;
@@ -38,7 +38,7 @@ public class Program
         {
             while(true)
             {
-                Console.WriteLine(ScheduledTasks.OrderBy(x => x.ScheduledTime).MultilineListWithAlignedTitle("scheduled tasks:"));
+                // Console.WriteLine(ScheduledTasks.OrderBy(x => x.ScheduledTime).MultilineListWithAlignedTitle("scheduled tasks:"));
                 SleepUntilNext(ScheduledTasks);
                 now = DateTime.Now;
                 foreach (ScheduledTask task in ScheduledTasks.Where(x => x.ScheduledTime < now).ToList())
@@ -54,7 +54,7 @@ public class Program
             // todo: some sort of TryExecuteEarly on ScheduledTask
         }
     }
-    public static IEnumerable<TaskScheduler> LoadSchedulers(KtvConfigDef2 config)
+    public static IEnumerable<TaskScheduler> LoadSchedulers(KtvConfig config)
     {
         if(config.ActivityTracker is ActivityTrackerConfig atc)
         {
