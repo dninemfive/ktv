@@ -88,23 +88,18 @@ public class Program
                                 ActivityDefs = [
                                     new()
                                     {
-                                        Matcher = new()
+                                        Patterns = new()
                                         {
-                                            FileNameMatcher = new()
-                                            {
-                                                ParentFolder = @"C:\Program Files (x86)\Steam\steamapps\common"
-                                            }
+                                            { ProcessPropertyTarget.FileName, @"C:\\Program Files \(x86\)\\Steam\\steamapps\\common\\(.+)\\.+" }
                                         },
-                                        FileNameRegex = @"C:\\Program Files \(x86\)\\Steam\\steamapps\\common\\(.+)\\.+",
                                         Format = "{fileName:0,1}"
                                     },
                                     new()
                                     {
-                                        Matcher = new()
+                                        Patterns = new()
                                         {
-                                            MainWindowTitleRegex = @"Minecraft \d+\.\d+"
+                                            { ProcessPropertyTarget.MainWindowTitle, @"Minecraft \d+\.\d+" }
                                         },
-                                        MainWindowTitleRegex = @"(Minecraft \d+\.\d+)",
                                         Format = "{mainWindowTitle:0,1}"
                                     }
                                 ]
@@ -118,14 +113,7 @@ public class Program
                                 ActivityDefs = [
                                     new()
                                     {
-                                        Matcher = new()
-                                        {
-                                            FileNameMatcher = new()
-                                            {
-                                                ParentFolder = @"C:\Program Files\Microsoft Visual Studio"
-                                            }
-                                        },
-                                        Format = "Visual Studio"
+                                        Format = "Microsoft Visual Studio"
                                     }
                                 ]
                             }
@@ -138,10 +126,6 @@ public class Program
                                 ActivityDefs = [
                                     new()
                                     {
-                                        Matcher = new()
-                                        {
-                                            ProcessName = "Discord"
-                                        },
                                         Format = "Discord"
                                     }
                                 ]
@@ -155,12 +139,10 @@ public class Program
                                 ActivityDefs = [
                                     new()
                                     {
-                                        Matcher = new()
+                                        Patterns = new()
                                         {
-                                            Mode = ProcessMatcherMode.ProcessNameMatches,
-                                            Value = "(foobar2000|firefox)"
+                                            { ProcessPropertyTarget.ProcessName, "(foobar2000|firefox)" }
                                         },
-                                        ProcessNameRegex = "(foobar2000|firefox)",
                                         Format = "{processName:0,1}"
                                     }
                                 ]
@@ -181,14 +163,13 @@ public class Program
                     },
                     CloseProcesses = new()
                     {
-                        FileNameMatcher = new()
-                        {
-                            ParentFolder = @"C:\Program Files (x86)\Steam\steamapps\common"
-                        }
+                        Mode = ProcessMatcherMode.InFolder,
+                        Value = @"C:\Program Files (x86)\Steam\steamapps\common"
                     },
                     IgnoreProcesses = new()
                     {
-                        ProcessName = @".+[Cc]rash.?[Hh]andler.+"
+                        Mode = ProcessMatcherMode.ProcessNameMatches,
+                        Value = @".+[Cc]rash.?[Hh]andler.+"
                     },
                     PeriodMinutes = 1
                 }
