@@ -4,3 +4,4 @@ obj/
 *.ktv.log
 *.secret
 Properties/
+*/calendar config.json

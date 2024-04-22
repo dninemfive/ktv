@@ -98,7 +98,7 @@ public class Program
                                     {
                                         Patterns = new()
                                         {
-                                            { ProcessPropertyTarget.MainWindowTitle, @"Minecraft \d+\.\d+" }
+                                            { ProcessPropertyTarget.MainWindowTitle, @"Minecraft\*? \d+\.\d+" }
                                         },
                                         Format = "{mainWindowTitle:0,1}"
                                     }
@@ -150,6 +150,13 @@ public class Program
                         }
                     },
                     PeriodMinutes = 15,
+                    Ignore = [
+                        new()
+                        {
+                            Mode = ProcessMatcherMode.ProcessNameMatches,
+                            Value = "Idle"
+                        }
+                    ]
                 }
             },
             ProcessClosers = [
