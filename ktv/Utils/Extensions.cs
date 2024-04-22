@@ -144,4 +144,13 @@ public static class Extensions
                 yield return day;
         }
     }
+#pragma warning disable IDE1006 // Naming Styles: i think it's funny to have the first character be lowercase here
+    public static string toCamelCase(this string s)
+#pragma warning restore IDE1006
+        => s.Length switch
+        {
+            0 => s,
+            1 => s.ToLower(),
+            _ => $"{s[0].ToLower()}{s[1..]}"
+        };
 }

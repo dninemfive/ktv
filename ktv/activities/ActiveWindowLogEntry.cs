@@ -17,4 +17,19 @@ public class ActiveWindowLogEntry(DateTime dateTime, string? processName, string
     public string? FileName { get; private set; } = fileName;
     public override string ToString()
         => new object?[] { ProcessName, MainWindowTitle, FileName }.MultilineListWithAlignedTitle($"{DateTime:G}");
+    public string? this[ProcessPropertyTarget ppt]
+        => ppt switch
+        {
+            ProcessPropertyTarget.FileName => FileName,
+            ProcessPropertyTarget.MainWindowTitle => MainWindowTitle,
+            ProcessPropertyTarget.ProcessName => ProcessName,
+            _ => throw new ArgumentOutOfRangeException($"{ppt} is not a valid ProcessPropertyTarget value!", nameof(ppt))
+        };
+    public bool AnyPropertyContains(string s)
+    {
+        foreach (ProcessPropertyTarget ppt in Enum.GetValues<ProcessPropertyTarget>())
+            if (this[ppt] is string property && property.Contains(s))
+                return true;
+        return false;
+    }
 }
