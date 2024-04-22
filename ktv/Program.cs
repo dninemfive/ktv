@@ -2,6 +2,7 @@
 using d9.utl;
 using d9.utl.compat;
 using System.Text.Json;
+using System.Text.RegularExpressions;
 
 namespace d9.ktv;
 
@@ -71,7 +72,7 @@ public class Program
                         {
                             { "games", GoogleUtils.EventColor.Banana },
                             { "social", GoogleUtils.EventColor.Blueberry },
-                            { "productivity", GoogleUtils.EventColor.Sage },
+                            { "productivity", GoogleUtils.EventColor.Basil },
                             { "media", GoogleUtils.EventColor.Tangerine },
                             { "programming", GoogleUtils.EventColor.Grape }
                         }
@@ -83,6 +84,7 @@ public class Program
                             "games",
                             new()
                             {
+                                EventColor = GoogleUtils.EventColor.Banana,
                                 ActivityDefs = [
                                     new()
                                     {
@@ -100,9 +102,9 @@ public class Program
                                     {
                                         Matcher = new()
                                         {
-                                            MainWindowTitleRegex = ".+Minecraft.+"
+                                            MainWindowTitleRegex = @"Minecraft \d+\.\d+"
                                         },
-                                        MainWindowTitleRegex = @".+(Minecraft \d+\.\d+).+",
+                                        MainWindowTitleRegex = @"(Minecraft \d+\.\d+)",
                                         Format = "{mainWindowTitle:0,1}"
                                     }
                                 ]
@@ -112,6 +114,7 @@ public class Program
                             "programming",
                             new()
                             {
+                                EventColor = GoogleUtils.EventColor.Grape,
                                 ActivityDefs = [
                                     new()
                                     {
@@ -131,14 +134,33 @@ public class Program
                             "social",
                             new()
                             {
+                                EventColor = GoogleUtils.EventColor.Blueberry,
                                 ActivityDefs = [
                                     new()
                                     {
                                         Matcher = new()
                                         {
-                                            ProcessNameRegex = ".+Discord.+"
+                                            ProcessName = "Discord"
                                         },
                                         Format = "Discord"
+                                    }
+                                ]
+                            }
+                        },
+                        {
+                            "media",
+                            new()
+                            {
+                                EventColor = GoogleUtils.EventColor.Tangerine,
+                                ActivityDefs = [
+                                    new()
+                                    {
+                                        Matcher = new()
+                                        {
+                                            ProcessName = "(foobar2000|firefox)"
+                                        },
+                                        ProcessNameRegex = "(foobar2000|firefox)",
+                                        Format = "{processName:0,1}"
                                     }
                                 ]
                             }
@@ -165,7 +187,7 @@ public class Program
                     },
                     IgnoreProcesses = new()
                     {
-                        ProcessNameRegex = @".+[Cc]rash.?[Hh]andler.+"
+                        ProcessName = @".+[Cc]rash.?[Hh]andler.+"
                     },
                     PeriodMinutes = 1
                 }

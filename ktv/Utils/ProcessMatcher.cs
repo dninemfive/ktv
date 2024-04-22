@@ -22,11 +22,11 @@ public class ProcessMatcher
     [JsonPropertyName("mainWindowTitle")]
     public string? MainWindowTitleRegex { get; set; }
     [JsonPropertyName("processName")]
-    public string? ProcessNameRegex { get; set; }
+    public string? ProcessName { get; set; }
     public bool Matches(string? fileName, string? mainWindowTitle, string? processName)
         => (FileNameMatcher?.Matches(fileName) ?? true)
            && (MainWindowTitleRegex is null || mainWindowTitle.Matches(MainWindowTitleRegex))
-           && (ProcessNameRegex is null || processName.Matches(ProcessNameRegex));
+           && (ProcessName is null || processName.Matches(ProcessName));
     public bool Matches([NotNullWhen(true)] Process? p)
         => p is not null && Matches(p.FileName(), p.MainWindowTitle, p.ProcessName);
     public bool Matches([NotNullWhen(true)] ActiveWindowLogEntry? awle)
