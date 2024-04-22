@@ -157,7 +157,8 @@ public class Program
                                     {
                                         Matcher = new()
                                         {
-                                            ProcessName = "(foobar2000|firefox)"
+                                            Mode = ProcessMatcherMode.ProcessNameMatches,
+                                            Value = "(foobar2000|firefox)"
                                         },
                                         ProcessNameRegex = "(foobar2000|firefox)",
                                         Format = "{processName:0,1}"
