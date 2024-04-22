@@ -152,7 +152,7 @@ public class Program
                 {
                     TimeConstraint = new()
                     {
-                        DaysOfWeek = [ DayOfWeek.Monday, DayOfWeek.Tuesday, DayOfWeek.Wednesday, DayOfWeek.Thursday, DayOfWeek.Friday ],
+                        DaysOfWeek = "weekdays",
                         StartTime = new(0, 30),
                         EndTime = new(10, 0)
                     },

@@ -3,15 +3,19 @@
 namespace d9.ktv;
 public class TimeConstraint
 {
-    // todo: aliases for "weekdays," "weekends", "[Su][Mo?][Tu][We?][Th][Fr?][Sa]", &c
-    [JsonPropertyName("dayOfWeek")]
-    public List<DayOfWeek>? DaysOfWeek { get; set; }
+    [JsonPropertyName("on")]
+    public string? DaysOfWeek { get; set; }
     [JsonPropertyName("after")]
     public TimeOnly? StartTime { get; set; }
     [JsonPropertyName("before")]
     public TimeOnly? EndTime { get; set; }
     public bool DayOfWeekMatches(DateTime dt)
-        => DaysOfWeek is null || !DaysOfWeek.Any() || DaysOfWeek.Contains(dt.DayOfWeek);
+    {
+        if (DaysOfWeek is null)
+            return true;
+        IEnumerable<DayOfWeek> days = DaysOfWeek.ParseWeekdays();
+        return !days.Any() || days.Contains(dt.DayOfWeek);
+    }
     public bool TimeMatches(DateTime dt)
     // if start time is less than end time, treat normally
     // if start time is greater than end time, look at the other half of the day
@@ -32,16 +36,13 @@ public class TimeConstraint
         DateTime matchingTime = new(DateOnly.FromDateTime(dt), StartTime ?? TimeOnly.MinValue);
         if (matchingTime < dt)
             matchingTime += TimeSpan.FromDays(1);
-        if (DaysOfWeek is not null && DaysOfWeek.Count != 0 && !DaysOfWeek.Contains(matchingTime.DayOfWeek))
-        {
-            int ct = 0;
-            while (ct++ < 7 && !DaysOfWeek.Contains(matchingTime.DayOfWeek))
-                matchingTime += TimeSpan.FromDays(1);
-        }
+        int ct = 0;
+        while (ct++ < 7 && !DayOfWeekMatches(matchingTime))
+            matchingTime += TimeSpan.FromDays(1);
         return matchingTime;
     }
     public override string ToString()
-        => $"{DaysOfWeek?.Abbreviation()} {(StartTime is not null, EndTime is not null) switch
+        => $"{DaysOfWeek?.ParseWeekdays().Abbreviation()} {(StartTime is not null, EndTime is not null) switch
         {
             (true, true) => $"{StartTime} - {EndTime}",
             (true, false) => $"{StartTime}",
