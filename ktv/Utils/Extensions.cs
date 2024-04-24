@@ -14,10 +14,8 @@ public static class Extensions
             s = s.Replace($"{c}", replaceWith);
         return s;
     }
-    public static double DivideBy(this TimeOnly dividend, TimeSpan divisor)
-        => dividend.ToTimeSpan() / divisor;
-    public static double DivideBy(this DateTime dt, TimeSpan divisor)
-        => TimeOnly.FromDateTime(dt).DivideBy(divisor);
+    public static double DivideBy(this TimeSpan dividend, TimeSpan divisor)
+        => dividend.TotalMicroseconds / divisor.TotalMicroseconds;
     public static bool IsInt(this double d)
         => Math.Abs(d - (int)d) < double.Epsilon;
     private static readonly TimeSpan _oneDay = TimeSpan.FromDays(1);

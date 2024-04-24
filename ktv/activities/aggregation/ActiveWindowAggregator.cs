@@ -51,26 +51,46 @@ public class ActiveWindowAggregator(ActivityAggregationConfig config) : FixedPer
     private void Aggregate(DateTime time)
     {
         IEnumerable<ActiveWindowLogEntry> entries = EntriesBetween(time - Period, time);
-        Console.WriteLine($"entries: {entries.ListNotation()}");
-        if(!entries.Any())
+        if(entries.Count() < 2)
         {
-            Console.WriteLine($"Cannot aggregate 0 entries!");
+            Console.WriteLine($"Cannot aggregate fewer than 2 entries!");
             return;
         }
-        DateTime minEntryTime = entries.Select(x => x.DateTime).Min();
-        // todo: set up a syntax to parse the active window process name and window name
-        CountingDictionary<Activity, int> dict = new();
-        foreach (Activity? a in entries.Select(Config.ActivityFor))
-            if (a is not null)
-                dict.Increment(a);
-        Console.WriteLine($"dict:     {dict.Select(x => $"{x.Key}: {x.Value}").ListNotation(brackets: ("{", "}"))}");
-        Dictionary<Activity, float> percentages = dict.Select(x => new KeyValuePair<Activity, float>(x.Key, x.Value / (float)dict.Total)).ToDictionary();
+        List<DateTime> timestamps = entries.Select(x => x.DateTime).ToList();
+        TimeSpan actualDuration = time - timestamps.Min();
+        IReadOnlyDictionary<Activity, float> percentages = PercentagesFrom(CountActivities(entries.Select(Config.ActivityFor)),
+                                                                           actualDuration,
+                                                                           MinIntervalBetween(timestamps));
         CalendarEventManager?.PostFromSummary(new(percentages, time - Period, time));
-        int maxCt = dict.Select(x => x.Value).Max();
-        Console.WriteLine($"{DateTime.Now:g} most common activities in the last {(time - entries.Select(x => x.DateTime).Min()).Natural()}:");
+        PrintPercentages(percentages, actualDuration);
+        _lastAggregationTime = time;
+    }
+    private static TimeSpan MinIntervalBetween(List<DateTime> timestamps)
+    {
+        List<TimeSpan> timespans = [];
+        for(int i = 1; i < timestamps.Count; i++)
+            timespans.Add(timestamps[i] - timestamps[i - 1]);
+        return timespans.Min();
+    }
+    private static IReadOnlyDictionary<Activity, int> CountActivities(IEnumerable<Activity?> activities)
+    {
+        CountingDictionary<Activity, int> result = new();
+        foreach (Activity? a in activities)
+            if (a is not null)
+                result.Increment(a);
+        return result;
+    }
+    private static IReadOnlyDictionary<Activity, float> PercentagesFrom(IReadOnlyDictionary<Activity, int> counts, TimeSpan duration, TimeSpan minInterval)
+    {
+        double expectedCount = duration.DivideBy(minInterval);
+        Dictionary<Activity, float> result = counts.Select(x => new KeyValuePair<Activity, float>(x.Key, x.Value / (float)expectedCount)).ToDictionary();
+        return result;
+    }
+    private static void PrintPercentages(IReadOnlyDictionary<Activity, float> percentages, TimeSpan duration)
+    {
+        Console.WriteLine($"{DateTime.Now:g} most common activities in the last {duration.Natural()}:");
         foreach ((Activity key, float percentage) in percentages.OrderByDescending(x => x.Value))
             Console.WriteLine($"\t{percentage,-5:P1}\t{key}");
-        _lastAggregationTime = time;
     }
     public override string ToString()
         => $"{nameof(ActiveWindowAggregator)}({Config})";

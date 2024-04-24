@@ -13,7 +13,6 @@ public class ActivityAggregationConfig
     public required float PeriodMinutes { get; set; }
     public Activity? ActivityFor(ActiveWindowLogEntry awle)
     {
-        Console.WriteLine($"ActivityFor({awle})");
         if (Ignore?.Any(x => x.IsSummaryMatch(awle)) ?? false)
             return null;
         // todo: document that this is how things are ordered since the dictionary is unordered

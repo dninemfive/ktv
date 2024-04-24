@@ -21,9 +21,6 @@ public class ActivityDef
         if (Patterns is null)
             return summary.AnyPropertyContains(Format) ? Format : null;
         IEnumerable<(string name, string? regex, string? value)> matches = Matches(summary);
-        Console.WriteLine($"Matches({summary.PrintNull()}) -> {matches.ListNotation()}");
-        string? result = matches.Any(x => x.value.IsMatch(x.regex)) ? Format.RegexReplace(Matches(summary), "(.+)") : null;
-        Console.WriteLine($"Name({summary.PrintNull()}) -> {result.PrintNull()}");
-        return result;
+        return matches.Any(x => x.value.IsMatch(x.regex)) ? Format.RegexReplace(Matches(summary), "(.+)") : null;
     }
 }
