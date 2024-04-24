@@ -26,4 +26,6 @@ public class ProcessSummary(string? fileName = null, string? mainWindowTitle = n
         => awle is not null ? new(awle) : new();
     public static implicit operator ProcessSummary(Process? process)
         => process is not null ? new(process) : new();
+    public override string ToString()
+        => $"{FileName}, {MainWindowTitle}, {ProcessName}";
 }

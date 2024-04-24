@@ -51,6 +51,7 @@ public class ActiveWindowAggregator(ActivityAggregationConfig config) : FixedPer
     private void Aggregate(DateTime time)
     {
         IEnumerable<ActiveWindowLogEntry> entries = EntriesBetween(time - Period, time);
+        Console.WriteLine($"entries: {entries.ListNotation()}");
         if(!entries.Any())
         {
             Console.WriteLine($"Cannot aggregate 0 entries!");
@@ -62,6 +63,7 @@ public class ActiveWindowAggregator(ActivityAggregationConfig config) : FixedPer
         foreach (Activity? a in entries.Select(Config.ActivityFor))
             if (a is not null)
                 dict.Increment(a);
+        Console.WriteLine($"dict:     {dict.Select(x => $"{x.Key}: {x.Value}").ListNotation(brackets: ("{", "}"))}");
         Dictionary<Activity, float> percentages = dict.Select(x => new KeyValuePair<Activity, float>(x.Key, x.Value / (float)dict.Total)).ToDictionary();
         CalendarEventManager?.PostFromSummary(new(percentages, time - Period, time));
         int maxCt = dict.Select(x => x.Value).Max();

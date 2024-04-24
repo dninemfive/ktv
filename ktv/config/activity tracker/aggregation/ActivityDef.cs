@@ -1,10 +1,14 @@
-﻿namespace d9.ktv;
+﻿using d9.utl;
+
+namespace d9.ktv;
 public class ActivityDef
 {
     public Dictionary<ProcessPropertyTarget, string>? Patterns { get; set; }
     public required string Format { get; set; }
     public bool IsMatch(ProcessSummary summary)
-        => Matches(summary).Any();
+    {
+        return Matches(summary).Any();
+    }
     public IEnumerable<(string name, string? regex, string? value)> Matches(ProcessSummary summary)
     {
         if (Patterns is null)
@@ -19,6 +23,7 @@ public class ActivityDef
         if (Patterns is null)
             return awle.AnyPropertyContains(Format) ? Format : null;
         IEnumerable<(string name, string? regex, string? value)> matches = Matches(awle);
+        Console.WriteLine($"Matches({awle.PrintNull()}): {matches.ListNotation()}");
         return matches.Any() ? Format.RegexReplace(Matches(awle), "(.+)") : null;
     }
 }

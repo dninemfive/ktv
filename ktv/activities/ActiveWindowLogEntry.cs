@@ -16,6 +16,9 @@ public class ActiveWindowLogEntry(DateTime dateTime, string? processName, string
     [JsonInclude]
     public string? FileName { get; private set; } = fileName;
     public override string ToString()
+        => $"{DateTime:G}: ({ProcessName,24}\t{FileName,64}\t{MainWindowTitle})";
+    [JsonIgnore]
+    public string MultilineNotation
         => new object?[] { ProcessName, MainWindowTitle, FileName }.MultilineListWithAlignedTitle($"{DateTime:G}");
     public string? this[ProcessPropertyTarget ppt]
         => ppt switch
