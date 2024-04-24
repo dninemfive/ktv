@@ -25,7 +25,7 @@ public class Program
     public static List<TaskScheduler> Schedulers { get; private set; } = [];
     public static void Main()
     {
-        WriteConfig();
+        // WriteConfig();
         DateTime now = DateTime.Now;
         if (Config.TryLoad<KtvConfig>(Args.ConfigPath) is not KtvConfig config)
         {
@@ -106,7 +106,35 @@ public class Program
                                 ActivityDefs = [
                                     new()
                                     {
-                                        Format = "Microsoft Visual Studio"
+                                        Patterns = new()
+                                        {
+                                            { ProcessPropertyTarget.FileName, "^C:/Program Files/Microsoft Visual Studio$" }
+                                        },
+                                        Format = "Visual Studio"
+                                    },
+                                    new()
+                                    {
+                                        Patterns = new()
+                                        {
+                                            { ProcessPropertyTarget.MainWindowTitle, "Visual Studio Code" }
+                                        },
+                                        Format = "VSCode"
+                                    },
+                                    new()
+                                    {
+                                        Patterns = new()
+                                        {
+                                            { ProcessPropertyTarget.ProcessName, "^mintty$" }
+                                        },
+                                        Format = "Git Bash"
+                                    },
+                                    new()
+                                    {
+                                        Patterns = new()
+                                        {
+                                            { ProcessPropertyTarget.ProcessName, "notepad++" }
+                                        },
+                                        Format = "Notepad++"
                                     }
                                 ]
                             }
@@ -151,10 +179,35 @@ public class Program
                                     {
                                         Patterns = new()
                                         {
-                                            { ProcessPropertyTarget.ProcessName, "EXCEL" }
+                                            { ProcessPropertyTarget.ProcessName, "^EXCEL$" }
                                         },
                                         Format = "Excel"
                                     },
+                                    new()
+                                    {
+                                        Patterns = new()
+                                        {
+                                            { ProcessPropertyTarget.ProcessName, "^Obsidian$" }
+                                        },
+                                        Format = "Obsidian"
+                                    }
+                                ]
+                            }
+                        },
+                        {
+                            "art",
+                            new()
+                            {
+                                EventColor = GoogleUtils.EventColor.Sage,
+                                ActivityDefs = [
+                                    new()
+                                    {
+                                        Patterns = new()
+                                        {
+                                            { ProcessPropertyTarget.ProcessName, "gimp" }
+                                        },
+                                        Format = "GIMP"
+                                    }
                                 ]
                             }
                         }

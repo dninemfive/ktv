@@ -3,15 +3,15 @@ A program which runs in the background keeping track of what processes are runni
 
 ## Todo:
 - [x] TaskScheduler class to generalize the concept of running things later
-- [~] ktv features - logging programs
+- [x] ktv features - logging programs
   - [x] log raw data to a file
   - [x] periodically load data from a file
   - [x] generalize program details to merge them
-  - [~] convert generalized details to Google Calendar events
+  - [x] convert generalized details to Google Calendar events
 - [~] slp features - closing programs
   - [x] program matching
-  - [~] some kind of expression syntax?
+  - [ ] some kind of expression syntax?
   - [ ] close programs based on how long they've been running in a given period of time
-  - [ ] close programs based on their ktv categorization
-- [~] structure config files for json use
+  - [x] close programs based on their ktv categorization
+- [x] structure config files for json use
 - [ ] pin the program to the taskbar notification section and have a UI which can be used to manage it
