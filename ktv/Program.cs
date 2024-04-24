@@ -67,15 +67,7 @@ public class Program
                     GoogleCalendar = new()
                     {
                         Id = "<id>",
-                        DefaultColor = GoogleUtils.EventColor.Graphite,
-                        ActivityColors = new()
-                        {
-                            { "games", GoogleUtils.EventColor.Banana },
-                            { "social", GoogleUtils.EventColor.Blueberry },
-                            { "productivity", GoogleUtils.EventColor.Basil },
-                            { "media", GoogleUtils.EventColor.Tangerine },
-                            { "programming", GoogleUtils.EventColor.Grape }
-                        }
+                        DefaultColor = GoogleUtils.EventColor.Graphite
                     },
                     DefaultCategoryName = "default",
                     CategoryDefs = new()
@@ -147,6 +139,23 @@ public class Program
                                     }
                                 ]
                             }
+                        },
+                        {
+                            "productivity",
+                            new()
+                            {
+                                EventColor = GoogleUtils.EventColor.Basil,
+                                ActivityDefs = [
+                                    new()
+                                    {
+                                        Patterns = new()
+                                        {
+                                            { ProcessPropertyTarget.ProcessName, "EXCEL" }
+                                        },
+                                        Format = "Excel"
+                                    }
+                                ]
+                            }
                         }
                     },
                     PeriodMinutes = 15,
@@ -154,7 +163,7 @@ public class Program
                         new()
                         {
                             Mode = ProcessMatcherMode.ProcessNameMatches,
-                            Value = "Idle"
+                            Value = "^Idle$"
                         }
                     ]
                 }

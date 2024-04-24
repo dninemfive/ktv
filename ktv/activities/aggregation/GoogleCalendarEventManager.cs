@@ -40,7 +40,7 @@ public class GoogleCalendarEventManager
     public string? TryPostEvent(Activity activity, DateTime start, DateTime end)
     {
         _eventIds.TryGetValue(activity, out string? existingId);
-        Event @event = activity.ToEvent(start, end, Config.GoogleCalendar!.ColorFor(activity.Category));
+        Event @event = activity.ToEvent(start, end, Config.ColorFor(activity.Category));
         string calendarId = Config.GoogleCalendar!.Id;
         try
         {

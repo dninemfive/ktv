@@ -19,7 +19,8 @@ public class ActivityDef
             return null;
         if (Patterns is null)
             return awle.AnyPropertyContains(Format) ? Format : null;
-        return Format.RegexReplace(MatchesFrom(awle), "(.+)");
+        IEnumerable<(string name, string? regex, string? value)> matches = MatchesFrom(awle);
+        return matches.Any() ? Format.RegexReplace(MatchesFrom(awle), "(.+)") : null;
     }
 }
 public enum ProcessPropertyTarget

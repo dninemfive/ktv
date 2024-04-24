@@ -24,4 +24,10 @@ public class ActivityAggregationConfig
                     return new(name, categoryName);
         return new((awle.ProcessName ?? awle.MainWindowTitle ?? awle.FileName).PrintNull(), DefaultCategoryName);
     }
+    public GoogleUtils.EventColor ColorFor(string category)
+    {
+        if (CategoryDefs.TryGetValue(category, out ActivityCategoryDef? def) && def.EventColor is GoogleUtils.EventColor color)
+            return color;
+        return GoogleCalendar?.DefaultColor ?? throw new Exception($"Attempted to get default Google Calendar color without a valid config!");
+    }
 }
