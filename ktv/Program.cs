@@ -162,7 +162,7 @@ public class Program
                     Ignore = [
                         new()
                         {
-                            Mode = ProcessMatcherMode.ProcessNameMatches,
+                            Mode = ProcessMatchMode.ProcessNameMatches,
                             Value = "^Idle$"
                         }
                     ]
@@ -179,12 +179,12 @@ public class Program
                     },
                     CloseProcesses = new()
                     {
-                        Mode = ProcessMatcherMode.InFolder,
+                        Mode = ProcessMatchMode.InFolder,
                         Value = @"C:\Program Files (x86)\Steam\steamapps\common"
                     },
                     IgnoreProcesses = new()
                     {
-                        Mode = ProcessMatcherMode.ProcessNameMatches,
+                        Mode = ProcessMatchMode.ProcessNameMatches,
                         Value = @".+[Cc]rash.?[Hh]andler.+"
                     },
                     PeriodMinutes = 1

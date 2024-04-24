@@ -7,9 +7,9 @@ public class ProcessCloserConfig
     [JsonPropertyName("when")]
     public TimeConstraint? TimeConstraint { get; set; }
     [JsonPropertyName("match")]
-    public ProcessMatcher? CloseProcesses { get; set; }
+    public ProcessMatcherDef? CloseProcesses { get; set; }
     [JsonPropertyName("except")]
-    public ProcessMatcher? IgnoreProcesses { get; set; }
+    public ProcessMatcherDef? IgnoreProcesses { get; set; }
     public required float PeriodMinutes { get; set; }
     public bool ShouldClose(Process? p, DateTime dt)
     {
@@ -21,6 +21,6 @@ public class ProcessCloserConfig
         }
         if (!(TimeConstraint?.Matches(dt) ?? false))
             return false;
-        return !(IgnoreProcesses?.Matches(p) ?? false) && (CloseProcesses?.Matches(p) ?? true);
+        return !(IgnoreProcesses?.IsMatch(p) ?? false) && (CloseProcesses?.IsMatch(p) ?? true);
     }
 }

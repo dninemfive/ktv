@@ -36,7 +36,7 @@ public static class Extensions
         string result = title.PadRight(padWidth);
         return result + objects.Select(x => x.PrintNull()).Aggregate((x, y) => $"{x}\n{padding}{y}");
     }
-    public static bool Matches(this string? s, string? regex)
+    public static bool IsMatch(this string? s, string? regex)
         => s is not null && regex is not null && Regex.IsMatch(s, regex);
     public static string RegexReplace(this string format, IEnumerable<(string key, string? value, string? regex)> variables, string? defaultRegex = null)
     {

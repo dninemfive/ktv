@@ -13,4 +13,6 @@ public class ActivityCategoryDef
     public GoogleUtils.EventColor? EventColor { get; set; }
     public static implicit operator ActivityCategoryDef(List<ActivityDef> activityDefs)
         => new() { ActivityDefs = activityDefs };
+    public ProcessMatcher ProcessMatcher
+        => (value, summary) => ActivityDefs.Any(x => x.IsMatch(summary));
 }

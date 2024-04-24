@@ -9,13 +9,13 @@ public class ActivityAggregationConfig
     public required string DefaultCategoryName { get; set; }
     [JsonPropertyName("categories")]
     public required Dictionary<string, ActivityCategoryDef> CategoryDefs { get; set; }
-    public List<ProcessMatcher>? Ignore { get; set; }
+    public List<ProcessMatcherDef>? Ignore { get; set; }
     public required float PeriodMinutes { get; set; }
     [JsonIgnore]
     public GoogleUtils.EventColor? DefaultColor => GoogleCalendar?.DefaultColor;
     public Activity? ActivityFor(ActiveWindowLogEntry awle)
     {
-        if (Ignore?.Any(x => x.Matches(awle)) ?? false)
+        if (Ignore?.Any(x => x.IsMatch(awle)) ?? false)
             return null;
         // todo: document that this is how things are ordered since the dictionary is unordered
         foreach ((string categoryName, ActivityCategoryDef category) in CategoryDefs.OrderBy(x => x.Key))

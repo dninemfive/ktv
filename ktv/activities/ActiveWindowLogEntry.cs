@@ -23,7 +23,7 @@ public class ActiveWindowLogEntry(DateTime dateTime, string? processName, string
             ProcessPropertyTarget.FileName => FileName,
             ProcessPropertyTarget.MainWindowTitle => MainWindowTitle,
             ProcessPropertyTarget.ProcessName => ProcessName,
-            _ => throw new ArgumentOutOfRangeException($"{ppt} is not a valid ProcessPropertyTarget value!", nameof(ppt))
+            _ => throw new ArgumentOutOfRangeException(nameof(ppt), $"{ppt} is not a valid ProcessPropertyTarget value!")
         };
     public bool AnyPropertyContains(string s)
     {

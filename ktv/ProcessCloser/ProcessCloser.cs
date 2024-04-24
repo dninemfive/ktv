@@ -7,8 +7,8 @@ public class ProcessCloser(ProcessCloserConfig config) : TaskScheduler
 {
     public TimeConstraint? TimeConstraint = config.TimeConstraint;
     public TimeSpan ClosePeriod { get; private set; } = TimeSpan.FromMinutes(config.PeriodMinutes);
-    public ProcessMatcher? ProcessesToClose { get; private set; } = config.CloseProcesses;
-    public ProcessMatcher? ProcessesToIgnore { get; private set; } = config.IgnoreProcesses;
+    public ProcessMatcherDef? ProcessesToClose { get; private set; } = config.CloseProcesses;
+    public ProcessMatcherDef? ProcessesToIgnore { get; private set; } = config.IgnoreProcesses;
     public override ScheduledTask NextTask(DateTime time)
     {
         TimeOnly nextTime = TimeOnly.FromDateTime(time + ClosePeriod);
@@ -23,7 +23,7 @@ public class ProcessCloser(ProcessCloserConfig config) : TaskScheduler
     {
         foreach (Process process in Process.GetProcesses())
         {
-            if (!(ProcessesToIgnore?.Matches(process) ?? false) && (ProcessesToClose?.Matches(process) ?? false))
+            if (!(ProcessesToIgnore?.IsMatch(process) ?? false) && (ProcessesToClose?.IsMatch(process) ?? false))
                 Console.WriteLine($"Close {process.ProcessName} ({process.MainWindowTitle})");
         }
     }
