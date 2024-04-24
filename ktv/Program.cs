@@ -25,6 +25,7 @@ public class Program
     public static List<TaskScheduler> Schedulers { get; private set; } = [];
     public static void Main()
     {
+        WriteConfig();
         DateTime now = DateTime.Now;
         if (Config.TryLoad<KtvConfig>(Args.ConfigPath) is not KtvConfig config)
         {
@@ -153,7 +154,7 @@ public class Program
                                             { ProcessPropertyTarget.ProcessName, "EXCEL" }
                                         },
                                         Format = "Excel"
-                                    }
+                                    },
                                 ]
                             }
                         }
@@ -177,17 +178,42 @@ public class Program
                         StartTime = new(0, 30),
                         EndTime = new(10, 0)
                     },
-                    CloseProcesses = new()
-                    {
-                        Mode = ProcessMatchMode.InFolder,
-                        Value = @"C:\Program Files (x86)\Steam\steamapps\common"
-                    },
-                    IgnoreProcesses = new()
-                    {
-                        Mode = ProcessMatchMode.ProcessNameMatches,
-                        Value = @".+[Cc]rash.?[Hh]andler.+"
-                    },
+                    ProcessesToClose = [
+                        new() { Mode = ProcessMatchMode.IsInCategory, Value = "games" }
+                    ],
+                    ProcessesToIgnore = [
+                        new() { Mode = ProcessMatchMode.ProcessNameMatches, Value = @".+[Cc]rash.?[Hh]andler.+" }
+                    ],
                     PeriodMinutes = 1
+                },
+                new()
+                {
+                    TimeConstraint = new()
+                    {
+                        StartTime = new(0, 30),
+                        EndTime = new(7, 0)
+                    },
+                    ProcessesToClose = [
+                        new() { Mode = ProcessMatchMode.IsInCategory, Value = "games" },
+                        new() { Mode = ProcessMatchMode.ProcessNameMatches, Value = "foobar2000" },
+                        new() { Mode = ProcessMatchMode.FileNameMatches, Value = "Visual Studio" }
+                    ],
+                    ProcessesToIgnore = [
+                        new() { Mode = ProcessMatchMode.ProcessNameMatches, Value = @".+[Cc]rash.?[Hh]andler.+" }
+                    ],
+                    PeriodMinutes = 1
+                },
+                new()
+                {
+                    TimeConstraint = new()
+                    {
+                        StartTime = new(1, 30),
+                        EndTime = new(7, 0)
+                    },
+                    ProcessesToClose = [
+                        new() { Mode = ProcessMatchMode.ProcessNameMatches, Value = "EXCEL" }
+                    ],
+                    PeriodMinutes = 10
                 }
             ]
         };
@@ -205,7 +231,7 @@ public class Program
         if (config.ProcessClosers is List<ProcessCloserConfig> pccs)
         {
             foreach (ProcessCloserConfig pcc in pccs)
-                if (pcc.CloseProcesses is not null || pcc.IgnoreProcesses is not null)
+                if (pcc.ProcessesToClose is not null || pcc.ProcessesToIgnore is not null)
                     yield return new ProcessCloser(pcc);
         }
     }

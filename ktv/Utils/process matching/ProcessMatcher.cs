@@ -2,7 +2,7 @@
 
 namespace d9.ktv;
 public delegate bool ProcessMatcher(string value, ProcessSummary summary);
-public static class ProcessMatchDelegates
+public static class ProcessMatchUtils
 {
     public static KtvConfig? Config { private get; set; }
     public static IReadOnlyDictionary<ProcessMatchMode, ProcessMatcher> Index { get; private set; }
@@ -30,4 +30,6 @@ public static class ProcessMatchDelegates
             return def.ProcessMatcher;
         throw new ArgumentOutOfRangeException(nameof(mode), $"{mode} is not a valid ProcessMatchMode value!");
     }
+    public static bool IsMatch(this List<ProcessMatcherDef>? matchers, ProcessSummary summary)
+        => matchers?.Any(x => x.IsMatch(summary)) ?? false;
 }

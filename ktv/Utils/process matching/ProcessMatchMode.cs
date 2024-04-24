@@ -5,5 +5,5 @@ public enum ProcessMatchMode
     FileNameMatches,
     MainWindowTitleMatches,
     ProcessNameMatches,
-    InCategory
+    IsInCategory
 }
