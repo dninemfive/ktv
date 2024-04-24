@@ -130,11 +130,7 @@ public class Program
                                     },
                                     new()
                                     {
-                                        Patterns = new()
-                                        {
-                                            { ProcessPropertyTarget.ProcessName, "notepad++" }
-                                        },
-                                        Format = "Notepad++"
+                                        Format = "notepad++"
                                     }
                                 ]
                             }

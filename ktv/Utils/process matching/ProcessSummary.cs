@@ -26,6 +26,13 @@ public class ProcessSummary(string? fileName = null, string? mainWindowTitle = n
         => awle is not null ? new(awle) : new();
     public static implicit operator ProcessSummary(Process? process)
         => process is not null ? new(process) : new();
+    public bool AnyPropertyContains(string s)
+    {
+        foreach (ProcessPropertyTarget ppt in Enum.GetValues<ProcessPropertyTarget>())
+            if (this[ppt] is string property && property.Contains(s))
+                return true;
+        return false;
+    }
     public override string ToString()
         => $"{FileName}, {MainWindowTitle}, {ProcessName}";
 }
