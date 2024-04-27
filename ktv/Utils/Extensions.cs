@@ -33,7 +33,7 @@ public static class Extensions
         result = result.Trim();
         if (string.IsNullOrWhiteSpace(result))
             throw new ArgumentException($"File name string `{s}` produced an empty or whitespace string after removing invalid characters for a filename!", nameof(s));
-        return s;
+        return result;
     }
     public static double DivideBy(this TimeSpan dividend, TimeSpan divisor)
         => dividend.TotalMicroseconds / divisor.TotalMicroseconds;
