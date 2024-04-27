@@ -20,7 +20,8 @@ public class ActivityAggregationConfig
             foreach (ActivityDef activity in category.ActivityDefs)
                 if (activity.Name(awle) is string name)
                     return new(name, categoryName);
-        return new((awle.ProcessName ?? awle.MainWindowTitle ?? awle.FileName).PrintNull(), DefaultCategoryName);
+        string? fallbackName = awle.ProcessName ?? awle.MainWindowTitle ?? awle.ProcessName;
+        return fallbackName is not null ? new(fallbackName, DefaultCategoryName) : null;
     }
     public GoogleUtils.EventColor ColorFor(string category)
     {

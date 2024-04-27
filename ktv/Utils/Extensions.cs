@@ -1,6 +1,7 @@
 ﻿using d9.utl;
 using d9.utl.compat;
 using System.Text.RegularExpressions;
+using MatchTuple = (string name, string? value, string? regex);
 
 namespace d9.ktv;
 
@@ -36,10 +37,10 @@ public static class Extensions
     }
     public static bool IsMatch(this string? s, string? regex)
         => s is not null && regex is not null && Regex.IsMatch(s, regex);
-    public static string RegexReplace(this string format, IEnumerable<(string key, string? value, string? regex)> variables, string? defaultRegex = null)
+    public static string RegexReplace(this string format, IEnumerable<MatchTuple> variables, string? defaultRegex = null)
     {
         foreach ((string key, string? value, string? regex) in variables)
-            format = format.RegexReplace(key, value, regex ?? defaultRegex);
+            format = format.RegexReplace((key, value, regex ?? defaultRegex));
         return format;
     }
     /// <summary>
@@ -81,16 +82,17 @@ public static class Extensions
     /// </para>
     /// </remarks>
     /// <returns></returns>
-    public static string RegexReplace(this string format, string key, string? value, string? regex)
+    public static string RegexReplace(this string format, MatchTuple match)
     {
+        (string key, string? value, string? regex) = match;
         if (value is null || regex is null)
             return format;
         MatchCollection matches = Regex.Matches(value, regex);
-        for (int match = 0; match < matches.Count; match++)
+        for (int matchIndex = 0; matchIndex < matches.Count; matchIndex++)
         {
-            GroupCollection groups = matches[match].Groups;
+            GroupCollection groups = matches[matchIndex].Groups;
             for(int group = 0; group < groups.Count; group++)
-                foreach (string indices in ValidReplacementTargetsIndicesFor(match, group))
+                foreach (string indices in ValidReplacementTargetsIndicesFor(matchIndex, group))
                     format = format.Replace($"{{{key}{indices}}}", groups[group].Value);
         }
         return format;
