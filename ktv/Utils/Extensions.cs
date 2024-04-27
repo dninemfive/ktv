@@ -8,7 +8,6 @@ namespace d9.ktv;
 public enum TitlePosition { First, Last }
 public static class Extensions
 {
-    public static string Time(this DateTime time) => time.ToString(TimeFormats.Time);
     public static string FileNameSafe(this string s, string replaceWith = "")
     {
         foreach (char c in Path.GetInvalidFileNameChars())
