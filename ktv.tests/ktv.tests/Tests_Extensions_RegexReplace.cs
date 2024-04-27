@@ -7,34 +7,34 @@ namespace d9.ktv.tests;
 public class Tests_Extensions_RegexReplace
 {
     [TestMethod]
-    public void Test_RegexReplace_NullValue()
+    public void Test_NullValue()
     {
         Assert.AreEqual("asdf", "asdf".RegexReplace(("test", null, ".+")));
     }
     [TestMethod]
-    public void Test_RegexReplace_NullRegex()
+    public void Test_NullRegex()
     {
         Assert.AreEqual("asdf", "asdf".RegexReplace(("test", "jkl;", null)));
     }
     [TestMethod]
-    public void Test_RegexReplace_NoInterpolation()
+    public void Test_NoInterpolation()
     {
         Assert.AreEqual("asdf", "asdf".RegexReplace(("test", "jkl;", ".+")));
     }
     [TestMethod]
-    public void Test_RegexReplace_OneMatch()
+    public void Test_OneMatch()
     {
         Assert.AreEqual("asdfqwerty", "asdf{test}".RegexReplace(("test", "qwerty", "qwer(.+)")));
         Assert.AreEqual("asdfqwerty", "asdf{test:0}".RegexReplace(("test", "qwerty", "qwer(.+)")));
         Assert.AreEqual("asdfqwerty", "asdf{test:0,0}".RegexReplace(("test", "qwerty", "qwer(.+)")));
     }
     [TestMethod]
-    public void Test_RegexReplace_OneMatchOneGroup()
+    public void Test_OneMatchOneGroup()
     {
         Assert.AreEqual("asdfty", "asdf{test:0,1}".RegexReplace(("test", "qwerty", "qwer(.+)")));
     }
     [TestMethod]
-    public void Test_RegexReplace_MultipleMatches()
+    public void Test_MultipleMatches()
     {
         Assert.AreEqual($"Aqwertyupty", $"A{{test:0,0}}y".RegexReplace(("test", "asdfqwertyuptyqwersy3", "qwer(.{2})?(.{3})?")));
         Assert.AreEqual($"tyohu", $"{{test:0,1}}ohu".RegexReplace(("test", "asdfqwertyuptyqwersy3", "qwer(.{2})?(.{3})?")));
