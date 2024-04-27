@@ -83,7 +83,7 @@ public class Program
                                     {
                                         Patterns = new()
                                         {
-                                            { ProcessPropertyTarget.FileName, @"C:\\Program Files \(x86\)\\Steam\\steamapps\\common\\(.+)\\.+" }
+                                            { ProcessPropertyTarget.FileName, @"^C:\\Program Files \(x86\)\\Steam\\steamapps\\common\\(^[\\]+).+" }
                                         },
                                         Format = "{fileName:0,1}"
                                     },
@@ -108,7 +108,7 @@ public class Program
                                     {
                                         Patterns = new()
                                         {
-                                            { ProcessPropertyTarget.FileName, "^C:/Program Files/Microsoft Visual Studio$" }
+                                            { ProcessPropertyTarget.FileName, "^C:/Program Files/Microsoft Visual Studio" }
                                         },
                                         Format = "Visual Studio"
                                     },
