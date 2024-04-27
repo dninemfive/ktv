@@ -68,7 +68,8 @@ public class Program
                     GoogleCalendar = new()
                     {
                         Id = "<id>",
-                        DefaultColor = GoogleUtils.EventColor.Graphite
+                        DefaultColor = GoogleUtils.EventColor.Graphite,
+                        ActivityPercentageThreshold = 0.3f
                     },
                     DefaultCategoryName = "default",
                     CategoryDefs = new()
@@ -83,7 +84,7 @@ public class Program
                                     {
                                         Patterns = new()
                                         {
-                                            { ProcessPropertyTarget.FileName, @"^C:\\Program Files \(x86\)\\Steam\\steamapps\\common\\(^[\\]+).+" }
+                                            { ProcessPropertyTarget.FileName, @"^C:\\Program Files \(x86\)\\Steam\\steamapps\\common\\([^\\]+).+" }
                                         },
                                         Format = "{fileName:0,1}"
                                     },

@@ -15,7 +15,7 @@ public class GoogleCalendarEventManager
             return null;
         return new(config);
     }
-    public void PostFromSummary(ActivitySummary summary, float threshold = 0.3f)
+    public void PostFromSummary(ActivitySummary summary)
     {
         foreach (Activity activity in summary)
         {
@@ -24,7 +24,7 @@ public class GoogleCalendarEventManager
                 start = summary.Start;
                 _startTimes[activity] = start;
             }
-            if (summary[activity] < threshold)
+            if (summary[activity] < Config.GoogleCalendar?.ActivityPercentageThreshold)
             {
                 Remove(activity);
                 continue;
