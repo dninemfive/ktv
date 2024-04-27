@@ -8,10 +8,31 @@ namespace d9.ktv;
 public enum TitlePosition { First, Last }
 public static class Extensions
 {
+    /// <summary>
+    /// Replaces characters which would be invalid in a file name with the specified string,
+    /// and trims the result to avoid situations where extra whitespace results in odd behavior,
+    /// since the Windows filesystem allows leading and trailing whitespace but e.g. File Explorer
+    /// does not.
+    /// </summary>
+    /// <param name="s">The string whose invalid characters to replace.</param>
+    /// <param name="replaceWith">The string with which to replace invalid characters.</param>
+    /// <returns>A string which is guaranteed to be safe to use as a file name.</returns>
+    /// <exception cref="ArgumentException">Thrown if the input string <paramref name="s"/> 
+    /// produces an empty or whitespace string after replacement and trimming.</exception>
+    /// <remarks>
+    /// Note that this is for <b>file names</b>, and so will replace important character for 
+    /// absolute paths, such as forward- and backslashes! In addition, this does not check for the
+    /// reserved Windows filenames, which can be found 
+    /// <see href="https://stackoverflow.com/a/31976060">here</see>.
+    /// </remarks>
     public static string FileNameSafe(this string s, string replaceWith = "")
     {
+        string result = s;
         foreach (char c in Path.GetInvalidFileNameChars())
-            s = s.Replace($"{c}", replaceWith);
+            result = result.Replace($"{c}", replaceWith);
+        result = result.Trim();
+        if (string.IsNullOrWhiteSpace(result))
+            throw new ArgumentException($"File name string `{s}` produced an empty or whitespace string after removing invalid characters for a filename!", nameof(s));
         return s;
     }
     public static double DivideBy(this TimeSpan dividend, TimeSpan divisor)
