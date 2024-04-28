@@ -34,8 +34,11 @@ public class Program
         }
         Schedulers = LoadSchedulers(config).ToList();
         Log.WriteLine(Schedulers.MultilineListWithAlignedTitle("schedulers:"));
-        foreach(TaskScheduler scheduler in  Schedulers)
+        foreach(TaskScheduler scheduler in Schedulers)
+        {
+            scheduler.SetUp();
             ScheduledTasks.Add(scheduler.NextTask(now));
+        }
         try
         {
             while(true)
