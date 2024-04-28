@@ -35,19 +35,8 @@ public static class Extensions
             throw new ArgumentException($"File name string `{s}` produced an empty or whitespace string after removing invalid characters for a filename!", nameof(s));
         return result;
     }
-    public static double DivideBy(this TimeSpan dividend, TimeSpan divisor)
-        => dividend.TotalMicroseconds / divisor.TotalMicroseconds;
     public static bool IsInt(this double d)
         => Math.Abs(d - (int)d) < double.Epsilon;
-    private static readonly TimeSpan _oneDay = TimeSpan.FromDays(1);
-    public static bool DividesDayEvenly(this TimeSpan divisor)
-        => (_oneDay / divisor).IsInt();
-    public static DateTime NextDayAlignedTime(this DateTime dt, TimeSpan ts)
-    {
-        if (!DividesDayEvenly(ts))
-            return dt + ts;
-        return dt.Floor(ts) + ts;
-    }
     public static string MultilineListWithAlignedTitle<T>(this IEnumerable<T?> objects, string title, int tabWidth = 2)
     {
         int padWidth = title.Length + tabWidth + (title.Length % tabWidth);

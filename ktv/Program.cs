@@ -21,26 +21,25 @@ public class Program
         public static readonly bool Test = CommandLineArgs.GetFlag(nameof(Test), 't');
     }
     public static DateTime LaunchTime { get; } = DateTime.Now;
-    public static List<ScheduledTask> ScheduledTasks { get; } = new();
+    public static List<ScheduledTask> ScheduledTasks { get; } = [];
     public static List<TaskScheduler> Schedulers { get; private set; } = [];
+    public static Log Log { get; private set; } = InitializeLog();
     public static void Main()
     {
-        // WriteConfig();
         DateTime now = DateTime.Now;
         if (Config.TryLoad<KtvConfig>(Args.ConfigPath) is not KtvConfig config)
         {
-            Console.WriteLine($"Could not find valid config at expected path {Path.GetFullPath(Args.ConfigPath)}!");
+            Log.WriteLine($"Could not find valid config at expected path {Path.GetFullPath(Args.ConfigPath)}!");
             return;
         }
         Schedulers = LoadSchedulers(config).ToList();
-        Console.WriteLine(Schedulers.MultilineListWithAlignedTitle("schedulers:"));
+        Log.WriteLine(Schedulers.MultilineListWithAlignedTitle("schedulers:"));
         foreach(TaskScheduler scheduler in  Schedulers)
             ScheduledTasks.Add(scheduler.NextTask(now));
         try
         {
             while(true)
             {
-                // Console.WriteLine(ScheduledTasks.OrderBy(x => x.ScheduledTime).MultilineListWithAlignedTitle("scheduled tasks:"));
                 SleepUntilNext(ScheduledTasks);
                 now = DateTime.Now;
                 foreach (ScheduledTask task in ScheduledTasks.Where(x => x.ScheduledTime < now).ToList())
@@ -53,221 +52,13 @@ public class Program
         }
         finally
         {
-            // todo: some sort of TryExecuteEarly on ScheduledTask
+            Log.Dispose();
         }
     }
-    public static void WriteConfig()
+    private static Log InitializeLog()
     {
-        KtvConfig config = new()
-        {
-            ActivityTracker = new()
-            {
-                LogPeriodMinutes = 0.25f,
-                AggregationConfig = new()
-                {
-                    GoogleCalendar = new()
-                    {
-                        Id = "<id>",
-                        DefaultColor = GoogleUtils.EventColor.Graphite,
-                        ActivityPercentageThreshold = 0.3f
-                    },
-                    DefaultCategoryName = "default",
-                    CategoryDefs = new()
-                    {
-                        {
-                            "games",
-                            new()
-                            {
-                                EventColor = GoogleUtils.EventColor.Banana,
-                                ActivityDefs = [
-                                    new()
-                                    {
-                                        Patterns = new()
-                                        {
-                                            { ProcessPropertyTarget.FileName, @"^C:\\Program Files \(x86\)\\Steam\\steamapps\\common\\([^\\]+).+" }
-                                        },
-                                        Format = "{fileName:0,1}"
-                                    },
-                                    new()
-                                    {
-                                        Patterns = new()
-                                        {
-                                            { ProcessPropertyTarget.MainWindowTitle, @"Minecraft\*? \d+\.\d+" }
-                                        },
-                                        Format = "{mainWindowTitle:0,1}"
-                                    }
-                                ]
-                            }
-                        },
-                        {
-                            "programming",
-                            new()
-                            {
-                                EventColor = GoogleUtils.EventColor.Grape,
-                                ActivityDefs = [
-                                    new()
-                                    {
-                                        Patterns = new()
-                                        {
-                                            { ProcessPropertyTarget.FileName, "^C:/Program Files/Microsoft Visual Studio" }
-                                        },
-                                        Format = "Visual Studio"
-                                    },
-                                    new()
-                                    {
-                                        Patterns = new()
-                                        {
-                                            { ProcessPropertyTarget.MainWindowTitle, "Visual Studio Code" }
-                                        },
-                                        Format = "VSCode"
-                                    },
-                                    new()
-                                    {
-                                        Patterns = new()
-                                        {
-                                            { ProcessPropertyTarget.ProcessName, "^mintty$" }
-                                        },
-                                        Format = "Git Bash"
-                                    },
-                                    new()
-                                    {
-                                        Format = "notepad++"
-                                    }
-                                ]
-                            }
-                        },
-                        {
-                            "social",
-                            new()
-                            {
-                                EventColor = GoogleUtils.EventColor.Blueberry,
-                                ActivityDefs = [
-                                    new()
-                                    {
-                                        Format = "Discord"
-                                    }
-                                ]
-                            }
-                        },
-                        {
-                            "media",
-                            new()
-                            {
-                                EventColor = GoogleUtils.EventColor.Tangerine,
-                                ActivityDefs = [
-                                    new()
-                                    {
-                                        Patterns = new()
-                                        {
-                                            { ProcessPropertyTarget.ProcessName, "(foobar2000|firefox)" }
-                                        },
-                                        Format = "{processName:0,1}"
-                                    }
-                                ]
-                            }
-                        },
-                        {
-                            "productivity",
-                            new()
-                            {
-                                EventColor = GoogleUtils.EventColor.Basil,
-                                ActivityDefs = [
-                                    new()
-                                    {
-                                        Patterns = new()
-                                        {
-                                            { ProcessPropertyTarget.ProcessName, "^EXCEL$" }
-                                        },
-                                        Format = "Excel"
-                                    },
-                                    new()
-                                    {
-                                        Patterns = new()
-                                        {
-                                            { ProcessPropertyTarget.ProcessName, "^Obsidian$" }
-                                        },
-                                        Format = "Obsidian"
-                                    }
-                                ]
-                            }
-                        },
-                        {
-                            "art",
-                            new()
-                            {
-                                EventColor = GoogleUtils.EventColor.Sage,
-                                ActivityDefs = [
-                                    new()
-                                    {
-                                        Patterns = new()
-                                        {
-                                            { ProcessPropertyTarget.ProcessName, "gimp" }
-                                        },
-                                        Format = "GIMP"
-                                    }
-                                ]
-                            }
-                        }
-                    },
-                    PeriodMinutes = 15,
-                    Ignore = [
-                        new()
-                        {
-                            Mode = ProcessMatchMode.ProcessNameMatches,
-                            Value = "^Idle$"
-                        }
-                    ]
-                }
-            },
-            ProcessClosers = [
-                new()
-                {
-                    TimeConstraint = new()
-                    {
-                        DaysOfWeek = "weekdays",
-                        StartTime = new(0, 30),
-                        EndTime = new(10, 0)
-                    },
-                    ProcessesToClose = [
-                        new() { Mode = ProcessMatchMode.IsInCategory, Value = "games" }
-                    ],
-                    ProcessesToIgnore = [
-                        new() { Mode = ProcessMatchMode.ProcessNameMatches, Value = @".+[Cc]rash.?[Hh]andler.+" }
-                    ],
-                    PeriodMinutes = 1
-                },
-                new()
-                {
-                    TimeConstraint = new()
-                    {
-                        StartTime = new(0, 30),
-                        EndTime = new(7, 0)
-                    },
-                    ProcessesToClose = [
-                        new() { Mode = ProcessMatchMode.IsInCategory, Value = "games" },
-                        new() { Mode = ProcessMatchMode.ProcessNameMatches, Value = "foobar2000" },
-                        new() { Mode = ProcessMatchMode.FileNameMatches, Value = "Visual Studio" }
-                    ],
-                    ProcessesToIgnore = [
-                        new() { Mode = ProcessMatchMode.ProcessNameMatches, Value = @".+[Cc]rash.?[Hh]andler.+" }
-                    ],
-                    PeriodMinutes = 1
-                },
-                new()
-                {
-                    TimeConstraint = new()
-                    {
-                        StartTime = new(1, 30),
-                        EndTime = new(7, 0)
-                    },
-                    ProcessesToClose = [
-                        new() { Mode = ProcessMatchMode.ProcessNameMatches, Value = "EXCEL" }
-                    ],
-                    PeriodMinutes = 10
-                }
-            ]
-        };
-        File.WriteAllText("config.json", JsonSerializer.Serialize(config, Config.DefaultSerializerOptions));
+        _ = Directory.CreateDirectory("logs");
+        return new(Path.Join("logs", $"{DateTime.Now.Format()}.ktv.log"), mode: Log.Mode.WriteImmediate);
     }
     public static IEnumerable<TaskScheduler> LoadSchedulers(KtvConfig config)
     {
@@ -287,7 +78,6 @@ public class Program
     }
     private static void SleepUntil(DateTime dt)
     {
-        // Console.WriteLine($"SleepUntil({dt:G})");
         int delay = (int)(dt - DateTime.Now).TotalMilliseconds;
         if(delay > 0)
             Thread.Sleep(delay);
