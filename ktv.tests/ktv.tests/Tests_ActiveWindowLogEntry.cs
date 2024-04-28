@@ -1,11 +1,4 @@
-﻿using d9.ktv;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-
-namespace ktv.tests;
+﻿namespace d9.ktv.tests;
 [TestClass]
 public class Tests_ActiveWindowLogEntry
 {
