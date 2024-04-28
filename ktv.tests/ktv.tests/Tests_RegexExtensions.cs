@@ -1,10 +1,7 @@
-using d9.ktv;
-using MatchTuple = (string name, string? value, string? regex);
-
 namespace d9.ktv.tests;
 
 [TestClass]
-public class Tests_Extensions_RegexReplace
+public class Tests_RegexExtensions
 {
     [TestMethod]
     public void Test_NullValue()
