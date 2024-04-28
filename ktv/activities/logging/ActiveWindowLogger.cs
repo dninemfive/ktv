@@ -13,7 +13,6 @@ public class ActiveWindowLogger(TimeSpan period) : FixedPeriodTaskScheduler(peri
     {
         Process? activeWindowProcess = ForegroundWindow.Process;
         ActiveWindowLogEntry entry = new(DateTime.Now, activeWindowProcess);
-        Console.WriteLine(entry.MultilineNotation);
         File.AppendAllText(fileName, $"{JsonSerializer.Serialize(entry)}\n");
     }
     public override string ToString()

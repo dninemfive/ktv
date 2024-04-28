@@ -53,7 +53,7 @@ public class ActiveWindowAggregator(ActivityAggregationConfig config) : FixedPer
         IEnumerable<ActiveWindowLogEntry> entries = EntriesBetween(time - Period, time);
         if(entries.Count() < 2)
         {
-            Console.WriteLine($"Cannot aggregate fewer than 2 entries!");
+            Program.Log.WriteLine($"Cannot aggregate fewer than 2 entries!");
             return;
         }
         List<DateTime> timestamps = entries.Select(x => x.DateTime).ToList();
@@ -88,9 +88,11 @@ public class ActiveWindowAggregator(ActivityAggregationConfig config) : FixedPer
     }
     private static void PrintPercentages(IReadOnlyDictionary<Activity, float> percentages, TimeSpan duration)
     {
-        Console.WriteLine($"{DateTime.Now:g} most common activities in the last {duration.Natural()}:");
-        foreach ((Activity key, float percentage) in percentages.OrderByDescending(x => x.Value))
-            Console.WriteLine($"\t{percentage,-5:P1}\t{key}");
+        string report = $"{DateTime.Now:g} most common activities in the last {duration.Natural()}:\n" +
+                        $"{percentages.OrderByDescending(x => x.Value)
+                                      .Select(x => $"\t{x.Value,-5:P1}\t{x.Key}")
+                                      .Aggregate((x, y) => $"{x}{y}")}";
+        Program.Log.WriteLine(report);
     }
     public override string ToString()
         => $"{nameof(ActiveWindowAggregator)}({Config})";
