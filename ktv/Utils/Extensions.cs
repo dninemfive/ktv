@@ -143,11 +143,14 @@ public static class Extensions
     public static string ToColorId(this GoogleUtils.EventColor color)
         => ((int)color).ToString();
     public static IEnumerable<DayOfWeek> ParseWeekdays(this string s)
-        => s switch
+    {
+        s = s.ToLower();
+        return s switch
         {
             "weekdays" or "weekends" => ParseWeekdayAlias(s),
             _ => ParseWeekdayString(s)
         };
+    }
     private static IEnumerable<DayOfWeek> ParseWeekdayAlias(string alias)
         => alias switch
         {
