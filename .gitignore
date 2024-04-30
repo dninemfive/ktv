@@ -1,8 +1,5 @@
 .vs/
 bin/
 obj/
-*.log
 *.secret
 Properties/
-*/calendar config.json
-config.json
