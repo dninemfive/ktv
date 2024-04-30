@@ -14,7 +14,7 @@ public class Program
                                ?? "config.json";
         public static readonly bool PrintToConsole = CommandLineArgs.GetFlag(nameof(PrintToConsole).toCamelCase());
     }
-    public static void Main()
+    public static async void Main()
     {
         // not `using` because the service will dispose this for us
         Log log = new(DateTime.Now.GenerateLogFile(), mode: Log.Mode.WriteImmediate);
@@ -25,10 +25,10 @@ public class Program
         } 
         catch(Exception e)
         {
-            log.WriteLine($"Could not find valid config at expected path {Path.GetFullPath(Args.ConfigPath)}!\n{e.GetType().Name}: {e.Message}";);
+            log.WriteLine($"Could not find valid config at expected path {Path.GetFullPath(Args.ConfigPath)}!\n{e.GetType().Name}: {e.Message}");
             return;
         }
         using KtvService service = new(config, log);
-        service.Run();
+        await service.Run();
     }
 }

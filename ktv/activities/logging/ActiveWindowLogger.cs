@@ -8,10 +8,10 @@ public class ActiveWindowLogger(TimeSpan period) : FixedPeriodTaskScheduler(peri
     {
         _ = Directory.CreateDirectory(Path.Join("logs", "ktv"));
     }
-    protected override ScheduledTask NextTaskInternal(DateTime time)
+    protected override TaskScheduler NextTaskInternal(DateTime time)
     {
-        string fileName = ActiveWindowLogUtils.FileNameFor(time);
-        return new(time, () => LogActiveWindow(fileName), this);
+        LogActiveWindow(ActiveWindowLogUtils.FileNameFor(time));
+        return this;
     }
     private static void LogActiveWindow(string fileName)
     {

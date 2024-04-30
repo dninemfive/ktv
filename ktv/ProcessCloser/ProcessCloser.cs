@@ -9,7 +9,13 @@ public class ProcessCloser(ProcessCloserConfig config) : TaskScheduler
     public TimeSpan ClosePeriod { get; private set; } = TimeSpan.FromMinutes(config.PeriodMinutes);
     public List<ProcessMatcherDef>? ProcessesToClose { get; private set; } = config.ProcessesToClose;
     public List<ProcessMatcherDef>? ProcessesToIgnore { get; private set; } = config.ProcessesToIgnore;
-    public override ScheduledTask NextTask(DateTime time)
+    public override async Task<TaskScheduler> NextTask(DateTime time)
+    {
+        await Task.Delay(NextDateTime(time) - DateTime.Now);
+        CloseApplicableProcesses();
+        return this;
+    }
+    public DateTime NextDateTime(DateTime time)
     {
         TimeOnly nextTime = TimeOnly.FromDateTime(time + ClosePeriod);
         DateTime nextDateTime = new(DateOnly.FromDateTime(time), nextTime);
@@ -17,14 +23,14 @@ public class ProcessCloser(ProcessCloserConfig config) : TaskScheduler
             nextDateTime = TimeConstraint.NextMatchingDateTime(nextDateTime);
         if (nextDateTime <= DateTime.Now)
             nextDateTime += (DateTime.Now.Date - nextDateTime.Date) + TimeSpan.FromDays(1);
-        return new(nextDateTime, CloseApplicableProcesses, this);
+        return nextDateTime;
     }
     public void CloseApplicableProcesses()
     {
         foreach (Process process in Process.GetProcesses())
         {
             if (!ProcessesToIgnore.IsMatch(process) && ProcessesToClose.IsMatch(process))
-                Console.WriteLine($"Close {process.ProcessName} ({process.MainWindowTitle})");
+                Log?.WriteLine($"Close {process.ProcessName} ({process.MainWindowTitle})");
         }
     }
     public override string ToString()

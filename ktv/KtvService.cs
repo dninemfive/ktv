@@ -6,7 +6,7 @@ public class KtvService : IDisposable
 {
     private bool _disposed;
     private List<TaskScheduler> _schedulers = [];
-    private List<ScheduledTask> _scheduledTasks = [];
+    private List<Task<TaskScheduler>> _scheduledTasks = [];
     private KtvConfig Config { get; set; }
     private Log Log { get; set; }
     public KtvService(KtvConfig config, Log log)
@@ -26,16 +26,12 @@ public class KtvService : IDisposable
             scheduler.SetUp();
             _scheduledTasks.Add(scheduler.NextTask(now));
         }
-        while (true)
+        while (_scheduledTasks.Any())
         {
-            SleepUntilNext(_scheduledTasks);
-            now = DateTime.Now;
-            foreach (ScheduledTask task in _scheduledTasks.Where(x => x.ScheduledTime < now).ToList())
-            {
-                task.Execute();
-                _scheduledTasks.Add(task.Scheduler.NextTask(task.ScheduledTime));
-                _scheduledTasks.Remove(task);
-            }
+            Task<TaskScheduler> nextCompletedTask = await Task.WhenAny(_scheduledTasks);
+            _scheduledTasks.Remove(nextCompletedTask);
+            TaskScheduler scheduler = await nextCompletedTask;
+            _scheduledTasks.Add(scheduler.NextTask(DateTime.Now));
         }
     }
     public static IEnumerable<TaskScheduler> LoadSchedulers(KtvConfig config)
@@ -54,15 +50,6 @@ public class KtvService : IDisposable
                     yield return new ProcessCloser(pcc);
         }
     }
-    private static void SleepUntil(DateTime dt)
-    {
-        int delay = (int)(dt - DateTime.Now).TotalMilliseconds;
-        if (delay > 0)
-            Thread.Sleep(delay);
-    }
-    private static void SleepUntilNext(IEnumerable<ScheduledTask> tasks)
-        => SleepUntil(tasks.Select(x => x.ScheduledTime).Min());
-
     protected virtual void Dispose(bool disposing)
     {
         if (!_disposed)

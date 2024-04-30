@@ -19,4 +19,10 @@
     <ProjectReference Include="..\ktv\ktv.csproj" />
   </ItemGroup>
 
+  <ItemGroup>
+    <Reference Include="utl">
+      <HintPath>..\..\utl\bin\Release\net7.0\utl.dll</HintPath>
+    </Reference>
+  </ItemGroup>
+
 </Project>
