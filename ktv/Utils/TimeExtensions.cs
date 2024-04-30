@@ -17,4 +17,10 @@ public static class TimeExtensions
             return dt + ts;
         return dt.Floor(ts) + ts;
     }
+    public static string GenerateLogFile(this DateTime dt)
+    {
+        string logFolder = "logs".AbsolutePath();
+        _ = Directory.CreateDirectory(logFolder);
+        return Path.Join(logFolder, $"{dt.Format()}.ktv.log");
+    }
 }
