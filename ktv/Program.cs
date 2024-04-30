@@ -14,7 +14,7 @@ public class Program
                                ?? "config.json";
         public static readonly bool PrintToConsole = CommandLineArgs.GetFlag(nameof(PrintToConsole).toCamelCase());
     }
-    public static async void Main()
+    public static async Task Main()
     {
         // not `using` because the service will dispose this for us
         Log log = new(DateTime.Now.GenerateLogFile(), mode: Log.Mode.WriteImmediate);
