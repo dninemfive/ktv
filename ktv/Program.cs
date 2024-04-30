@@ -27,11 +27,16 @@ public class Program
     public static void Main()
     {
         DateTime now = DateTime.Now;
-        if (Config.TryLoad<KtvConfig>(Args.ConfigPath) is not KtvConfig config)
+        KtvConfig config;
+        try
         {
-            Log.WriteLine($"Could not find valid config at expected path {Path.GetFullPath(Args.ConfigPath)}!");
+            config = Config.Load<KtvConfig>(Args.ConfigPath);
+        } 
+        catch(Exception e)
+        {
+            Log.WriteLine($"Could not find valid config at expected path {Path.GetFullPath(Args.ConfigPath)}!\n{e.GetType().Name}: {e.Message}");
             return;
-        }
+        }        
         Schedulers = LoadSchedulers(config).ToList();
         Log.WriteLine(Schedulers.MultilineListWithAlignedTitle("schedulers:"));
         foreach(TaskScheduler scheduler in Schedulers)
