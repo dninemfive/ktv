@@ -8,6 +8,15 @@
     <UseWPF>true</UseWPF>
     <AssemblyName>ktv</AssemblyName>
     <RootNamespace>d9.ktv.gui</RootNamespace>
+    <ApplicationIcon>ktv.ico</ApplicationIcon>
   </PropertyGroup>
+
+  <ItemGroup>
+    <Content Include="ktv.ico" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\ktv\ktv.csproj" />
+  </ItemGroup>
 
 </Project>

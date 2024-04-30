@@ -4,6 +4,8 @@
              xmlns:local="clr-namespace:d9.ktv.gui"
              StartupUri="MainWindow.xaml">
     <Application.Resources>
-         
+        <SolidColorBrush x:Key="ConsoleBackgroundColor" Color="Black"/>
+        <SolidColorBrush x:Key="ConsoleTextColor" Color="White"/>
+        <Thickness x:Key="TextPadding">6 4</Thickness>
     </Application.Resources>
 </Application>
