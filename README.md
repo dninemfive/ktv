@@ -10,3 +10,6 @@ A program which runs in the background keeping track of what processes are runni
   - [ ] Create subcategories which can be merged if they don't meet the threshold for adding to the calendar
 - [ ] Close programs based on how long they've been running in a given period of time
   - [ ] Have a little warning window pop up a bit before they close
+  
+## Credits
+- Font used in the logo is [URW Gothic L](https://fontsinuse.com/typefaces/20262/urw-gothic)

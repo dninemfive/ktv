@@ -7,12 +7,17 @@
     <Nullable>enable</Nullable>
     <RootNamespace>d9.ktv</RootNamespace>
     <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
+    <ApplicationIcon>ktv.ico</ApplicationIcon>
   </PropertyGroup>
 
   <ItemGroup>
     <Compile Remove="logs\**" />
     <EmbeddedResource Remove="logs\**" />
     <None Remove="logs\**" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Content Include="ktv.ico" />
   </ItemGroup>
 
   <ItemGroup>
