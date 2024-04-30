@@ -3,7 +3,7 @@ using System.Diagnostics;
 
 namespace d9.ktv;
 // future optimization: merge all ProcessClosers into one which does a decision tree of what to close
-public class ProcessCloser(ProcessCloserConfig config) : TaskScheduler
+public class ProcessCloser(Progress<string> progress, ProcessCloserConfig config) : TaskScheduler(progress)
 {
     public TimeConstraint? TimeConstraint = config.TimeConstraint;
     public TimeSpan ClosePeriod { get; private set; } = TimeSpan.FromMinutes(config.PeriodMinutes);
@@ -30,7 +30,7 @@ public class ProcessCloser(ProcessCloserConfig config) : TaskScheduler
         foreach (Process process in Process.GetProcesses())
         {
             if (!ProcessesToIgnore.IsMatch(process) && ProcessesToClose.IsMatch(process))
-                Log?.WriteLine($"Close {process.ProcessName} ({process.MainWindowTitle})");
+                Report($"Close {process.ProcessName} ({process.MainWindowTitle})");
         }
     }
     public override string ToString()

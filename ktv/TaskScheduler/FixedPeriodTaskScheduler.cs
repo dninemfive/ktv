@@ -4,7 +4,7 @@
 /// tries to align to the current day.
 /// </summary>
 /// <param name="period"></param>
-public abstract class FixedPeriodTaskScheduler(TimeSpan period) : TaskScheduler
+public abstract class FixedPeriodTaskScheduler(Progress<string> progress, TimeSpan period) : TaskScheduler(progress)
 {
     public TimeSpan Period => period;
     public override async Task<TaskScheduler> NextTask(DateTime time)

@@ -2,7 +2,7 @@
 using System.Text.Json;
 
 namespace d9.ktv;
-public class ActiveWindowLogger(TimeSpan period) : FixedPeriodTaskScheduler(period)
+public class ActiveWindowLogger(Progress<string> progress, TimeSpan period) : FixedPeriodTaskScheduler(progress, period)
 {
     public override void SetUp()
     {

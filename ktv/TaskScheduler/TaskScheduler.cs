@@ -1,9 +1,9 @@
-﻿using d9.utl;
-
-namespace d9.ktv;
-public abstract class TaskScheduler(Log? log = null)
+﻿namespace d9.ktv;
+public abstract class TaskScheduler(Progress<string> progress)
 {
-    public Log? Log { get; private set; } = log;
+    public Progress<string> Progress { get; set; } = progress;
     public virtual void SetUp() { }
     public abstract Task<TaskScheduler> NextTask(DateTime time);
+    public void Report(object? obj)
+        => Progress.Report($"{obj}");
 }

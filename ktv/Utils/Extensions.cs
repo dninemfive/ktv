@@ -25,4 +25,6 @@ public static class Extensions
             1 => s.ToLower(),
             _ => $"{s[0].ToLower()}{s[1..]}"
         };
+    public static void Report<T>(this Progress<T> progress, T value)
+        => ((IProgress<T>)progress).Report(value);
 }

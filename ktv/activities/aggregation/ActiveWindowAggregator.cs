@@ -7,7 +7,8 @@ namespace d9.ktv.ActivityLogger;
 /// was happening during the specified time period.
 /// </summary>
 /// <param name="period">The length of time over which to summarize the raw active window data.</param>
-public class ActiveWindowAggregator(ActivityAggregationConfig config) : FixedPeriodTaskScheduler(TimeSpan.FromMinutes(config.PeriodMinutes))
+public class ActiveWindowAggregator(Progress<string> progress, ActivityAggregationConfig config) 
+    : FixedPeriodTaskScheduler(progress, TimeSpan.FromMinutes(config.PeriodMinutes))
 {
     public ActivityAggregationConfig Config { get; private set; } = config;
     public GoogleCalendarEventManager? CalendarEventManager { get; private set; } = GoogleCalendarEventManager.From(config);
@@ -56,7 +57,7 @@ public class ActiveWindowAggregator(ActivityAggregationConfig config) : FixedPer
         IEnumerable<ActiveWindowLogEntry> entries = EntriesBetween(time - Period, time);
         if(entries.Count() < 2)
         {
-            Log?.WriteLine($"Cannot aggregate fewer than 2 entries!");
+            Report($"Cannot aggregate fewer than 2 entries!");
             return;
         }
         List<DateTime> timestamps = entries.Select(x => x.DateTime).ToList();
@@ -89,17 +90,15 @@ public class ActiveWindowAggregator(ActivityAggregationConfig config) : FixedPer
         Dictionary<Activity, float> result = counts.Select(x => new KeyValuePair<Activity, float>(x.Key, x.Value / (float)expectedCount)).ToDictionary();
         return result;
     }
-    private static void PrintPercentages(Log? log, IReadOnlyDictionary<Activity, float> percentages, TimeSpan duration)
+    private void PrintPercentages(IReadOnlyDictionary<Activity, float> percentages, TimeSpan duration)
     {
-        if (log is null)
-            return;
         if (!percentages.Any())
-            log.WriteLine($"{DateTime.Now:g} no activities in the last {duration.Natural()}.");
+            Report($"{DateTime.Now:g} no activities in the last {duration.Natural()}.");
         string report = $"{DateTime.Now:g} most common activities in the last {duration.Natural()}:\n" +
                         $"{percentages.OrderByDescending(x => x.Value)
                                       .Select(x => $"\t{x.Value,-5:P1}\t{x.Key}")
                                       .Aggregate((x, y) => $"{x}\n{y}")}";
-        log.WriteLine(report);
+        Report(report);
     }
     public override string ToString()
         => $"{nameof(ActiveWindowAggregator)}({Config})";

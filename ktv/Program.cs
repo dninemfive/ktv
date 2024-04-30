@@ -28,7 +28,8 @@ public class Program
             log.WriteLine($"Could not find valid config at expected path {Path.GetFullPath(Args.ConfigPath)}!\n{e.GetType().Name}: {e.Message}");
             return;
         }
-        using KtvService service = new(config, log);
+        Progress<string> progress = new(log.WriteLine);
+        KtvService service = new(config, progress);
         await service.Run();
     }
 }
