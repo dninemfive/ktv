@@ -5,7 +5,9 @@ VisualStudioVersion = 17.3.32929.385
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "ktv", "ktv\ktv.csproj", "{0BDE0E02-5783-4901-98B9-724CC2537D71}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ktv.tests", "ktv.tests\ktv.tests\ktv.tests.csproj", "{C36B10E7-0E20-4E1B-BD96-9310B941584D}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "ktv.tests", "ktv.tests\ktv.tests\ktv.tests.csproj", "{C36B10E7-0E20-4E1B-BD96-9310B941584D}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ktv.gui", "ktv.gui\ktv.gui.csproj", "{057B8086-9FED-4303-8FCD-F06230127CA4}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -21,6 +23,10 @@ Global
 		{C36B10E7-0E20-4E1B-BD96-9310B941584D}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{C36B10E7-0E20-4E1B-BD96-9310B941584D}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{C36B10E7-0E20-4E1B-BD96-9310B941584D}.Release|Any CPU.Build.0 = Release|Any CPU
+		{057B8086-9FED-4303-8FCD-F06230127CA4}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{057B8086-9FED-4303-8FCD-F06230127CA4}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{057B8086-9FED-4303-8FCD-F06230127CA4}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{057B8086-9FED-4303-8FCD-F06230127CA4}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
