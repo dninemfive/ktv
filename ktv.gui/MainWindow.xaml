@@ -6,9 +6,16 @@
         xmlns:local="clr-namespace:d9.ktv.gui"
         mc:Ignorable="d"
         Title="MainWindow" Height="450" Width="800">
-    <DockPanel>
-        <ToolBar DockPanel.Dock="Top"/>
-        <local:ConsoleControl x:Name="Console"/>
-        <ToolBar Width="100"/>
-    </DockPanel>
+    <Grid>
+        <Button x:Name="StartButton" HorizontalAlignment="Center" VerticalAlignment="Center" Panel.ZIndex="2" Click="StartButton_Click" Padding="4 2">
+            Start
+        </Button>
+        <DockPanel>
+            <StackPanel Orientation="Horizontal" DockPanel.Dock="Top">
+                <Label x:Name="UptimeLabel">0:00</Label>
+
+            </StackPanel>
+            <local:ConsoleControl x:Name="Console"/>
+        </DockPanel>
+    </Grid>
 </Window>

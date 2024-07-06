@@ -6,7 +6,7 @@
     <Nullable>enable</Nullable>
     <ImplicitUsings>enable</ImplicitUsings>
     <UseWPF>true</UseWPF>
-    <AssemblyName>ktv</AssemblyName>
+    <AssemblyName>ktv.gui</AssemblyName>
     <RootNamespace>d9.ktv.gui</RootNamespace>
     <ApplicationIcon>ktv.ico</ApplicationIcon>
   </PropertyGroup>
