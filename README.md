@@ -1,4 +1,5 @@
 # ktv - A<ins>ct</ins>i<ins>v</ins>ity Tracker
+## NOTE: unfortunately, Windows Defender detects this program as a "potentially unwanted program" and deletes it, if it is packaged as a standalone EXE. As such, i will not be releasing this program for public use as previously planned.
 A program which runs in the background keeping track of what processes are running productivity purposes. i have now merged it with [slp](https://github.com/dninemfive/slp), which similarly runs in the background and shuts down programs when i need to sleep. This ended up being a total rewrite, drastically improving ktv's performance by getting rid of the weird spooling loop i used in my first version, as well as implementing a scheduling logic which is honestly pretty cool.
 
 ## Todo:
