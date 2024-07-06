@@ -66,7 +66,7 @@ public class ActiveWindowAggregator(Progress<string> progress, ActivityAggregati
                                                                            actualDuration,
                                                                            MinIntervalBetween(timestamps));
         CalendarEventManager?.PostFromSummary(new(percentages, time - Period, time));
-        PrintPercentages(Log, percentages, actualDuration);
+        PrintPercentages(percentages, actualDuration);
         _lastAggregationTime = time;
     }
     private static TimeSpan MinIntervalBetween(List<DateTime> timestamps)

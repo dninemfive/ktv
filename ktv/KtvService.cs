@@ -4,7 +4,6 @@ using d9.utl;
 namespace d9.ktv;
 public class KtvService(KtvConfig config, Progress<string> progress)
 {
-    private bool _disposed;
     private List<TaskScheduler> _schedulers = [];
     private readonly List<Task<TaskScheduler>> _scheduledTasks = [];
     private KtvConfig Config { get; set; } = config;
