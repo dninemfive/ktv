@@ -8,6 +8,8 @@
     <RootNamespace>d9.ktv</RootNamespace>
     <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
     <ApplicationIcon>ktv.ico</ApplicationIcon>
+    <SignAssembly>True</SignAssembly>
+    <AssemblyOriginatorKeyFile>C:\Users\dninemfive\Documents\workspaces\misc\ktv\ktv.snk</AssemblyOriginatorKeyFile>
   </PropertyGroup>
 
   <ItemGroup>
