@@ -41,17 +41,13 @@ public partial class TimeFractionProgressBar : UserControl
     public TimeSpan? TimePerUpdate
     {
         get => _timePerUpdate;
-        set
-        {
-            _timePerUpdate = value;
-            UpdateLabels();
-        }
+        private set => _timePerUpdate = value;
     }
     public TimeFractionProgressBar()
     {
         InitializeComponent();
     }
-    private void ReceiveUpdate(object? _, TimeFraction? tf)
+    public void ReceiveUpdate(object? _, TimeFraction? tf)
     {
         if (tf is TimeFraction fraction)
         {
@@ -68,9 +64,10 @@ public partial class TimeFractionProgressBar : UserControl
         Update(TimeElapsedLabel, elapsed, elapsed is null);
         Update(TimePerUpdateLabel, TimePerUpdate, elapsed is null);
     }
-    private static void Update(Label label, TimeSpan? value, bool eitherNull)
+    private void Update(Label label, TimeSpan? value, bool? eitherNull = null)
     {
-        label.Visibility = eitherNull ? Visibility.Hidden : Visibility.Visible;
+        eitherNull ??= (TimeUntilUpdate is null || TimePerUpdate is null);
+        label.Visibility = eitherNull.Value ? Visibility.Hidden : Visibility.Visible;
         label.Content = value.ToStringOrNA();
     }
 }

@@ -13,8 +13,8 @@
         <DockPanel>
             <StackPanel Orientation="Horizontal" DockPanel.Dock="Top">
                 <Label x:Name="UptimeLabel">0:00</Label>
-
             </StackPanel>
+            <local:ScheduleProgressBarCollection x:Name="ProgressBars"/>
             <local:ConsoleControl x:Name="Console"/>
         </DockPanel>
     </Grid>

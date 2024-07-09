@@ -18,12 +18,13 @@ namespace d9.ktv.gui;
 public partial class MainWindow : Window
 {
     public Log Log { get; private set; }
-    private readonly Progress<string> _serviceProgress = new();
+    private readonly Progress<string> _serviceLog;
     public KtvService Service { get; private set; }
     public MainWindow()
     {
         InitializeComponent();
         Log = new(DateTime.Now.GenerateLogFile(), Console, mode: Log.Mode.WriteImmediate);
+        _serviceLog = new(Log.WriteLine);
         string configPath = "config.json";
         KtvConfig? config = Config.TryLoad<KtvConfig>(configPath);
         if (config is null)
@@ -31,14 +32,16 @@ public partial class MainWindow : Window
             Log.WriteLine($"Could not find config at {configPath.AbsolutePath()}! Using default config...");
             config = KtvConfig.Default;
         }
-        Service = new(config, _serviceProgress);
-        _serviceProgress.ProgressChanged += (_, s) => Log.WriteLine(s);
+        Service = KtvService.CreateAndLog(config, _serviceLog);
     }
 
     private async void StartButton_Click(object sender, RoutedEventArgs _)
     {
         if (sender is Button b)
             b.Visibility = Visibility.Hidden;
-        await Service.Run();
+        Task runningService = Service.Run();
+        foreach (TaskScheduler scheduler in Service.Schedulers)
+            ProgressBars.Add(scheduler);
+        await runningService;
     }
 }

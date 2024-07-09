@@ -4,16 +4,22 @@ using d9.utl;
 namespace d9.ktv;
 public class KtvService(KtvConfig config, Progress<string> progress)
 {
-    private List<TaskScheduler> _schedulers = [];
+    private List<TaskScheduler> _schedulers = LoadSchedulers(progress, config).ToList();
+    public IReadOnlyList<TaskScheduler> Schedulers => _schedulers;
     private readonly List<Task<TaskScheduler>> _scheduledTasks = [];
     private KtvConfig Config { get; set; } = config;
     private Progress<string> Progress { get; set; } = progress;
+    private bool _running = false;
+    public static KtvService CreateAndLog(KtvConfig config, Progress<string> progress)
+    {
+        KtvService result = new(config, progress);
+        progress.Report(result._schedulers.MultilineListWithAlignedTitle("schedulers:"));
+        return result;
+    }
     public async Task Run()
     {
-        // todo: check if already running to avoid having two runs of the same instance?
+        _running = !_running ? true : throw new Exception("Attempted to run a KtvService which was already running!");
         DateTime now = DateTime.Now;
-        _schedulers = LoadSchedulers(Progress, Config).ToList();
-        Progress.Report(_schedulers.MultilineListWithAlignedTitle("schedulers:"));
         foreach (TaskScheduler scheduler in _schedulers)
         {
             scheduler.SetUp();
