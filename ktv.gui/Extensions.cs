@@ -18,6 +18,22 @@ public static class Extensions
         result.Inlines.Add(new Run($"{obj}"));
         return result;
     }
+    public static TimeSpan? Subtract(this TimeSpan? left, TimeSpan? right)
+    {
+        if(left is TimeSpan left_ && right is TimeSpan right_)
+        {
+            return left_ - right_;
+        }
+        return null;
+    }
+    public static double? DivideBy(this TimeSpan? dividend, TimeSpan? divisor)
+    {
+        if(dividend is TimeSpan dividend_ && divisor is TimeSpan divisor_)
+        {
+            return dividend_ / divisor_;
+        }
+        return null;
+    }
     public static string ToStringOrNA(this TimeSpan? ts)
     {
         if (ts is null)

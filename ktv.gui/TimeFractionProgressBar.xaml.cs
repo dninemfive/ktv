@@ -32,15 +32,9 @@ public partial class TimeFractionProgressBar : UserControl
         {
             _timeUntilUpdate = value;
             InProgress = _timeUntilUpdate is not null;
-            if (_timeUntilUpdate is TimeSpan tuu && TimePerUpdate is TimeSpan tpu)
-            {
-                ProgressBar.Value = tuu / tpu;
-                TimeElapsedLabel.Content = $"{tpu - tuu:g}";
-            }
-            else
-            {
-                TimeElapsedLabel.Content = "(N/A)";
-            }
+            if (_timeUntilUpdate.DivideBy(TimePerUpdate) is double d)
+                ProgressBar.Value = d;
+            UpdateLabels();
         }
     }
     private TimeSpan? _timePerUpdate;
@@ -50,14 +44,14 @@ public partial class TimeFractionProgressBar : UserControl
         set
         {
             _timePerUpdate = value;
-            TimePerUpdateLabel.Content = _timePerUpdate.ToStringOrNA();
+            UpdateLabels();
         }
     }
     public TimeFractionProgressBar()
     {
         InitializeComponent();
     }
-    public void ReceiveUpdate(object? _, TimeFraction? tf)
+    private void ReceiveUpdate(object? _, TimeFraction? tf)
     {
         if (tf is TimeFraction fraction)
         {
@@ -67,5 +61,16 @@ public partial class TimeFractionProgressBar : UserControl
         {
             TimeUntilUpdate = null;
         }
+    }
+    private void UpdateLabels()
+    {
+        TimeSpan? elapsed = TimePerUpdate.Subtract(TimeUntilUpdate);
+        Update(TimeElapsedLabel, elapsed, elapsed is null);
+        Update(TimePerUpdateLabel, TimePerUpdate, elapsed is null);
+    }
+    private static void Update(Label label, TimeSpan? value, bool eitherNull)
+    {
+        label.Visibility = eitherNull ? Visibility.Hidden : Visibility.Visible;
+        label.Content = value.ToStringOrNA();
     }
 }
