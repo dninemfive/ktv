@@ -1,8 +1,4 @@
-﻿using d9.ktv.ActivityLogger;
-using d9.utl;
-using d9.utl.compat;
-using System.Text.Json;
-using System.Text.RegularExpressions;
+﻿using d9.utl;
 
 namespace d9.ktv;
 
@@ -11,7 +7,7 @@ public class Program
     public static class Args
     {
         public static readonly string ConfigPath = CommandLineArgs.TryGet(nameof(ConfigPath).toCamelCase(), CommandLineArgs.Parsers.FilePath)
-                               ?? "config.json";
+                               ?? "config.json".AbsolutePath();
         public static readonly bool PrintToConsole = CommandLineArgs.GetFlag(nameof(PrintToConsole).toCamelCase());
     }
     public static async Task Main()

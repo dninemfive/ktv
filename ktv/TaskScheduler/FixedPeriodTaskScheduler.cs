@@ -4,12 +4,16 @@
 /// tries to align to the current day.
 /// </summary>
 /// <param name="period"></param>
-public abstract class FixedPeriodTaskScheduler(Progress<string> progress, TimeSpan period) : TaskScheduler(progress)
+public abstract class FixedPeriodTaskScheduler(Progress<string> logProgress, Progress<TimeFraction?> timeProgress, TimeSpan period)
+    : TaskScheduler(logProgress, timeProgress)
 {
+    public FixedPeriodTaskScheduler(Progress<string> logProgress, TimeSpan period) : this(logProgress, new(), period) { }
     public TimeSpan Period => period;
     public override async Task<TaskScheduler> NextTask(DateTime time)
     {
-        await Task.Delay(time.NextDayAlignedTime(Period) - time);
+        TimeSpan delay = time.NextDayAlignedTime(Period) - time;
+        ((IProgress<TimeFraction?>)UpdateProgress).Report(new(delay, Period));
+        await Task.Delay(delay);
         return NextTaskInternal(time.NextDayAlignedTime(Period));
     }
     protected abstract TaskScheduler NextTaskInternal(DateTime time);
