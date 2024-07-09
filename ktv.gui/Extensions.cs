@@ -18,4 +18,10 @@ public static class Extensions
         result.Inlines.Add(new Run($"{obj}"));
         return result;
     }
+    public static string ToStringOrNA(this TimeSpan? ts)
+    {
+        if (ts is null)
+            return "(N/A)";
+        return $"{ts:g}";
+    }
 }

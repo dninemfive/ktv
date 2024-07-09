@@ -10,12 +10,24 @@
     <Compile Update="ConsoleControl.xaml.cs">
       <SubType>Code</SubType>
     </Compile>
+    <Compile Update="ScheduleProgressBarCollection.xaml.cs">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Update="TimeFractionProgressBar.xaml.cs">
+      <SubType>Code</SubType>
+    </Compile>
   </ItemGroup>
   <ItemGroup>
     <Page Update="ConsoleControl.xaml">
       <SubType>Designer</SubType>
     </Page>
     <Page Update="MainWindow.xaml">
+      <SubType>Designer</SubType>
+    </Page>
+    <Page Update="ScheduleProgressBarCollection.xaml">
+      <SubType>Designer</SubType>
+    </Page>
+    <Page Update="TimeFractionProgressBar.xaml">
       <SubType>Designer</SubType>
     </Page>
   </ItemGroup>
