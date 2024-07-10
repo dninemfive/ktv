@@ -19,7 +19,7 @@ public static class TimeExtensions
     }
     public static string GenerateLogFile(this DateTime dt)
     {
-        string logFolder = "logs".AbsolutePath();
+        string logFolder = "logs".AbsoluteOrInBaseFolder();
         _ = Directory.CreateDirectory(logFolder);
         return Path.Join(logFolder, $"{dt.Format()}.ktv.log");
     }

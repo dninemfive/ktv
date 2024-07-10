@@ -7,7 +7,7 @@ public class Program
     public static class Args
     {
         public static readonly string ConfigPath = CommandLineArgs.TryGet(nameof(ConfigPath).toCamelCase(), CommandLineArgs.Parsers.FilePath)
-                               ?? "config.json".AbsolutePath();
+                               ?? "config.json".AbsoluteOrInBaseFolder();
         public static readonly bool PrintToConsole = CommandLineArgs.GetFlag(nameof(PrintToConsole).toCamelCase());
     }
     public static async Task Main()
@@ -25,7 +25,7 @@ public class Program
             return;
         }
         Progress<string> progress = new(log.WriteLine);
-        KtvService service = new(config, progress);
+        KtvService service = KtvService.CreateAndLog(config, progress);
         await service.Run();
     }
 }
