@@ -1,6 +1,4 @@
-﻿using System.Reflection;
-
-namespace d9.ktv;
+﻿namespace d9.ktv;
 [AttributeUsage(AttributeTargets.Field, AllowMultiple = false)]
 public class ImplementedByAttribute(Type? type, string methodName) : Attribute
 {
