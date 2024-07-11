@@ -23,6 +23,8 @@ public static class ProcessMatchUtils
         => PropertyMatches(summary.MainWindowTitle, value);
     public static bool ProcessNameMatches(string value, ProcessSummary summary)
         => PropertyMatches(summary.ProcessName, value);
+    public static bool IsInCategory(string value, ProcessSummary summary)
+        => false;
     public static ProcessMatcher ToDelegate(this ProcessMatchMode mode, string category)
     {
         if(Index.TryGetValue(mode, out ProcessMatcher? matcher)) return matcher;
