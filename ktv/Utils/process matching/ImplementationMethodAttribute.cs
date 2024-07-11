@@ -2,16 +2,16 @@
 
 namespace d9.ktv;
 [AttributeUsage(AttributeTargets.Field, AllowMultiple = false)]
-internal class ImplementationMethodAttribute(string methodName) : Attribute
+public class ImplementationMethodAttribute(string methodName) : Attribute
 {
     public readonly string MethodName = methodName;
 }
-internal class EnumImplementation<E, D>
+public class EnumImplementation<E, D>
     where E : struct, Enum
     where D : Delegate
 {
     private readonly Dictionary<E, D> _dict = new();
-    internal EnumImplementation()
+    public EnumImplementation()
     {
         Type enumType = typeof(E), thisType = GetType();
         foreach(string fieldName in Enum.GetNames(enumType))

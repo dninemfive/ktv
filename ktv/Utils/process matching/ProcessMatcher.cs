@@ -2,17 +2,9 @@
 
 namespace d9.ktv;
 public delegate bool ProcessMatcher(string value, ProcessSummary summary);
-public static class ProcessMatchUtils
+public class ProcessMatchModeImplementation : EnumImplementation<ProcessMatchMode, ProcessMatcher>
 {
-    public static KtvConfig? Config { private get; set; }
-    public static IReadOnlyDictionary<ProcessMatchMode, ProcessMatcher> Index { get; private set; }
-        = new Dictionary<ProcessMatchMode, ProcessMatcher>()
-        {
-            { ProcessMatchMode.InFolder, IsInFolder },
-            { ProcessMatchMode.FileNameMatches, FileNameMatches },
-            { ProcessMatchMode.MainWindowTitleMatches, MainWindowTitleMatches },
-            { ProcessMatchMode.ProcessNameMatches, ProcessNameMatches }
-        };
+    public static readonly ProcessMatchModeImplementation Instance = new();
     public static bool IsInFolder(string value, ProcessSummary summary)
         => summary.FileName?.IsInFolder(value) ?? false;
     private static bool PropertyMatches(string? propertyValue, string regex)
@@ -25,13 +17,17 @@ public static class ProcessMatchUtils
         => PropertyMatches(summary.ProcessName, value);
     public static bool IsInCategory(string value, ProcessSummary summary)
         => false;
+}
+{
+    public static KtvConfig? Config { private get; set; }
+    public static readonly EnumImplementation<ProcessMatchMode, ProcessMatcher> Implementation = new();
     public static ProcessMatcher ToDelegate(this ProcessMatchMode mode, string category)
     {
         if(Index.TryGetValue(mode, out ProcessMatcher? matcher)) return matcher;
         if (Config?.ActivityTracker?.AggregationConfig?.CategoryDefs?.TryGetValue(category, out ActivityCategoryDef? def) ?? false)
             return def.ProcessMatcher;
         throw new ArgumentOutOfRangeException(nameof(mode), $"{mode} is not a valid ProcessMatchMode value!");
-    }
-    public static bool IsMatch(this List<ProcessMatcherDef>? matchers, ProcessSummary summary)
-        => matchers?.Any(x => x.IsMatch(summary)) ?? false;
+}
+public static bool IsMatch(this List<ProcessMatcherDef>? matchers, ProcessSummary summary)
+    => matchers?.Any(x => x.IsMatch(summary)) ?? false;
 }

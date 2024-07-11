@@ -1,5 +1,4 @@
 ﻿namespace d9.ktv;
-[EnumImplementation(typeof(ProcessMatchUtils), typeof(bool), typeof(string), typeof(ProcessSummary))]
 public enum ProcessMatchMode
 {
     [ImplementationMethod(nameof(ProcessMatchUtils.IsInFolder))]
