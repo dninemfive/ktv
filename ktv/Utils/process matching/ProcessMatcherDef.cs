@@ -9,7 +9,7 @@ public class ProcessMatcherDef
     public required ProcessMatchMode Mode { get; set; }
     public required string Value { get; set; }
     public bool IsMatch(ProcessSummary summary)
-        => Mode.ToDelegate(Value)(Value, summary);
+        => Mode.ToDelegate()(Value, summary);
     public bool IsSummaryMatch([NotNullWhen(true)] ActiveWindowLogEntry? awle)
         => awle is not null && IsMatch(awle);
     public bool IsSummaryMatch([NotNullWhen(true)] Process? p)
