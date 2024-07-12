@@ -93,7 +93,10 @@ public class ActiveWindowAggregator(Progress<string> progress, ActivityAggregati
     private void PrintPercentages(IReadOnlyDictionary<Activity, float> percentages, TimeSpan duration)
     {
         if (!percentages.Any())
+        {
             Report($"{DateTime.Now:g} no activities in the last {duration.Natural()}.");
+            return;
+        }
         string report = $"{DateTime.Now:g} most common activities in the last {duration.Natural()}:\n" +
                         $"{percentages.OrderByDescending(x => x.Value)
                                       .Select(x => $"\t{x.Value,-5:P1}\t{x.Key}")
