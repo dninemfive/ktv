@@ -30,7 +30,10 @@ public class ProcessCloser(Progress<string> progress, ProcessCloserConfig config
         foreach (Process process in Process.GetProcesses())
         {
             if (!ProcessesToIgnore.IsMatch(process) && ProcessesToClose.IsMatch(process))
+            {
                 Report($"Close {process.ProcessName} ({process.MainWindowTitle})");
+                process.Close();
+            }
         }
     }
     public override string ToString()
