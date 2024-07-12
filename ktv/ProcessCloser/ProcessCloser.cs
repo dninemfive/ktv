@@ -12,7 +12,7 @@ public class ProcessCloser(Progress<string> progress, ProcessCloserConfig config
     public override async Task<TaskScheduler> NextTask(DateTime time)
     {
         await Task.Delay(NextDateTime(time) - DateTime.Now);
-        CloseApplicableProcesses();
+        CloseMatchingProcesses();
         return this;
     }
     public DateTime NextDateTime(DateTime time)
@@ -25,13 +25,14 @@ public class ProcessCloser(Progress<string> progress, ProcessCloserConfig config
             nextDateTime += (DateTime.Now.Date - nextDateTime.Date) + TimeSpan.FromDays(1);
         return nextDateTime;
     }
-    public void CloseApplicableProcesses()
+    public void CloseMatchingProcesses()
     {
+        Console.WriteLine($"{this} attempting to close matching processes...");
         foreach (Process process in Process.GetProcesses())
         {
             if (!ProcessesToIgnore.IsMatch(process) && ProcessesToClose.IsMatch(process))
             {
-                Report($"Closing {process.FullInfo()}");
+                Report($"\t{process.FullInfo()}");
                 process.Close();
             }
         }
