@@ -17,6 +17,19 @@ internal static class ProcessExtensions
     }
     internal static string? FileName(this Process process)
         => process.TryGetProcessModule()?.FileName;
+    public static string FullInfo(this Process process)
+    {
+        string extraInfo = process.MainWindowTitle;
+        if(process.FileName() is string s && !string.IsNullOrWhiteSpace(s))
+        {
+            if (!string.IsNullOrWhiteSpace(extraInfo))
+                extraInfo += "/";
+            extraInfo += s;
+        }
+        if (!string.IsNullOrWhiteSpace(extraInfo))
+            extraInfo = $" ({extraInfo})";
+        return $"{process.ProcessName}{extraInfo}";
+    }
     internal static bool IsInFolder(this Process process, string folder)
         => process.FileName()?
                   .IsInFolder(folder)

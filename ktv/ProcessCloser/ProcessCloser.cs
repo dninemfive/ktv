@@ -31,7 +31,7 @@ public class ProcessCloser(Progress<string> progress, ProcessCloserConfig config
         {
             if (!ProcessesToIgnore.IsMatch(process) && ProcessesToClose.IsMatch(process))
             {
-                Report($"Close {process.ProcessName} ({process.MainWindowTitle})");
+                Report($"Closing {process.FullInfo()}");
                 process.Close();
             }
         }
