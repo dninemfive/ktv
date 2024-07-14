@@ -27,12 +27,12 @@ public class ProcessCloser(Progress<string> progress, ProcessCloserConfig config
     }
     public void CloseMatchingProcesses()
     {
-        Console.WriteLine($"{this} attempting to close matching processes...");
+        //Console.WriteLine($"{this} attempting to close matching processes...");
         foreach (Process process in Process.GetProcesses())
         {
             if (!ProcessesToIgnore.IsMatch(process) && ProcessesToClose.IsMatch(process))
             {
-                Report($"\t{process.FullInfo()}");
+                //Report($"\t{process.FullInfo()}");
                 process.Close();
             }
         }
