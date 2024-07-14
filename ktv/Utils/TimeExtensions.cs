@@ -23,4 +23,6 @@ public static class TimeExtensions
         _ = Directory.CreateDirectory(logFolder);
         return Path.Join(logFolder, $"{dt.Format()}.ktv.log");
     }
+    public static TimeSpan RoundToMinutes(this TimeSpan ts)
+        => TimeSpan.FromMinutes(double.Round(ts.TotalMinutes));
 }

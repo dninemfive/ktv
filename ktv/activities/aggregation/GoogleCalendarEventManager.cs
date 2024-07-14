@@ -34,8 +34,23 @@ public class GoogleCalendarEventManager
     }
     private void Remove(Activity activity)
     {
+        void printDicts(string msg)
+        {
+            Console.WriteLine(msg);
+            foreach (Activity key in _startTimes.Keys.Union(_eventIds.Keys)
+                                                     .Distinct()
+                                                     .OrderBy(x => x.Category)
+                                                     .ThenBy(x => x.Name))
+            {
+                Console.WriteLine($"{key,-20}\t{(_startTimes.TryGetValue(key, out DateTime value) ? value : ""),-20}" +
+                                  $"\t{(_eventIds.TryGetValue(key, out string? id) ? id : "")}");
+            }
+        }
+        printDicts("before:");
+        Console.WriteLine($"Remove {activity}");
         _startTimes.Remove(activity);
         _eventIds.Remove(activity);
+        printDicts("after:");
     }
     public string? TryPostEvent(Activity activity, DateTime start, DateTime end)
     {

@@ -9,11 +9,11 @@
     <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
     <ApplicationIcon>ktv.ico</ApplicationIcon>
     <SignAssembly>True</SignAssembly>
-    <AssemblyOriginatorKeyFile>C:\Users\dninemfive\Documents\workspaces\misc\ktv\ktv.snk</AssemblyOriginatorKeyFile>
     <PackageId>com.dninemfive.ktv</PackageId>
     <Title>ktv</Title>
     <Company>dninemfive</Company>
     <Product>ktv</Product>
+    <DelaySign>False</DelaySign>
   </PropertyGroup>
 
   <ItemGroup>
@@ -35,9 +35,5 @@
       <HintPath>..\..\utl\bin\Release\net7.0\utl.dll</HintPath>
     </Reference>
   </ItemGroup>
-
-  <Target Name="PostBuild" AfterTargets="PostBuildEvent">
-    <Exec Command="rem signtool sign /a /fd SHA256 /tr https://rfc3161.ai.moda /td SHA256 &quot;C:\Users\dninemfive\Documents\workspaces\misc\ktv\ktv\bin\Release\net8.0\ktv.exe&quot;" />
-  </Target>
 
 </Project>
