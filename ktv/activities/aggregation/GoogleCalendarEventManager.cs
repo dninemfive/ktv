@@ -19,23 +19,23 @@ public class GoogleCalendarEventManager
     {
         foreach (Activity activity in summary)
         {
-            if(_startedEvents.TryGetValue(activity, out EventStartTime eventStartTime))
+            if (summary[activity] >= Config.GoogleCalendar?.ActivityPercentageThreshold)
             {
-                if (summary[activity] >= Config.GoogleCalendar?.ActivityPercentageThreshold)
+                if(_startedEvents.TryGetValue(activity, out EventStartTime eventStartTime))
                 {
                     (DateTime start, string id) = eventStartTime;
                     UpdateEvent(id, activity, start, summary.End);
-                } 
+                }
                 else
                 {
-                    _startedEvents.Remove(activity);
+                    string? id = TryPostEvent(activity, summary.Start, summary.End);
+                    if (id is not null)
+                        _startedEvents.Add(activity, (summary.Start, id));
                 }
-            }
-            else if (summary[activity] >= Config.GoogleCalendar?.ActivityPercentageThreshold)
+            } 
+            else
             {
-                string? id = TryPostEvent(activity, summary.Start, summary.End);
-                if (id is string actualId)
-                    _startedEvents.Add(activity, (summary.Start, actualId));
+                _startedEvents.Remove(activity);
             }
         }
     }
