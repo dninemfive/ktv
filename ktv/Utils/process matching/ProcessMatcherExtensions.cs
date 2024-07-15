@@ -1,6 +1,8 @@
 ﻿namespace d9.ktv;
 public static class ProcessMatcherExtensions
 {
+    public static ProcessMatcher ToDelegate(this ProcessMatchMode mode)
+        => ProcessMatchModeImplementation.Instance[mode];
     public static bool IsMatch(this List<ProcessMatcherDef>? matchers, ProcessSummary summary)
         => matchers?.Any(x => x.IsMatch(summary)) ?? false;
     public static bool IsMatch(this List<ProcessMatcherDef>? matchers, ProcessSummary summary, out List<ProcessMatcherDef> matches)

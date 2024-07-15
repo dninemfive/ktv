@@ -6,9 +6,24 @@ using System.Text;
 using System.Threading.Tasks;
 
 namespace d9.ktv;
-public class ProcessMatchModeImplementation(KtvConfig config) : EnumImplementation<ProcessMatchMode, ProcessMatcher>()
+public class ProcessMatchModeImplementation : EnumImplementation<ProcessMatchMode, ProcessMatcher>
 {
-    public KtvConfig Config { get; private set; } = config;
+    public KtvConfig Config { get; private set; }
+    private static ProcessMatchModeImplementation? _instance = null;
+    public static ProcessMatchModeImplementation Instance
+    {
+        get => _instance ?? throw new Exception($"Attempted to reference ProcessMatchModeImplementation.Instance before it was set!");
+        set
+        {
+            Console.WriteLine($"ALERT: Setting ProcessMatchModeImplementation._instance!");
+            _instance = value;
+        }
+    }
+    public ProcessMatchModeImplementation(KtvConfig config) : base()
+    {
+        Config = config;
+        Instance = this;
+    }
     private static bool PropertyMatches(string? propertyValue, string regex)
         => propertyValue?.IsMatch(regex) ?? false;
 #pragma warning disable CA1822 // Mark members as static: need to be instance members for new EnumImplementation constructor
