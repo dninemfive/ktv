@@ -24,6 +24,8 @@ public class Program
             log.WriteLine($"Could not find valid config at expected path {Path.GetFullPath(Args.ConfigPath)}!\n{e.GetType().Name}: {e.Message}");
             return;
         }
+        // todo: somehow multiple progress reports within the same method can cause a crash here
+        // probably needs a custom method which handles this, possibly aggregating reports into an async-safe collection and writing sequentially
         Progress<string> progress = new(log.WriteLine);
         KtvService service = KtvService.CreateAndLog(config, progress);
         await service.Run();
