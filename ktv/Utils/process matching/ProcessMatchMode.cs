@@ -1,14 +1,14 @@
 ﻿namespace d9.ktv;
 public enum ProcessMatchMode
 {
-    [ImplementedBy(nameof(ProcessMatchUtils.IsInFolder))]
+    [ImplementedBy(nameof(ProcessMatchModeImplementation.IsInFolder))]
     InFolder,
-    [ImplementedBy(nameof(ProcessMatchUtils.FileNameMatches))]
+    [ImplementedBy(nameof(ProcessMatchModeImplementation.FileNameMatches))]
     FileNameMatches,
-    [ImplementedBy(nameof(ProcessMatchUtils.MainWindowTitleMatches))]
+    [ImplementedBy(nameof(ProcessMatchModeImplementation.MainWindowTitleMatches))]
     MainWindowTitleMatches,
-    [ImplementedBy(nameof(ProcessMatchUtils.ProcessNameMatches))]
+    [ImplementedBy(nameof(ProcessMatchModeImplementation.ProcessNameMatches))]
     ProcessNameMatches,
-    [ImplementedBy(nameof(ProcessMatchUtils.IsInCategory))]
+    [ImplementedBy(nameof(ProcessMatchModeImplementation.IsInCategory))]
     IsInCategory
 }
