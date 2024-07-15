@@ -1,4 +1,5 @@
 ﻿using d9.utl;
+using System.Diagnostics.CodeAnalysis;
 
 namespace d9.ktv;
 public static class ProcessMatchUtils
@@ -21,4 +22,16 @@ public static class ProcessMatchUtils
         => Config?.ActivityTracker?.AggregationConfig?.CategoryDefs.Any(x => x.Value.ProcessMatcher(value, summary)) ?? false;
     public static bool IsMatch(this List<ProcessMatcherDef>? matchers, ProcessSummary summary)
         => matchers?.Any(x => x.IsMatch(summary)) ?? false;
+    public static bool IsMatch(this List<ProcessMatcherDef>? matchers, ProcessSummary summary, out List<ProcessMatcherDef> matches)
+    {
+        matches = [];
+        if (matchers is null)
+            return false;
+        foreach (ProcessMatcherDef def in matchers)
+        {
+            if (def.IsMatch(summary))
+                matches.Add(def);
+        }
+        return matches.Any();
+    }
 }

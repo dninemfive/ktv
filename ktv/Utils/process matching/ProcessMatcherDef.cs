@@ -13,4 +13,6 @@ public class ProcessMatcherDef
         => awle is not null && IsMatch(awle);
     public bool IsSummaryMatch([NotNullWhen(true)] Process? p)
         => p is not null && IsMatch(p);
+    public override string ToString()
+        => $"{Mode} {Value}";
 }

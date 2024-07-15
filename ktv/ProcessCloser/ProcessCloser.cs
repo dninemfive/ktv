@@ -27,14 +27,20 @@ public class ProcessCloser(Progress<string> progress, ProcessCloserConfig config
     }
     public void CloseMatchingProcesses()
     {
-        //Console.WriteLine($"{this} attempting to close matching processes...");
+        List<string> closedProcesses = new();
         foreach (Process process in Process.GetProcesses())
         {
-            if (!ProcessesToIgnore.IsMatch(process) && ProcessesToClose.IsMatch(process))
+            if (!ProcessesToIgnore.IsMatch(process) && ProcessesToClose.IsMatch(process, out List<ProcessMatcherDef> matches))
             {
-                //Report($"\t{process.FullInfo()}");
+                closedProcesses.Add($"\t{process.FullInfo()}\n\t\tMatching defs: {matches.ListNotation()}");
                 process.Close();
             }
+        }
+        if(closedProcesses.Any())
+        {
+            Report($"{this} closed the following processes:");
+            foreach (string s in closedProcesses)
+                Report(s);
         }
     }
     public override string ToString()
