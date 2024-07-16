@@ -40,13 +40,13 @@ public class KtvService(KtvConfig config, Progress<string> progress)
             TimeSpan logPeriod = TimeSpan.FromMinutes(atc.LogPeriodMinutes);
             yield return new ActiveWindowLogger(progress, logPeriod);
             if (atc.AggregationConfig is ActivityAggregationConfig aac)
-                yield return new ActiveWindowAggregator(progress, aac);
+                yield return new ActiveWindowAggregator(progress, aac, config.ProcessMatchModeImplementation);
         }
         if (config.ProcessClosers is List<ProcessCloserConfig> pccs)
         {
             foreach (ProcessCloserConfig pcc in pccs)
                 if (pcc.ProcessesToClose is not null || pcc.ProcessesToIgnore is not null)
-                    yield return new ProcessCloser(progress, pcc);
+                    yield return new ProcessCloser(progress, pcc, config.ProcessMatchModeImplementation);
         }
     }
 }

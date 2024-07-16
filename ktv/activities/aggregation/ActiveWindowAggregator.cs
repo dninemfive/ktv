@@ -7,11 +7,12 @@ namespace d9.ktv.ActivityLogger;
 /// was happening during the specified time period.
 /// </summary>
 /// <param name="period">The length of time over which to summarize the raw active window data.</param>
-public class ActiveWindowAggregator(Progress<string> progress, ActivityAggregationConfig config) 
+public class ActiveWindowAggregator(Progress<string> progress, ActivityAggregationConfig config, ProcessMatchModeImplementation pmmi) 
     : FixedPeriodTaskScheduler(progress, TimeSpan.FromMinutes(config.PeriodMinutes))
 {
     public ActivityAggregationConfig Config { get; private set; } = config;
     public GoogleCalendarEventManager? CalendarEventManager { get; private set; } = GoogleCalendarEventManager.From(config);
+    public ProcessMatchModeImplementation ProcessMatchModeImplementation { get; private set; } = pmmi;
     private DateTime _lastAggregationTime = DateTime.Now;
     /// <summary>
     ///     Gets the <see cref="ActiveWindowLogEntry">ActiveWindowLogEntries</see> during the
@@ -62,7 +63,7 @@ public class ActiveWindowAggregator(Progress<string> progress, ActivityAggregati
         }
         List<DateTime> timestamps = entries.Select(x => x.DateTime).ToList();
         TimeSpan actualDuration = time - timestamps.Min();
-        IReadOnlyDictionary<Activity, float> percentages = PercentagesFrom(CountActivities(entries.Select(Config.ActivityFor)),
+        IReadOnlyDictionary<Activity, float> percentages = PercentagesFrom(CountActivities(entries.Select(ActivityFor)),
                                                                            actualDuration,
                                                                            MinIntervalBetween(timestamps));
         CalendarEventManager?.PostFromSummary(new(percentages, time - Period, time));
@@ -106,4 +107,16 @@ public class ActiveWindowAggregator(Progress<string> progress, ActivityAggregati
     }
     public override string ToString()
         => $"{nameof(ActiveWindowAggregator)}({Config})";
+    public Activity? ActivityFor(ActiveWindowLogEntry awle)
+    {
+        if (ProcessMatchModeImplementation.AnyMatch(Config.Ignore, awle))
+            return null;
+        // todo: document that this is how things are ordered since the dictionary is unordered
+        foreach ((string categoryName, ActivityCategoryDef category) in Config.CategoryDefs.OrderBy(x => x.Key))
+            foreach (ActivityDef activity in category.ActivityDefs)
+                if (activity.Name(awle) is string name)
+                    return new(name, categoryName);
+        string? fallbackName = awle.ProcessName ?? awle.MainWindowTitle ?? awle.ProcessName;
+        return fallbackName is not null ? new(fallbackName, Config.DefaultCategoryName) : null;
+    }
 }

@@ -14,4 +14,15 @@ public class KtvConfig
             LogPeriodMinutes = 15
         }
     };
+    [JsonIgnore]
+    private ProcessMatchModeImplementation? _processMatchModeImplementation = null;
+    [JsonIgnore]
+    public ProcessMatchModeImplementation ProcessMatchModeImplementation
+    {
+        get
+        {
+            _processMatchModeImplementation ??= new(this);
+            return _processMatchModeImplementation;
+        }
+    }
 }

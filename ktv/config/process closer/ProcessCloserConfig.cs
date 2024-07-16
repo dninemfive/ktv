@@ -11,16 +11,4 @@ public class ProcessCloserConfig
     [JsonPropertyName("except")]
     public List<ProcessMatcherDef>? ProcessesToIgnore { get; set; }
     public required float PeriodMinutes { get; set; }
-    public bool ShouldClose(Process? p, DateTime dt)
-    {
-        if(ProcessesToClose is null && ProcessesToIgnore is null)
-        {
-            // never close all processes
-            // maybe include an override switch but lol
-            return false;
-        }
-        if (!(TimeConstraint?.Matches(dt) ?? false))
-            return false;
-        return !ProcessesToIgnore.IsMatch(p) && ProcessesToClose.IsMatch(p);
-    }
 }
