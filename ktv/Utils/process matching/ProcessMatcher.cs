@@ -1,2 +1,2 @@
 ﻿namespace d9.ktv;
-public delegate bool ProcessMatcher(string value, ProcessSummary summary);
+public delegate bool ProcessMatcher(ProcessMatchModeImplementation instance, string value, ProcessSummary summary);

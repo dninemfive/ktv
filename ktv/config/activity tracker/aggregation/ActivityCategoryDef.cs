@@ -15,5 +15,5 @@ public class ActivityCategoryDef
         => new() { ActivityDefs = activityDefs };
     [JsonIgnore]
     public ProcessMatcher ProcessMatcher
-        => (value, summary) => ActivityDefs.Any(x => x.IsMatch(summary));
+        => (_, value, summary) => ActivityDefs.Any(x => x.IsMatch(summary));
 }
