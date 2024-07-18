@@ -29,10 +29,6 @@ public class ProcessMatchModeImplementation : EnumImplementation<ProcessMatchMod
 #pragma warning restore CA1822
     public bool IsInCategory(string value, ProcessSummary summary)
         => Config.ActivityTracker?.AggregationConfig?.CategoryDefs.Any(x => x.Value.ProcessMatcher(this, value, summary)) ?? false;
-    public bool IsSummaryMatch(ProcessMatcherDef def, [NotNullWhen(true)] ActiveWindowLogEntry? awle)
-        => awle is not null && IsMatch(def, awle);
-    public bool IsSummaryMatch(ProcessMatcherDef def, [NotNullWhen(true)] Process? p)
-        => p is not null && IsMatch(def, p);
     public bool IsMatch(ProcessMatcherDef def, ProcessSummary summary)
         => this[def.Mode](this, def.Value, summary);
     public bool AnyMatch(List<ProcessMatcherDef>? matchers, ProcessSummary summary)

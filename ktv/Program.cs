@@ -13,6 +13,10 @@ public class Program
     public static async Task Main()
     {
         // not `using` because the service will dispose this for us
+        // todo: redo Log class with ability to use async writing.
+        // possibly just Log(params Func<object?>[] callbacks)?
+        // with static methods which act as sugar for common log stuff like writing to a file
+        // possibly also have like an `event` on it idk
         Log log = new(DateTime.Now.GenerateLogFile(), mode: Log.Mode.WriteImmediate);
         KtvConfig config;
         try

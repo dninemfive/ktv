@@ -17,9 +17,10 @@ public class GoogleCalendarEventManager
     }
     public void PostFromSummary(ActivitySummary summary)
     {
-        foreach (Activity activity in summary)
+        foreach (Activity activity in summary.Union(_startedEvents.Keys))
         {
-            if (summary[activity] >= Config.GoogleCalendar?.ActivityPercentageThreshold)
+            if (summary.TryGetValue(activity, out float percentage)
+                && percentage >= Config.GoogleCalendar?.ActivityPercentageThreshold)
             {
                 if(_startedEvents.TryGetValue(activity, out EventStartTime eventStartTime))
                 {

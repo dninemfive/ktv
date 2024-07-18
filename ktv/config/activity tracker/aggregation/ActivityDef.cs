@@ -1,4 +1,5 @@
-﻿using MatchTuple = (string name, string? value, string? regex);
+﻿using d9.utl;
+using MatchTuple = (string name, string? value, string? regex);
 
 namespace d9.ktv;
 public class ActivityDef
@@ -14,13 +15,20 @@ public class ActivityDef
         foreach ((ProcessPropertyTarget key, string regex) in Patterns)
             yield return (key.ToString().toCamelCase(), summary[key], regex);
     }
+    public override string ToString()
+        => $"ActivityDef({Patterns?.Select(x => $"{x.Key}: {x.Value}").ListNotation().PrintNull()}, {Format})";
     public string? Name(ProcessSummary? summary)
     {
+        string? report(string? value)
+        {
+            // Console.WriteLine($"{this}.Name({summary.PrintNull()}): {value.PrintNull()}");
+            return value;
+        }
         if (summary is null)
-            return null;
+            return report(null);
         if (Patterns is null)
-            return summary.AnyPropertyContains(Format) ? Format : null;
+            return report(summary.AnyPropertyContains(Format) ? Format : null);
         IEnumerable<MatchTuple> matches = Matches(summary);
-        return matches.Any(x => x.value.IsMatch(x.regex)) ? Format.RegexReplace(matches, "(.+)") : null;
+        return report(matches.Any(x => x.value.IsMatch(x.regex)) ? Format.RegexReplace(matches, "(.+)") : null);
     }
 }

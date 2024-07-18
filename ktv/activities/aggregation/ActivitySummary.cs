@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections;
 using System.Collections.Generic;
+using System.Diagnostics.CodeAnalysis;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -13,6 +14,8 @@ public class ActivitySummary(IReadOnlyDictionary<Activity, float> activities, Da
     public DateTime Start { get; private set; } = start;
     public DateTime End { get; private set; } = end;
     public float this[Activity activity] => Activities[activity];
+    public bool TryGetValue(Activity activity, [NotNullWhen(true)] out float result)
+        => Activities.TryGetValue(activity, out result);
     public IEnumerator<Activity> GetEnumerator()
         => Activities.Keys.GetEnumerator();
     IEnumerator IEnumerable.GetEnumerator()
