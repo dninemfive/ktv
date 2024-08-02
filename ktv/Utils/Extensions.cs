@@ -1,5 +1,5 @@
 ﻿using d9.utl;
-using d9.utl.compat;
+using d9.utl.compat.google;
 
 namespace d9.ktv;
 
@@ -14,7 +14,7 @@ public static class Extensions
         string result = title.PadRight(padWidth);
         return result + objects.Select(x => x.PrintNull()).Aggregate((x, y) => $"{x}\n{padding}{y}");
     }
-    public static string ToColorId(this GoogleUtils.EventColor color)
+    public static string ToColorId(this GoogleCalendar.EventColor color)
         => ((int)color).ToString();
 #pragma warning disable IDE1006 // Naming Styles: i think it's funny to have the first character be lowercase here
     public static string toCamelCase(this string s)

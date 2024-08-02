@@ -1,5 +1,6 @@
 ﻿using d9.utl.compat;
 
+using d9.utl.compat.google;
 namespace d9.ktv.tests;
 [TestClass]
 public class Tests_Extensions
@@ -17,8 +18,8 @@ public class Tests_Extensions
     [TestMethod]
     public void Test_ToColorId()
     {
-        foreach(int i in Enum.GetValuesAsUnderlyingType<GoogleUtils.EventColor>())
-            Assert.AreEqual(i.ToString(), ((GoogleUtils.EventColor)i).ToColorId());
+        foreach(int i in Enum.GetValuesAsUnderlyingType<GoogleCalendar.EventColor>())
+            Assert.AreEqual(i.ToString(), ((GoogleCalendar.EventColor)i).ToColorId());
     }
     [TestMethod]
     public void Test_toCamelCase_0LengthString()
