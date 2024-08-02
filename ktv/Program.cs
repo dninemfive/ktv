@@ -14,6 +14,7 @@ public class Program
     {
         // not `using` because the service will dispose this for us
         Log log = Log.ConsoleAndFile(DateTime.Now.GenerateLogFile(), true);
+        await log.WriteLine($"test");
         KtvConfig config;
         try
         {
@@ -24,6 +25,7 @@ public class Program
             await log.WriteLine($"Could not find valid config at expected path {Path.GetFullPath(Args.ConfigPath)}!\n{e.GetType().Name}: {e.Message}");
             return;
         }
+        // await Task.Delay(1000000);
         KtvService service = KtvService.CreateAndLog(config, log);
         await service.Run();
     }

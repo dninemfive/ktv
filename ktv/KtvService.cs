@@ -25,12 +25,20 @@ public class KtvService(KtvConfig config, Log log)
             scheduler.SetUp();
             _scheduledTasks.Add(scheduler.NextTask(now));
         }
-        while (_scheduledTasks.Any())
+        try
         {
-            Task<TaskScheduler> nextCompletedTask = await Task.WhenAny(_scheduledTasks);
-            _scheduledTasks.Remove(nextCompletedTask);
-            TaskScheduler scheduler = await nextCompletedTask;
-            _scheduledTasks.Add(scheduler.NextTask(DateTime.Now));
+            while (_scheduledTasks.Any())
+            {
+                Task<TaskScheduler> nextCompletedTask = await Task.WhenAny(_scheduledTasks);
+                _scheduledTasks.Remove(nextCompletedTask);
+                TaskScheduler scheduler = await nextCompletedTask;
+                _scheduledTasks.Add(scheduler.NextTask(DateTime.Now));
+            }
+        }
+        finally
+        {
+            await Log.WriteLine("ktv shutting down...");
+            Log.Dispose();
         }
     }
     public static IEnumerable<TaskScheduler> LoadSchedulers(KtvConfig config, Log log)
