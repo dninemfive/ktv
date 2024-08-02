@@ -25,7 +25,7 @@ public class Program
             await log.WriteLine($"Could not find valid config at expected path {Path.GetFullPath(Args.ConfigPath)}!\n{e.GetType().Name}: {e.Message}");
             return;
         }
-        KtvService service = KtvService.CreateAndLog(config, log);
+        KtvService service = await KtvService.CreateAndLog(config, log);
         await service.Run();
     }
 }

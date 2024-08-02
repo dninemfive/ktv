@@ -10,17 +10,20 @@ public class KtvService(KtvConfig config, Log log)
     private KtvConfig Config { get; set; } = config;
     private Log Log { get; set; } = log;
     private bool _running = false;
-    public static KtvService CreateAndLog(KtvConfig config, Log log)
+    public static async Task<KtvService> CreateAndLog(KtvConfig config, Log log)
     {
+        await log.WriteLine("1");
         KtvService result = new(config, log);
-        log.WriteLine(result._schedulers.MultilineListWithAlignedTitle("schedulers:"));
+        await log.WriteLine(result.PrettyPrint());
+        await log.WriteLine("2");
+        // await log.WriteLine(result._schedulers.MultilineListWithAlignedTitle("schedulers:"));
         return result;
     }
     public async Task Run()
     {
+        await Log.WriteLine("Run()");
         _running = !_running ? true : throw new Exception("Attempted to run a KtvService which was already running!");
         DateTime now = DateTime.Now;
-        await Task.Delay(1000000);
         foreach (TaskScheduler scheduler in _schedulers)
         {
             scheduler.SetUp();
@@ -46,16 +49,25 @@ public class KtvService(KtvConfig config, Log log)
     {
         if (config.ActivityTracker is ActivityTrackerConfig atc)
         {
+            log.WriteLine($"Loading activity tracker...");
             TimeSpan logPeriod = TimeSpan.FromMinutes(atc.LogPeriodMinutes);
+            log.WriteLine($"\tyielding activewindowlogger...");
             yield return new ActiveWindowLogger(logPeriod, log);
+            log.WriteLine($"\tyielding aggregator...");
             if (atc.AggregationConfig is ActivityAggregationConfig aac)
+            {
+                log.WriteLine($"\t\t{aac}");
                 yield return new ActiveWindowAggregator(aac, config.ProcessMatchModeImplementation, log);
+            }
+            log.WriteLine($"...done");
         }
         if (config.ProcessClosers is List<ProcessCloserConfig> pccs)
         {
+            log.WriteLine($"loading process closers");
             foreach (ProcessCloserConfig pcc in pccs)
                 if (pcc.ProcessesToClose is not null || pcc.ProcessesToIgnore is not null)
                     yield return new ProcessCloser(pcc, config.ProcessMatchModeImplementation, log);
         }
+        log.WriteLine($"...done");
     }
 }

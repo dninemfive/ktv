@@ -17,9 +17,21 @@ public class GoogleCalendarEventManager
     }
     public static GoogleCalendarEventManager? From(ActivityAggregationConfig config, Log log)
     {
+        log.WriteLine($"GoogleCalendarEventManager.From");
         if (config.GoogleCalendar is null)
+        {
+            log.WriteLine($"returning null");
             return null;
-        return new(config, log);
+        }
+        try
+        {
+            return new(config, log);
+        }
+        catch(Exception e)
+        {
+            log.WriteLine($"Caught {e.GetType().Name} while attempting to create GoogleCalendarEventManager: {e.Message}");
+            return null;
+        }
     }
     public void PostFromSummary(ActivitySummary summary)
     {
