@@ -20,6 +20,7 @@ public class KtvService(KtvConfig config, Log log)
     {
         _running = !_running ? true : throw new Exception("Attempted to run a KtvService which was already running!");
         DateTime now = DateTime.Now;
+        await Task.Delay(1000000);
         foreach (TaskScheduler scheduler in _schedulers)
         {
             scheduler.SetUp();
