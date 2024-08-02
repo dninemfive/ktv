@@ -1,13 +1,15 @@
-﻿namespace d9.ktv;
+﻿using d9.utl;
+
+namespace d9.ktv;
 /// <summary>
 /// Abstracts the pattern of a task scheduler which schedules a task at a fixed interval which
 /// tries to align to the current day.
 /// </summary>
 /// <param name="period"></param>
-public abstract class FixedPeriodTaskScheduler(Progress<string> logProgress, Progress<TimeFraction?> timeProgress, TimeSpan period)
-    : TaskScheduler(logProgress, timeProgress)
+public abstract class FixedPeriodTaskScheduler(TimeSpan period, Log log, Progress<TimeFraction?> timeProgress)
+    : TaskScheduler(log, timeProgress)
 {
-    public FixedPeriodTaskScheduler(Progress<string> logProgress, TimeSpan period) : this(logProgress, new(), period) { }
+    public FixedPeriodTaskScheduler(TimeSpan period, Log log) : this(period, log, new()) { }
     public TimeSpan Period => period;
     public override async Task<TaskScheduler> NextTask(DateTime time)
     {

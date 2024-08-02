@@ -7,11 +7,11 @@ namespace d9.ktv.ActivityLogger;
 /// was happening during the specified time period.
 /// </summary>
 /// <param name="period">The length of time over which to summarize the raw active window data.</param>
-public class ActiveWindowAggregator(Progress<string> progress, ActivityAggregationConfig config, ProcessMatchModeImplementation pmmi) 
-    : FixedPeriodTaskScheduler(progress, TimeSpan.FromMinutes(config.PeriodMinutes))
+public class ActiveWindowAggregator(ActivityAggregationConfig config, ProcessMatchModeImplementation pmmi, Log log) 
+    : FixedPeriodTaskScheduler(TimeSpan.FromMinutes(config.PeriodMinutes), log)
 {
     public ActivityAggregationConfig Config { get; private set; } = config;
-    public GoogleCalendarEventManager? CalendarEventManager { get; private set; } = GoogleCalendarEventManager.From(config);
+    public GoogleCalendarEventManager? CalendarEventManager { get; private set; } = GoogleCalendarEventManager.From(config, log);
     public ProcessMatchModeImplementation ProcessMatchModeImplementation { get; private set; } = pmmi;
     private DateTime _lastAggregationTime = DateTime.Now;
     /// <summary>

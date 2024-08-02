@@ -13,10 +13,6 @@ public class Program
     public static async Task Main()
     {
         // not `using` because the service will dispose this for us
-        // todo: redo Log class with ability to use async writing.
-        // possibly just Log(params Func<object?>[] callbacks)?
-        // with static methods which act as sugar for common log stuff like writing to a file
-        // possibly also have like an `event` on it idk
         Log log = Log.ConsoleAndFile(DateTime.Now.GenerateLogFile(), true);
         KtvConfig config;
         try
@@ -28,10 +24,7 @@ public class Program
             await log.WriteLine($"Could not find valid config at expected path {Path.GetFullPath(Args.ConfigPath)}!\n{e.GetType().Name}: {e.Message}");
             return;
         }
-        // todo: somehow multiple progress reports within the same method can cause a crash here
-        // probably needs a custom method which handles this, possibly aggregating reports into an async-safe collection and writing sequentially
-        Progress<string> progress = new((s) => Write(log, s));
-        KtvService service = KtvService.CreateAndLog(config, progress);
+        KtvService service = KtvService.CreateAndLog(config, log);
         await service.Run();
     }
     private static void Write(Log log, string s)

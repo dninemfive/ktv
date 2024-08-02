@@ -1,8 +1,9 @@
-﻿using System.Diagnostics;
+﻿using d9.utl;
+using System.Diagnostics;
 using System.Text.Json;
 
 namespace d9.ktv;
-public class ActiveWindowLogger(Progress<string> progress, TimeSpan period) : FixedPeriodTaskScheduler(progress, period)
+public class ActiveWindowLogger(TimeSpan period, Log log) : FixedPeriodTaskScheduler(period, log)
 {
     public override void SetUp()
     {

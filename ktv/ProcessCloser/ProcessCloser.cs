@@ -3,7 +3,7 @@ using System.Diagnostics;
 
 namespace d9.ktv;
 // future optimization: merge all ProcessClosers into one which does a decision tree of what to close
-public class ProcessCloser(Progress<string> progress, ProcessCloserConfig config, ProcessMatchModeImplementation pmmi) : TaskScheduler(progress)
+public class ProcessCloser(ProcessCloserConfig config, ProcessMatchModeImplementation pmmi, Log log) : TaskScheduler(log)
 {
     public TimeConstraint? TimeConstraint = config.TimeConstraint;
     public TimeSpan ClosePeriod { get; private set; } = TimeSpan.FromMinutes(config.PeriodMinutes);

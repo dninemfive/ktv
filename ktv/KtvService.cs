@@ -2,18 +2,18 @@
 using d9.utl;
 
 namespace d9.ktv;
-public class KtvService(KtvConfig config, Progress<string> progress)
+public class KtvService(KtvConfig config, Log log)
 {
-    private List<TaskScheduler> _schedulers = LoadSchedulers(progress, config).ToList();
+    private List<TaskScheduler> _schedulers = LoadSchedulers(config, log).ToList();
     public IReadOnlyList<TaskScheduler> Schedulers => _schedulers;
     private readonly List<Task<TaskScheduler>> _scheduledTasks = [];
     private KtvConfig Config { get; set; } = config;
-    private Progress<string> Progress { get; set; } = progress;
+    private Log Log { get; set; } = log;
     private bool _running = false;
-    public static KtvService CreateAndLog(KtvConfig config, Progress<string> progress)
+    public static KtvService CreateAndLog(KtvConfig config, Log log)
     {
-        KtvService result = new(config, progress);
-        progress.Report(result._schedulers.MultilineListWithAlignedTitle("schedulers:"));
+        KtvService result = new(config, log);
+        log.WriteLine(result._schedulers.MultilineListWithAlignedTitle("schedulers:"));
         return result;
     }
     public async Task Run()
@@ -33,20 +33,20 @@ public class KtvService(KtvConfig config, Progress<string> progress)
             _scheduledTasks.Add(scheduler.NextTask(DateTime.Now));
         }
     }
-    public static IEnumerable<TaskScheduler> LoadSchedulers(Progress<string> progress, KtvConfig config)
+    public static IEnumerable<TaskScheduler> LoadSchedulers(KtvConfig config, Log log)
     {
         if (config.ActivityTracker is ActivityTrackerConfig atc)
         {
             TimeSpan logPeriod = TimeSpan.FromMinutes(atc.LogPeriodMinutes);
-            yield return new ActiveWindowLogger(progress, logPeriod);
+            yield return new ActiveWindowLogger(logPeriod, log);
             if (atc.AggregationConfig is ActivityAggregationConfig aac)
-                yield return new ActiveWindowAggregator(progress, aac, config.ProcessMatchModeImplementation);
+                yield return new ActiveWindowAggregator(aac, config.ProcessMatchModeImplementation, log);
         }
         if (config.ProcessClosers is List<ProcessCloserConfig> pccs)
         {
             foreach (ProcessCloserConfig pcc in pccs)
                 if (pcc.ProcessesToClose is not null || pcc.ProcessesToIgnore is not null)
-                    yield return new ProcessCloser(progress, pcc, config.ProcessMatchModeImplementation);
+                    yield return new ProcessCloser(pcc, config.ProcessMatchModeImplementation, log);
         }
     }
 }
