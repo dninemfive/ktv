@@ -27,6 +27,4 @@ public class Program
         KtvService service = KtvService.CreateAndLog(config, log);
         await service.Run();
     }
-    private static void Write(Log log, string s)
-        => log.WriteLine(s);
 }
