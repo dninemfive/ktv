@@ -17,7 +17,7 @@ public class Program
         // possibly just Log(params Func<object?>[] callbacks)?
         // with static methods which act as sugar for common log stuff like writing to a file
         // possibly also have like an `event` on it idk
-        Log log = new(DateTime.Now.GenerateLogFile(), mode: Log.Mode.WriteImmediate);
+        Log log = Log.ConsoleAndFile(DateTime.Now.GenerateLogFile(), true);
         KtvConfig config;
         try
         {
@@ -25,13 +25,15 @@ public class Program
         } 
         catch(Exception e)
         {
-            log.WriteLine($"Could not find valid config at expected path {Path.GetFullPath(Args.ConfigPath)}!\n{e.GetType().Name}: {e.Message}");
+            await log.WriteLine($"Could not find valid config at expected path {Path.GetFullPath(Args.ConfigPath)}!\n{e.GetType().Name}: {e.Message}");
             return;
         }
         // todo: somehow multiple progress reports within the same method can cause a crash here
         // probably needs a custom method which handles this, possibly aggregating reports into an async-safe collection and writing sequentially
-        Progress<string> progress = new(log.WriteLine);
+        Progress<string> progress = new((s) => Write(log, s));
         KtvService service = KtvService.CreateAndLog(config, progress);
         await service.Run();
     }
+    private static void Write(Log log, string s)
+        => log.WriteLine(s);
 }

@@ -1,7 +1,6 @@
 ﻿using d9.utl;
-using d9.utl.compat;
+using d9.utl.compat.google;
 using Google.Apis.Calendar.v3.Data;
-using System.Diagnostics;
 
 namespace d9.ktv;
 public class Activity(string name, string category)
@@ -21,7 +20,7 @@ public class Activity(string name, string category)
         => HashCode.Combine(Name, Category);
     public override string ToString()
         => $"[{Category}] {Name}";
-    public Event ToEvent(DateTime start, DateTime end, GoogleUtils.EventColor color)
+    public Event ToEvent(DateTime start, DateTime end, GoogleCalendar.EventColor color)
         => new()
         {
             Summary = Name,
