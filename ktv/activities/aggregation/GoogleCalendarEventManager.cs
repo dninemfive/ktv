@@ -15,6 +15,12 @@ public class GoogleCalendarEventManager
         Context = new("google auth.json.secret".AbsoluteOrInBaseFolder(), log);
         Calendar = GoogleCalendar.CreateFrom(Context, Config.GoogleCalendar!.Id);
     }
+    private GoogleCalendarEventManager(ActivityAggregationConfig cfg, GoogleServiceContext context, GoogleCalendar calendar)
+    {
+        Config = cfg;
+        Context = context;
+        Calendar = calendar;
+    }
     public static GoogleCalendarEventManager? From(ActivityAggregationConfig config, Log log)
     {
         log.WriteLine($"GoogleCalendarEventManager.From");
@@ -23,15 +29,26 @@ public class GoogleCalendarEventManager
             log.WriteLine($"returning null");
             return null;
         }
-        try
+        log.WriteLine($"trying to load context...");
+        if (GoogleServiceContext.TryLoad("google auth.json.secret".AbsoluteOrInBaseFolder(), log) is GoogleServiceContext context)
         {
-            return new(config, log);
+            log.WriteLine($"trying to create calendar...");
+            try
+            {
+                if (GoogleCalendar.TryCreateFrom(context, config.GoogleCalendar!.Id) is GoogleCalendar calendar)
+                {
+                    log.WriteLine($"success!...");
+                    return new(config, context, calendar);
+                }
+            } 
+            catch(Exception e)
+            {
+                log.WriteLine(e.Summary());
+            }
+            log.WriteLine("failed to load calendar");
         }
-        catch(Exception e)
-        {
-            log.WriteLine($"Caught {e.GetType().Name} while attempting to create GoogleCalendarEventManager: {e.Message}");
-            return null;
-        }
+        log.WriteLine("failed to load context");
+        return null;
     }
     public void PostFromSummary(ActivitySummary summary)
     {
