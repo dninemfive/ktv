@@ -34,5 +34,5 @@ public class ProcessSummary(string? fileName = null, string? mainWindowTitle = n
         return false;
     }
     public override string ToString()
-        => $"{FileName}, {MainWindowTitle}, {ProcessName}";
+        => $"`{FileName}`, `{MainWindowTitle}`, `{ProcessName}`";
 }

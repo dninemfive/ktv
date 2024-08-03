@@ -57,5 +57,20 @@ public class Tests_ProcessMatchModeImplementation
         Assert.IsFalse(Pmmi.IsInCategory("games", new ProcessSummary(@"C:\Users\dninemfive\Music\_foobar2000\foobar2000.exe",
                                                                       "C418: Minecraft - Volume Alpha - Key [foobar2000]",
                                                                       "foobar2000")));
+        Assert.IsFalse(Pmmi.IsInCategory("games", new ProcessSummary(@"C:\Program Files\Mozilla Firefox\firefox.exe",
+                                                                      "IsInCategory process matcher produces false positives · Issue #1 · dninemfive/ktv - Mozilla Firefox", // lmao
+                                                                      "firefox")));
+        Assert.IsFalse(Pmmi.IsInCategory("games", new ProcessSummary(@"C:\Program Files\Mozilla Firefox\firefox.exe",
+                                                                      "",
+                                                                      "firefox")));
+        Assert.IsFalse(Pmmi.IsInCategory("games", new ProcessSummary(@"C:\Program Files\Microsoft Office\Root\Office16\EXCEL.EXE",
+                                                                      "diet6.xlsx - Excel",
+                                                                      "EXCEL")));
+        Assert.IsFalse(Pmmi.IsInCategory("games", new ProcessSummary(@"C:\Users\dninemfive\AppData\Local\Obsidian\Obsidian.exe",
+                                                                      "BsStd 3 - Signage - obsidian - Obsidian v1.6.7",
+                                                                      "Obsidian")));
+        Assert.IsFalse(Pmmi.IsInCategory("games", new ProcessSummary(@"C:\Users\dninemfive\AppData\Local\Obsidian\Obsidian.exe",
+                                                                      "",
+                                                                      "Obsidian")));
     }
 }

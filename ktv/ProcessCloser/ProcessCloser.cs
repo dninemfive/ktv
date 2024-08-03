@@ -46,7 +46,7 @@ public class ProcessCloser(ProcessCloserConfig config, ProcessMatchModeImplement
             if (!ProcessMatchModeImplementation.AnyMatch(ProcessesToIgnore, process) 
                 && ProcessMatchModeImplementation.AnyMatch(ProcessesToClose, process, out List<ProcessMatcherDef> matches))
             {
-                closedProcesses.Add($"\t{process.FullInfo()}\n\t\tMatching defs: {matches.ListNotation()}");
+                closedProcesses.Add($"\t{new ProcessSummary(process)}\n\t\tMatching defs: {matches.ListNotation()}");
                 process.Close();
             }
         }
