@@ -12,16 +12,12 @@ public class KtvService(KtvConfig config, Log log)
     private bool _running = false;
     public static async Task<KtvService> CreateAndLog(KtvConfig config, Log log)
     {
-        await log.WriteLine("1");
         KtvService result = new(config, log);
-        await log.WriteLine(result.PrettyPrint());
-        await log.WriteLine("2");
-        // await log.WriteLine(result._schedulers.MultilineListWithAlignedTitle("schedulers:"));
+        await log.WriteLine(result._schedulers.MultilineListWithAlignedTitle("schedulers:"));
         return result;
     }
     public async Task Run()
     {
-        await Log.WriteLine("Run()");
         _running = !_running ? true : throw new Exception("Attempted to run a KtvService which was already running!");
         DateTime now = DateTime.Now;
         foreach (TaskScheduler scheduler in _schedulers)

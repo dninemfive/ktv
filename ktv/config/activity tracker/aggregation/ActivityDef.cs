@@ -29,6 +29,7 @@ public class ActivityDef
         if (Patterns is null)
             return report(summary.AnyPropertyContains(Format) ? Format : null);
         IEnumerable<MatchTuple> matches = Matches(summary);
-        return report(matches.Any(x => x.value.IsMatch(x.regex)) ? Format.RegexReplace(matches, "(.+)") : null);
+        // document: change from .Any() to .All()
+        return report(matches.All(x => x.value.IsMatch(x.regex)) ? Format.RegexReplace(matches, "(.+)") : null);
     }
 }

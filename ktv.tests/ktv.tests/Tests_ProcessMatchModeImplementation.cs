@@ -9,6 +9,8 @@ namespace d9.ktv.tests;
 [TestClass]
 public class Tests_ProcessMatchModeImplementation
 {
+    // todo: just copy current config to a static thing and load it here
+    // didn't catch the issue with IsInCategory bc i only included one category for "simplicity"
     public ProcessMatchModeImplementation Pmmi = new(new KtvConfig()
     {
         ActivityTracker = new()
