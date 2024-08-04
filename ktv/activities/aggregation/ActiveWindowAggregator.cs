@@ -7,12 +7,13 @@ namespace d9.ktv.ActivityLogger;
 /// was happening during the specified time period.
 /// </summary>
 /// <param name="period">The length of time over which to summarize the raw active window data.</param>
-public class ActiveWindowAggregator(ActivityAggregationConfig config, ProcessMatchModeImplementation pmmi, Log log) 
+public class ActiveWindowAggregator(ActivityAggregationConfig config, ProcessMatchModeImplementation pmmi, string logFolderPath, Log log) 
     : FixedPeriodTaskScheduler(TimeSpan.FromMinutes(config.PeriodMinutes), log)
 {
     public ActivityAggregationConfig Config { get; private set; } = config;
     public GoogleCalendarEventManager? CalendarEventManager { get; private set; } = GoogleCalendarEventManager.From(config, log);
     public ProcessMatchModeImplementation ProcessMatchModeImplementation { get; private set; } = pmmi;
+    public string LogFolderPath => logFolderPath;
     private DateTime _lastAggregationTime = DateTime.Now;
     /// <summary>
     ///     Gets the <see cref="ActiveWindowLogEntry">ActiveWindowLogEntries</see> during the
@@ -31,7 +32,7 @@ public class ActiveWindowAggregator(ActivityAggregationConfig config, ProcessMat
     /// </remarks>
     public static IEnumerable<ActiveWindowLogEntry> EntriesBetween(DateTime start, DateTime end)
     {
-        foreach (string fileName in ActiveWindowLogUtils.FileNamesFor(start, end))
+        foreach (string fileName in ActiveWindowLogger.FileNamesFor(start, end))
         {
             if (!File.Exists(fileName))
                 continue;

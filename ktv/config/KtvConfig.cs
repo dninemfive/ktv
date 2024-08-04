@@ -1,4 +1,5 @@
-﻿using System.Text.Json.Serialization;
+﻿using d9.utl;
+using System.Text.Json.Serialization;
 
 namespace d9.ktv;
 public class KtvConfig
@@ -25,4 +26,6 @@ public class KtvConfig
             return _processMatchModeImplementation;
         }
     }
+    [JsonIgnore]
+    public readonly string BasePath = Config.BaseFolderPath;
 }

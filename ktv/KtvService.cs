@@ -46,7 +46,7 @@ public class KtvService(KtvConfig config, Log log)
         if (config.ActivityTracker is ActivityTrackerConfig atc)
         {
             TimeSpan logPeriod = TimeSpan.FromMinutes(atc.LogPeriodMinutes);
-            yield return new ActiveWindowLogger(logPeriod, log);
+            yield return new ActiveWindowLogger(Path.Join(config.BasePath, "logs", "active window"), logPeriod, log);
             if (atc.AggregationConfig is ActivityAggregationConfig aac)
             {
                 yield return new ActiveWindowAggregator(aac, config.ProcessMatchModeImplementation, log);
