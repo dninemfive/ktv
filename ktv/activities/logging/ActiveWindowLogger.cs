@@ -3,17 +3,16 @@ using System.Diagnostics;
 using System.Text.Json;
 
 namespace d9.ktv;
-public class ActiveWindowLogger(string logFolderPath, TimeSpan period, Log log) : FixedPeriodTaskScheduler(period, log)
+public class ActiveWindowLogger(ActiveWindowLog activityLog, TimeSpan period, Log log) : FixedPeriodTaskScheduler(period, log)
 {
-    public static TimeSpan FileDuration => TimeSpan.FromMinutes(15);
-    public string LogFolderPath => logFolderPath;
+    public ActiveWindowLog ActivityLog => activityLog;
     public override void SetUp()
     {
-        _ = Directory.CreateDirectory(LogFolderPath);
+        _ = Directory.CreateDirectory(ActivityLog.FolderPath);
     }
     protected override TaskScheduler NextTaskInternal(DateTime time)
     {
-        LogActiveWindow(FileNameFor(time));
+        LogActiveWindow(ActivityLog.FileNameFor(time));
         return this;
     }
     private static void LogActiveWindow(string fileName)
@@ -24,21 +23,4 @@ public class ActiveWindowLogger(string logFolderPath, TimeSpan period, Log log) 
     }
     public override string ToString()
         => $"{typeof(ActiveWindowLogger).Name}({Period})";
-    public static string FileNameFor(DateTime time)
-    {
-        time = time.Floor(TimeSpan.FromMinutes(15));
-        string fileName = Path.Join("logs", "ktv", $"{time.Format()}.activewindow.log");
-        if (!File.Exists(fileName))
-            File.AppendAllText(fileName, "");
-        return fileName;
-    }
-    public static IEnumerable<string> FileNamesFor(DateTime start, DateTime end)
-    {
-        DateTime cur = start;
-        while (cur < end)
-        {
-            yield return FileNameFor(cur);
-            cur += FileDuration;
-        }
-    }
 }
