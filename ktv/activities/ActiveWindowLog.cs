@@ -4,7 +4,7 @@ namespace d9.ktv;
 public class ActiveWindowLog(string baseFolder, TimeSpan? fileDuration = null)
 {
     public readonly TimeSpan FileDuration = fileDuration ?? TimeSpan.FromMinutes(15);
-    public readonly string FolderPath = Path.Join(baseFolder, "logs", "active window");
+    public readonly string FolderPath = Path.Join(baseFolder);
     public string FileNameFor(DateTime time)
     {
         time = time.Floor(TimeSpan.FromMinutes(15));

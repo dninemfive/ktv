@@ -14,7 +14,7 @@ public class Program
     {
         // not `using` because the service will dispose this for us
         Log log = new(Log.Components.Console, Log.Components.WriteTextTo(DateTime.Now.GenerateLogFile()));
-        await log.WriteLine(Config.BaseFolderPath);
+        await log.WriteLine($"Starting ktv in {Config.BaseFolderPath}...");
         KtvConfig config;
         try
         {
