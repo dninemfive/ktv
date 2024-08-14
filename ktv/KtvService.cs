@@ -7,7 +7,7 @@ public class KtvService(KtvConfig config, Log log)
     private List<TaskScheduler> _schedulers = LoadSchedulers(config, log).ToList();
     public IReadOnlyList<TaskScheduler> Schedulers => _schedulers;
     private readonly List<Task<TaskScheduler>> _scheduledTasks = [];
-    private KtvConfig Config { get; set; } = config;
+    public KtvConfig Config { get; private set; } = config;
     private Log Log { get; set; } = log;
     private bool _running = false;
     public static async Task<KtvService> CreateAndLog(KtvConfig config, Log log)

@@ -28,4 +28,25 @@ public class KtvConfig
     }
     [JsonIgnore]
     public readonly string BasePath = Config.BaseFolderPath;
+    public bool IsInCategory(string value, ProcessSummary summary)
+    {
+        bool result = false;
+        if (ActivityTracker is ActivityTrackerConfig atc)
+        {
+            if (atc.AggregationConfig is ActivityAggregationConfig aac)
+            {
+                if (aac.CategoryDefs.TryGetValue(value, out ActivityCategoryDef? acd))
+                {
+                    foreach (ActivityDef ad in acd.ActivityDefs)
+                    {
+                        if (ad.IsMatch(summary))
+                        {
+                            result = true;
+                        }
+                    }
+                }
+            }
+        }
+        return result;
+    }
 }

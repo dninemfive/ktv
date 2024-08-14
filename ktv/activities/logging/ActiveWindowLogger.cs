@@ -23,4 +23,6 @@ public class ActiveWindowLogger(ActiveWindowLog activityLog, TimeSpan period, Lo
     }
     public override string ToString()
         => $"{typeof(ActiveWindowLogger).Name}({Period})";
+
+    public event EventHandler<ProcessSummary> OnActiveWindowLogged;
 }

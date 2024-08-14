@@ -9,13 +9,10 @@ using System.Threading.Tasks;
 using Google.Apis.Calendar.v3.Data;
 
 namespace d9.ktv;
-public class ProcessMatchModeImplementation : EnumImplementation<ProcessMatchMode, ProcessMatcher>
+public class ProcessMatchModeImplementation(KtvConfig config) : EnumImplementation<ProcessMatchMode, ProcessMatcher>()
 {
-    public KtvConfig Config { get; private set; }
-    public ProcessMatchModeImplementation(KtvConfig config) : base()
-    {
-        Config = config;
-    }
+    public KtvConfig Config { get; private set; } = config;
+
     private static bool PropertyMatches(string? propertyValue, string regex)
         => propertyValue?.IsMatch(regex) ?? false;
 #pragma warning disable CA1822 // Mark members as static: need to be instance members for new EnumImplementation constructor

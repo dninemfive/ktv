@@ -29,6 +29,7 @@
   <ItemGroup>
     <PackageReference Include="Google.Apis.Calendar.v3" Version="1.68.0.3473" />
     <PackageReference Include="HueApi" Version="1.6.3" />
+    <PackageReference Include="HueApi.ColorConverters" Version="1.5.1" />
   </ItemGroup>
 
   <ItemGroup>
