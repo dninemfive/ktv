@@ -2,7 +2,7 @@
 using MatchTuple = (string name, string? value, string? regex);
 
 namespace d9.ktv;
-public class ActivityDef
+public class ProcessMatchDef
 {
     public Dictionary<ProcessPropertyTarget, string>? Patterns { get; set; }
     public required string Format { get; set; }
@@ -16,20 +16,14 @@ public class ActivityDef
             yield return (key.ToString().toCamelCase(), summary[key], regex);
     }
     public override string ToString()
-        => $"ActivityDef({Patterns?.Select(x => $"{x.Key}: {x.Value}").ListNotation().PrintNull()}, {Format})";
+        => $"ProcessMatchDef({Patterns?.Select(x => $"{x.Key}: {x.Value}").ListNotation().PrintNull()}, {Format})";
     public string? Name(ProcessSummary? summary)
     {
-        string? report(string? value)
-        {
-            // Console.WriteLine($"{this}.Name({summary.PrintNull()}): {value.PrintNull()}");
-            return value;
-        }
         if (summary is null)
-            return report(null);
+            return null;
         if (Patterns is null)
-            return report(summary.AnyPropertyContains(Format) ? Format : null);
+            return summary.AnyPropertyContains(Format) ? Format : null;
         IEnumerable<MatchTuple> matches = Matches(summary);
-        // document: change from .Any() to .All()
-        return report(matches.All(x => x.value.IsMatch(x.regex)) ? Format.RegexReplace(matches, "(.+)") : null);
+        return matches.All(x => x.value.IsMatch(x.regex)) ? Format.RegexReplace(matches, "(.+)") : null;
     }
 }

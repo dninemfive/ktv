@@ -113,8 +113,8 @@ public class ActiveWindowAggregator(ActivityAggregationConfig config, ProcessMat
         if (ProcessMatchModeImplementation.AnyMatch(Config.Ignore, awle))
             return null;
         // todo: document that this is how things are ordered since the dictionary is unordered
-        foreach ((string categoryName, ActivityCategoryDef category) in Config.CategoryDefs.OrderBy(x => x.Key))
-            foreach (ActivityDef activity in category.ActivityDefs)
+        foreach ((string categoryName, CategoryDef category) in Config.CategoryDefs.OrderBy(x => x.Key))
+            foreach (ProcessMatchDef activity in category.ProcessMatchDefs)
                 if (activity.Name(awle) is string name)
                     return new(name, categoryName);
         string? fallbackName = awle.ProcessName ?? awle.MainWindowTitle ?? awle.ProcessName;

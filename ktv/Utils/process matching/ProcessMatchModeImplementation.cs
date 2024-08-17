@@ -37,9 +37,9 @@ public class ProcessMatchModeImplementation : EnumImplementation<ProcessMatchMod
         {
             if(atc.AggregationConfig is ActivityAggregationConfig aac)
             {
-                if(aac.CategoryDefs.TryGetValue(value, out ActivityCategoryDef? acd))
+                if(aac.CategoryDefs.TryGetValue(value, out CategoryDef? acd))
                 {
-                    foreach (ActivityDef ad in acd.ActivityDefs)
+                    foreach (ProcessMatchDef ad in acd.ProcessMatchDefs)
                     {
                         // Console.WriteLine($"\t\t{ad.Format}: {ad.Name(summary)}\t{ad.IsMatch(summary)}");
                         if (ad.IsMatch(summary))
