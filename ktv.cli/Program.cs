@@ -1,6 +1,6 @@
 ﻿using d9.utl;
 
-namespace d9.ktv;
+namespace d9.ktv.cli;
 
 public class Program
 {
@@ -19,8 +19,8 @@ public class Program
         try
         {
             config = Config.Load<KtvConfig>(Args.ConfigPath);
-        } 
-        catch(Exception e)
+        }
+        catch (Exception e)
         {
             await log.WriteLine($"Could not find valid config at expected path {Path.GetFullPath(Args.ConfigPath)}!\n{e.GetType().Name}: {e.Message}");
             return;
