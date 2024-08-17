@@ -1,15 +1,6 @@
 ﻿using d9.utl;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using HueApi;
-using HueApi.ColorConverters;
-using HueApi.ColorConverters.HSB;
-using HueApi.Models;
 using d9.utl.compat.google;
-using d9.ktv.ActivityLogger;
+using HueApi.ColorConverters.HSB;
 
 namespace d9.ktv;
 public class HueSynchronizer
@@ -50,18 +41,10 @@ public class HueSynchronizationConfig
 }
 public static class HueExtensions
 {
-    public static HSB AverageToward(this HSB old, HSB @new, double alpha)
+    public static HSB AverageHueToward(this HSB old, HSB @new, double alpha)
     {
-        int avg(int a, int b)
-            => (int)(alpha * a + (1 - alpha) * b);
-        return new(avg(old.Hue, @new.Hue), avg(old.Saturation, @new.Saturation), avg(old.Brightness, @new.Brightness));
+        // hue is an angle, so we want to make sure it takes the shortest path from old to new
     }
     public static HSB WithBrightness(this HSB val, double brightness)
         => new(val.Hue, val.Saturation, (int)(brightness * 255));
-    public static string HexCode(this GoogleCalendar.EventColor eventColor)
-        => eventColor switch
-        {
-            GoogleCalendar.EventColor.Lavender => "#7986cb",
-            GoogleCalendar.EventColor.Sage
-        };
 }
