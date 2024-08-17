@@ -4,36 +4,26 @@ using d9.utl;
 namespace d9.ktv;
 public class KtvService(KtvConfig config, Log log)
 {
-    private List<TaskScheduler> _schedulers = LoadSchedulers(config, log).ToList();
-    public IReadOnlyList<TaskScheduler> Schedulers => _schedulers;
-    private readonly List<Task<TaskScheduler>> _scheduledTasks = [];
+    public readonly TaskManager TaskManager = new(LoadSchedulers(config, log));
     public KtvConfig Config { get; private set; } = config;
     private Log Log { get; set; } = log;
     private bool _running = false;
     public static async Task<KtvService> CreateAndLog(KtvConfig config, Log log)
     {
         KtvService result = new(config, log);
-        await log.WriteLine(result._schedulers.MultilineListWithAlignedTitle("schedulers:"));
+        await log.WriteLine(result.TaskManager.MultilineListWithAlignedTitle("schedulers:"));
         return result;
     }
     public async Task Run()
     {
         _running = !_running ? true : throw new Exception("Attempted to run a KtvService which was already running!");
-        DateTime now = DateTime.Now;
-        foreach (TaskScheduler scheduler in _schedulers)
-        {
-            scheduler.SetUp();
-            _scheduledTasks.Add(scheduler.NextTask(now));
-        }
         try
         {
-            while (_scheduledTasks.Any())
-            {
-                Task<TaskScheduler> nextCompletedTask = await Task.WhenAny(_scheduledTasks);
-                _scheduledTasks.Remove(nextCompletedTask);
-                TaskScheduler scheduler = await nextCompletedTask;
-                _scheduledTasks.Add(scheduler.NextTask(DateTime.Now));
-            }
+            await TaskManager.Run();
+        }
+        catch(Exception e)
+        {
+            await Log.WriteLine($"KtvService.Run(): caught {e.Summary()}");
         }
         finally
         {

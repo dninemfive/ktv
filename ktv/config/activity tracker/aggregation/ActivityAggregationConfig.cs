@@ -1,4 +1,5 @@
-﻿using d9.utl.compat.google;
+﻿using d9.utl;
+using d9.utl.compat.google;
 using System.Text.Json.Serialization;
 namespace d9.ktv;
 public class ActivityAggregationConfig
@@ -15,5 +16,14 @@ public class ActivityAggregationConfig
         if (CategoryDefs.TryGetValue(category, out ActivityCategoryDef? def) && def.EventColor is GoogleCalendar.EventColor color)
             return color;
         return GoogleCalendar?.DefaultColor ?? throw new Exception($"Attempted to get default Google Calendar color without a valid config!");
+    }
+    public ActivityCategoryDef? Categorize(ProcessSummary summary)
+    {
+        // todo: document that this is how things are ordered since the dictionary is unordered
+        foreach ((string categoryName, ActivityCategoryDef category) in CategoryDefs.OrderBy(x => x.Key))
+            foreach (ActivityDef activity in category.ActivityDefs)
+                if (activity.Name(summary) is string name)
+                    return category;
+        return null;
     }
 }
