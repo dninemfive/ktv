@@ -13,7 +13,10 @@ public class Program
     public static async Task Main()
     {
         // not `using` because the service will dispose this for us
-        Log log = new(Log.Components.Console, Log.Components.WriteTextTo(DateTime.Now.GenerateLogFile()));
+        List<ILogComponent> components = [Log.Components.WriteTextTo(DateTime.Now.GenerateLogFile())];
+        if (Args.PrintToConsole)
+            components.Add(Log.Components.Console);
+        Log log = new([.. components]);
         await log.WriteLine($"Starting ktv in {Config.BaseFolderPath}...");
         KtvConfig config;
         try
